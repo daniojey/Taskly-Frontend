@@ -8,10 +8,15 @@ function HomePage() {
     useEffect(() => {
         const getProducts = async () => {
             try {
+                // const item = localStorage.setItem('accessToken', null)
+                const accessToken = localStorage.getItem('accessToken')
+
+                // console.log('ACCESSS', accessToken)
+
                 const response = await api.get(
                     'api/v1/groups/', {
                         headers: {
-                            Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU2MjI5OTExLCJpYXQiOjE3NTYyMjgxMTEsImp0aSI6IjZjYTk0ZDlhM2U1ZTQ0YzY4ZDVkMGUwNzg2OTU5ODZiIiwidXNlcl9pZCI6IjEifQ.0uFE19Ejh59GnmSlZD86dJGPEvs6Dm1OkYZ0HGn0Pvw'
+                            Authorization: `Bearer ${accessToken}`
                         }
                     }
                 );
