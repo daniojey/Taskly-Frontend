@@ -56,7 +56,7 @@ api.interceptors.response.use(
                       return Promise.reject(error)
                     }
 
-                    const newAccessToken = refreshTokenCall(refreshResponse)
+                    const newAccessToken =await refreshTokenCall(refreshResponse)
                     // console.log(refreshResponse)
 
                     localStorage.setItem('accessToken', newAccessToken);
