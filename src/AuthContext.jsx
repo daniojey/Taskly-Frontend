@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, { useState, useEffect, createContext, useMemo, useCallback } from "react";
 import { api } from "../api";
 import Cookies from "js-cookie";
 import { verifyToken } from "../tokens_func";
@@ -11,65 +11,67 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(false)
     const [isLogin, setIsLogin] = useState(false)
     const [error, setError] = useState(null)
-    const [authChecked, setAuthCheked] = useState(false);
-    const [auth, setAuth] = useState({
-        accessToken: null,
-        refreshToken: null
-    })
+    const [showLoading, setShowLoading] = useState(true)
+    console.log('🔄 AuthProvider создается/перерендеривается') 
 
     useEffect(() => {
-        const getCSRF = async () => {
+        console.log('🚀 Инициализация сессии запущена')
+
+        const inicializeSession = async () => {
             setLoading(true)
             try {
-                const response = await api.get('api/v1/csrf/')
+                try {
+                    const response = await api.get('api/v1/csrf/')
 
-                // const data =await response.data
-                // console.log(data.csrfToken)
-                // console.log(response.headers)
+                    // const data =await response.data
+                    // console.log(data.csrfToken)
+                    // console.log(response.headers)
 
-                const data = await response.data
+                    const data = await response.data
 
-                // if (data) {
-                //     console.log(Cookies.get('csrftoken'))
-                // }
-                // const newToken = response.headers['csrftoken'];
-                // document.cookie = `csrftoken=${newToken}; Path=/; Secure; SameSite=None`;
-            } catch (error) {
-                console.log(error)
-            }
-        }
+                    // if (data) {
+                    //     console.log(Cookies.get('csrftoken'))
+                    // }
+                    // const newToken = response.headers['csrftoken'];
+                    // document.cookie = `csrftoken=${newToken}; Path=/; Secure; SameSite=None`;
+                } catch (error) {
+                    console.log(error)
+                }
 
-        const checkAuth = async () => {
-            try {
-                const accessTokenStorage = localStorage.getItem('accessToken')
 
-                const response = await verifyToken(accessTokenStorage)
+                try {
+                    const accessTokenStorage = localStorage.getItem('accessToken')
 
-                if (response?.user) {
-                    setUser(response?.user);
-                    localStorage.setItem('user', JSON.stringify(response?.user))
-                } else {
+                    const response = await verifyToken(accessTokenStorage)
+
+                    if (response?.user) {
+                        setUser(response?.user);
+                        localStorage.setItem('user', JSON.stringify(response?.user))
+                    } else {
+                        setUser(null)
+                        localStorage.removeItem('user')
+                    }
+                } catch (err) {
                     setUser(null)
                     localStorage.removeItem('user')
+                } finally {
                 }
-            } catch (err) {
-                setUser(null)
-                localStorage.removeItem('user')
-                setAuthCheked(false)
+
+
+            } catch (error) {
+                console.log(error)
             } finally {
-                setLoading(false);
-                setAuthCheked(true)
+                setLoading(false)
+                setTimeout(() => {
+                    setShowLoading(false)
+                }, 1500)
             }
-            
         }
 
-        checkAuth()
-        getCSRF()
-
-        setLoading(false)
+        inicializeSession()
     }, [])
 
-    const login = async (username, password) => {
+    const login = useCallback(async (username, password) => {
         try {
             const response = await api.post('/api/v1/token/',
                 { username, password },
@@ -107,11 +109,27 @@ export const AuthProvider = ({ children }) => {
         } finally {
             setIsLogin(false)
         }
-    }
+    }, [])
+
+    const contextValue =  useMemo(() => ({
+        user,
+        login,
+        loading,
+        isLogin,
+        error
+    }), [user, login, loading, isLogin, error])
 
     return (
-        <AuthContext.Provider value={{user, login, isLogin, error, authChecked}}>
-            {loading ? <div className="Loading-container">Loading...</div> : children}
+        <AuthContext.Provider value={contextValue}>
+            {children}
+            
+            {showLoading && (
+                <div className={`loading-overlay ${!loading ? 'fade-out' : ''}`}>
+                    <div className="Loading-container">
+                        Loading...
+                    </div>
+                </div>
+            )}
         </AuthContext.Provider>
     )
 }
