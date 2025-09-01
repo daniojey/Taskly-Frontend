@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }) => {
                 },
             )
 
-            setUser(userResponse.user);
+            setUser(userResponse.data.user);
             setError(null)
             console.log(userResponse.user)
             return true
@@ -111,13 +111,30 @@ export const AuthProvider = ({ children }) => {
         }
     }, [])
 
+
+    const logout = useCallback(async () => {
+        
+        try {
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('refreshToken')
+        } catch (error) {
+            console.error(error)
+        }
+
+        setUser(null)
+
+        console.log('ВСЁ удалено')
+    }, [])
+
     const contextValue =  useMemo(() => ({
         user,
         login,
+        logout,
         loading,
         isLogin,
-        error
-    }), [user, login, loading, isLogin, error])
+        error,
+        showLoading
+    }), [user, login, logout, loading, isLogin, error, showLoading])
 
     return (
         <AuthContext.Provider value={contextValue}>

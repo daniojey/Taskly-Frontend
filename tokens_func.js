@@ -41,3 +41,10 @@ export async function verifyToken(token) {
         return null
     }
 }
+
+
+export function getAccessToken() {
+    const accessToken = localStorage.getItem('accessToken')
+
+    return `Bearer ${accessToken}`
+}

@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react'
-import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router'
-import Homepage from './pages/HomePage/HomePage'
-import ProfilePage from './pages/ProfilePage/ProfilePage'
-import Header from './components/Header/Header'
+
 import { api } from '../api'
 import { AuthProvider } from './AuthContext'
+
+import './App.css'
+
+import Header from './components/Header/Header'
+
+import Homepage from './pages/HomePage/HomePage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
 import LoginPage from './pages/LoginPage/LoginPage'
+import ProtectedRoute from './ProtectedRoute'
+import GroupsPage from './pages/GroupsPage/GroupsPage'
 
 
 function App() {
@@ -19,8 +25,19 @@ function App() {
 
           <Routes>
             <Route path='/' element={<Homepage />} />
-            <Route path='/profile' element={<ProfilePage />} />
+            <Route path='/profile/' element={<ProfilePage />} />
             <Route path='/login' element={<LoginPage />} />
+            <Route path='/groups/' element={
+                <ProtectedRoute>
+                  <GroupsPage/>
+                </ProtectedRoute>
+            } />
+            <Route path='/groups/:groupId' element={
+                <ProtectedRoute>
+                  <GroupsPage/>
+                </ProtectedRoute>
+            } />
+
           </Routes>
         </AuthProvider>
       </Router>

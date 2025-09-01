@@ -51,7 +51,7 @@
 .header-authenticate-body {
     display: flex;
 
-    a {
+    a, button {
         display: flex;
         justify-content: center;
         align-items: center;
