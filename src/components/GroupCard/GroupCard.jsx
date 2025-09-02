@@ -1,12 +1,21 @@
+import DynamicPngIcon from "../UI/icons/DynamicPngIcon"
+import './GroupCard.css'
 
 function GroupCard({ props }) {
-    const { id, name } = props
+    const { index , id, name, members, projects } = props
+    console.log(props)
 
     return (
         <>
-            <div className="group-card__body">
+            <div 
+            className={props?.created ? "group-card__body created" : "group-card__body" }
+            style={{ animationDelay: `${index * 0.15}s` }} 
+            >
+                <DynamicPngIcon iconName="groupIcon" className="groupIcon"/>
                 <div className="group-card__body-text">
-                    {name}
+                    <h3>{name}</h3>
+                    <p>members: {members ? Object.keys(members).length : Error}</p>
+                    <p>projects: {projects ? Object.keys(projects).length: Error}</p>
                 </div>
             </div>
         </>

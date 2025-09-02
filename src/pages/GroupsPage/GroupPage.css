@@ -1,0 +1,208 @@
+.group-navigation-block {
+    display: flex;
+    width: 100%;
+    max-width: 1300px;
+    padding: 24px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    margin: 20px auto;
+    font-family: var(--main-font);
+    align-items: center;
+    justify-content: space-between;
+    animation: borderAnimated 1.5s ease-in-out forwards;
+    animation-delay: 0.3s;
+
+    button {
+        display: flex;
+        color: rgb(0, 0, 0);
+        background-color: rgb(0, 137, 250);
+        padding: 10px 35px;
+        font-size: 1.1rem;
+        font-weight: 200;
+        border-radius: 12px;
+        transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
+
+        &:hover {
+            background-color: white;
+        }
+    }
+
+    &:hover {
+        animation: borderAnimated 1.5s ease-in-out infinite forwards;
+    }
+}
+
+
+.group-navigation-block__filter {
+    display: flex;
+    align-items: center;
+
+    label {
+        display: flex;
+        font-size: 1.3rem;
+        margin-right: 10px;
+    }
+
+    select {
+        height: 45px;
+        padding: 10px 40px 10px 10px;
+        color: #FFF;
+        font-family: Roboto;
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 146%; /* 26.28px */
+        background: rgb(0, 0, 0);
+        border: 1px solid rgb(0, 137, 250);
+        border-radius: 12px;
+        appearance: none; /* Убираем стандартную стрелочку */
+        background-image: url('https://teststepbucket.s3.amazonaws.com/icons/create_test_arrow.svg'); /* Добавляем свою стрелку */
+        background-repeat: no-repeat;
+        background-position: right 10px center; /* Положение стрелки */
+        background-size: 24px; /* Размер стрелки */
+        transition: outline 0.4s ease-in, box-shadow 0.4s ease-in-out;
+
+        &:focus {
+            outline: 1px solid rgb(0, 137, 250);
+            box-shadow: 2px 3px 3px rgb(0, 137, 250);
+        }
+    }
+}
+
+.group-form-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 0px;
+    max-width: 1300px;
+    margin: 10px auto;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    background-color: black;
+    interpolate-size: allow-keywords;
+    transition: all 0.4s ease-in-out;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    gap: 20px;
+    
+    h2 {
+        display: flex;
+        font-family: var(--main-font-bold);
+        font-weight: 700;
+        font-size: 1.6rem;
+    }
+
+    input {
+        display: flex;
+        width: 100%;
+        max-width: 400px;
+        box-sizing: border-box;
+        padding: 15px 20px;
+        border: 1px solid white;
+        background-color: rgb(15, 15, 15);
+        border-radius: 12px;
+        transition: border 0.4s ease, outline 0.3s ease-in-out;
+        margin-bottom: 20px;
+        font-family: var(--main-font);
+        font-size: 1rem;
+
+        &:focus {
+            border: 1px solid rgb(0, 137, 250);
+            outline: 1px solid rgb(0, 137, 250);
+        }
+    }
+
+    button {
+        display: flex;
+        color: rgb(0, 0, 0);
+        background-color: rgb(0, 137, 250);
+        padding: 10px 35px;
+        font-size: 1.1rem;
+        font-weight: 200;
+        border-radius: 12px;
+        transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
+
+        &:hover {
+            background-color: white;
+        }
+    }
+}
+
+.group-form-body.active {
+    border: 0.3px solid rgb(255, 255, 255, 0.2);
+    padding: 24px;
+    min-height: 35%;
+}
+
+.active-button {
+  background-color: white !important;
+
+  &:hover {
+    background-color: rgb(0, 137, 250) !important;
+  }
+}
+
+/* @keyframes heightIn {
+    0% {
+        height: 0;
+        overflow: hidden;
+    }
+
+    50% {
+        padding: 24px;
+    }
+
+    100% {
+        height: 500px;
+        overflow: visible;
+    }
+}
+ */
+
+
+.group-cards-body {
+    display: grid;
+    width: 100%;
+    max-width: 1300px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-auto-rows: 150px;
+    gap: 20px 20px;
+    align-items: start;
+    justify-content: center;
+    padding: 0px 40px;
+    box-sizing: border-box;
+    margin: 20px auto;
+    border-left: 0.3px solid rgb(255, 255, 255, 0.1);
+    border-right: 0.3px solid rgb(255, 255, 255, 0.1);
+}
+
+
+@keyframes borderAnimated {
+    0% {
+        border: 0px solid rgb(0, 0, 0);
+    }
+
+    10% {
+        border-top: 1px solid white;
+    }
+
+    25% {
+        border-right: 1px solid white;
+    }
+
+    50% {
+        border-bottom: 1px solid white;
+    }
+
+    75% {
+        border-left: 1px solid white;
+    }
+
+    100% {
+        border: 0.3px solid rgb(255, 255, 255, 0.2);
+    }
+}

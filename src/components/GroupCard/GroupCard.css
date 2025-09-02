@@ -1,0 +1,75 @@
+.group-card__body {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 150px;
+    border-radius: 12px;
+    background-color: black;
+    color: rgb(255, 255, 255);
+    padding: 26px 24px 24px 24px;
+    box-sizing: border-box;
+    flex-direction: column;
+    border: 0.5px solid rgb(0, 137, 250);
+    box-shadow: 2px 3px 3px rgb(0, 137, 250);
+    transition: all 0.3s ease-out;
+    transform: scale(0);
+    animation: scaleIn 0.5s ease forwards;
+    cursor: pointer;
+
+    &:hover {
+        border-color: #ffff;
+        box-shadow: 1px 2px 2px #ffff;
+    }
+}
+
+.group-card__body.created {
+    border: 0.5px solid rgb(65, 255, 90);
+    box-shadow: 2px 3px 3px rgb(65, 255, 90);
+
+    &:hover {
+        border-color: #ffff;
+        box-shadow: 1px 2px 2px #ffff;
+    }
+}
+
+
+.group-card__body-text {
+    
+    h3 {
+        display: flex;
+        font-family: var(--main-font-bold);
+        font-weight: 1000;
+        margin: 10px 0 10px 0;
+    }
+
+    p {
+        display: flex;
+        font-family: var(--main-font);
+        font-weight: 500;
+        margin: 0;
+        margin-bottom: 5px;
+    }
+}
+
+
+.groupIcon {
+    display: flex;
+    position: absolute;
+    left: 10px;
+    top: 5%;
+}
+
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
