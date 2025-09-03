@@ -1,0 +1,132 @@
+.project-card {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    min-width: 300px;
+    flex-direction: column;
+    padding: 10px 10px 100px 10px;
+    border: 0.2px solid rgb(255, 255, 255, 0.2);
+}
+
+
+.project-card__title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(0, 137, 250);
+    padding: 10px 24px;
+    border-radius: 12px;
+
+    h2 {
+        margin: 0;
+        font-family: var(--main-font-bold);
+    }
+}
+
+.project-card__body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+
+    label {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0px 24px;
+        font-family: var(--main-font-bold);
+        font-size: 1.5rem;
+        animation: bottomLine 4s ease-in-out infinite;
+    }
+
+}
+
+.project-card__task-card {
+    display: flex;
+    flex-direction: column;
+    border: 0.3px solid rgb(255, 255, 255, 0.3);
+    border-radius: 12px;
+    margin-top: 10px;
+    justify-content: center;
+    align-items: start;
+    box-sizing: border-box;
+    padding: 15px;
+    gap: 20px;
+    transition: border 0.3s ease-in-out;
+
+    .title-task {
+        display: flex;
+        background-color: rgb(0, 137, 250);
+        width: 100%;
+        padding: 10px 15px;
+        margin: -15px -15px -15px -15px;
+        font-family: var(--main-font-bold);
+    }
+
+    p {
+        margin: 0;
+        font-family: var(--main-font);
+    }
+
+    &:hover {
+        border: 0.3px solid rgb(0, 137, 250);
+    }
+}
+
+.project-card__task-not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 40px;
+
+    h2 {
+        display: flex;
+        font-family: var(--main-font-bold);
+        font-size: 1.7rem;
+
+    }
+
+    a {
+        display: flex;
+        box-sizing: border-box;
+        background-color: white;
+        padding: 10px 20px;
+        color: black;
+        border-radius: 12px;
+        transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+
+        &:hover {
+            background-color: rgb(0, 137, 250);
+            color: white;
+        }
+    }
+}
+
+
+.created_date {
+    position: absolute;
+    padding: 4px 15px;
+    border: 0.2px solid rgb(255, 255, 255, 0.2);
+    border-radius: 12px;
+    margin-right: 15px;
+    right: 0;
+    bottom: 0;
+}
+
+@keyframes bottomLine {
+    0% {
+        border-bottom: 1px solid white;
+        box-shadow: 0 3px 0 0 white;
+    }
+
+    50% {
+        border-bottom: 1px solid rgb(0, 137, 250);
+        box-shadow: 0px 0px 3px rgb(0, 137, 250);
+    }
+
+    100% {
+        border-bottom: 1px solid white;
+        box-shadow: 0 3px 0 0 white;
+    }
+}

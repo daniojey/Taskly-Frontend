@@ -13,6 +13,7 @@ import ProfilePage from './pages/ProfilePage/ProfilePage'
 import LoginPage from './pages/LoginPage/LoginPage'
 import ProtectedRoute from './ProtectedRoute'
 import GroupsPage from './pages/GroupsPage/GroupsPage'
+import GroupPageDetail from './pages/GroupPageDetail/GroupPageDetail'
 
 
 function App() {
@@ -34,10 +35,9 @@ function App() {
             } />
             <Route path='/groups/:groupId' element={
                 <ProtectedRoute>
-                  <GroupsPage/>
+                  <GroupPageDetail/>
                 </ProtectedRoute>
             } />
-
           </Routes>
         </AuthProvider>
       </Router>

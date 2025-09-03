@@ -1,0 +1,153 @@
+.group-detail__title {
+    display: flex;
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+    box-sizing: border-box;
+    padding: 24px;
+    border: 0.2px solid rgb(255, 255, 255, 0.2);
+    border-radius: 12px;
+    font-family: var(--main-font-bold);
+    overflow: hidden;
+    animation: fadeIn 0.3s ease-in-out forwards;
+
+    h2 {
+        font-size: 2rem;
+        display: inline-block;
+        position: relative;
+        transform: translateX(-200%);
+        animation-duration: 2s;
+        animation-timing-function: ease-out;
+        animation-fill-mode: forwards;
+        animation-name: slide-in-left;
+        text-transform: uppercase;
+    }
+}
+
+
+.group-detail__body {
+    display: flex;
+    width: 100%;
+    max-width: 1300px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    padding: 24px 24px 30px 24px;
+    border: 0.2px solid rgb(255, 255, 255, 0.2);
+    border-radius: 0px 0px 12px 12px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+    animation-delay: 0.5s;
+    gap: 20px;
+}
+
+
+.group-detail__navigation {
+    display: flex;
+    width: 100%;
+    max-width: 1300px;
+    box-sizing: border-box;
+    padding: 24px;
+    margin: 0 auto;
+    border: 0.2px solid rgb(255, 255, 255, 0.2);
+    border-radius: 12px 12px 0px 0px;
+    align-items: center;
+    justify-content: space-between;
+
+    h2 {
+        margin: 0;
+    }
+}
+
+
+.group-detail__navigation-buttons {
+    display: flex;
+    gap: 30px;
+
+    button {
+        background-color: rgb(0, 137, 250);
+        color: black;
+        padding: 6px 35px;
+        transition: color 0.4s ease-in-out, background-color 0.4s ease-in-out;
+
+        &:hover {
+            background-color: white;
+        }
+
+    }
+}
+
+
+.group-detail__body-projects {
+    display: flex;
+    gap: 30px;
+    width: 65%;
+    overflow-x: scroll;
+    border: 0.2px solid rgb(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.group-detail__body-projects::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.grs {
+    display: flex;
+    margin: 0 50px;
+}
+
+.group-detail__body-members {
+    display: flex;
+    flex-direction: column;
+    width: 35%;
+    box-sizing: border-box;
+    padding: 24px;
+    gap: 20px;
+    overflow-y: auto;
+}
+
+.group-detail__member-container {
+    display: flex;
+    gap: 15px;
+
+    img {
+        display: flex;
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: start;
+        font-family: var(--main-font);
+        font-weight: 700;
+    }
+
+    p {
+        margin: 0;
+    }
+}
+
+
+@keyframes slide-in-left {
+    0% {
+        transform: translateX(-200%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}

@@ -112,7 +112,11 @@ function GroupsPage() {
             <div className="group-cards-body">
 
                 {groups && groups.map((item, index) => (
-                    <GroupCard props={{index, ...item}} key={index} index={index}/>
+                    <GroupCard 
+                    props={{index, ...item}} 
+                    key={index} 
+                    index={index}
+                    />
                 ))}
             </div>
             

@@ -1,7 +1,9 @@
 import groupIcon from '../../../assets/group.jpg'
+import defaultImageProfile from '../../../assets/default_image_profile.jpg'
 
 const iconMap = {
-    groupIcon: groupIcon
+    groupIcon: groupIcon,
+    defaultImageProfile: defaultImageProfile
 }
 
 const DynamicPngIcon = ({
