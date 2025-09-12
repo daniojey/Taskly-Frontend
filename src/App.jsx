@@ -14,7 +14,7 @@ import LoginPage from './pages/LoginPage/LoginPage'
 import ProtectedRoute from './ProtectedRoute'
 import GroupsPage from './pages/GroupsPage/GroupsPage'
 import GroupPageDetail from './pages/GroupPageDetail/GroupPageDetail'
-
+import ProjectBasePage from './pages/ProjectBasePage/ProjectBasePage'
 
 function App() {
 
@@ -38,6 +38,12 @@ function App() {
                   <GroupPageDetail/>
                 </ProtectedRoute>
             } />
+
+            <Route path='/projects/:projectId' element={
+              <ProtectedRoute>
+                <ProjectBasePage/>
+              </ProtectedRoute>
+            }/>
           </Routes>
         </AuthProvider>
       </Router>

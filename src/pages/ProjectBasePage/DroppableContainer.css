@@ -1,0 +1,24 @@
+.droppable-container__body {
+    display: flex;
+    flex-direction: column;
+    border: 0.3px solid rgb(255, 255, 255, 0.3);
+    border-radius: 12px;
+    background-color: rgb(15, 15, 15);
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.droppable-container__title {
+    display: flex;
+    justify-content: center;
+}
+
+.task-column-content {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0px;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}

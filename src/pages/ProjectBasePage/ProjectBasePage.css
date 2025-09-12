@@ -1,0 +1,11 @@
+.task-base__container-body {
+    display: grid;
+    width: 100%;
+    justify-content: center;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    padding: 24px;
+    gap: 20px;
+    box-sizing: border-box;
+}
+

@@ -1,13 +1,25 @@
 import "./ProjectCard.css"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 
 
 function ProjectCard({ props }) {
     const { id, title, tasks, create_at} = props
+    const navigate = useNavigate()
+
+    const clickCard = async(e) => {
+        
+        if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.closest('a') || e.target.closest('button')) {
+            return;
+        }
+
+        console.log('CLICK CARD')
+        console.log(e.target.tagName)
+        navigate(`/projects/${id}/`)
+    }
 
     return (
         <>
-            <div className="project-card">
+            <div className="project-card" onClick={clickCard}>
                 <div className="project-card__title">
                     <h2>{title}</h2>
                 </div>
@@ -22,7 +34,7 @@ function ProjectCard({ props }) {
                     )): (
                         <div className="project-card__task-not-found">
                             <h2>Not found tasks</h2>
-                            <Link to={`/projeects/${id}/`}>Create</Link>
+                            <Link to={`/projects/${id}/`}>Create</Link>
                         </div>
                     )}
                 </div>

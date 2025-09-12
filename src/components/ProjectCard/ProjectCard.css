@@ -6,6 +6,12 @@
     flex-direction: column;
     padding: 10px 10px 100px 10px;
     border: 0.2px solid rgb(255, 255, 255, 0.2);
+    transition: border 0.4s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+        border: 0.3px solid rgb(0, 137, 250);
+    }
 }
 
 
