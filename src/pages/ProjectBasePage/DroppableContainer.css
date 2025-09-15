@@ -1,11 +1,40 @@
+.task-base__title-body {
+    display: flex;
+    width: 96%;
+    margin: 20px auto;
+    box-sizing: border-box;
+    padding: 24px;
+    border: 0.3px solid rgb(255, 255, 255, 0.3);
+    background-color: rgb(15, 15, 15);
+    border-radius: 12px;
+}
+
+.project-base-container__body {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    height: 100%;
+}
+
 .droppable-container__body {
     display: flex;
+    width: 100%;
     flex-direction: column;
     border: 0.3px solid rgb(255, 255, 255, 0.3);
     border-radius: 12px;
     background-color: rgb(15, 15, 15);
     padding: 24px;
     box-sizing: border-box;
+    animation: fadeIn 0.5s ease-in-out forwards;
+    font-family: var(--main-font-bold);
+
+    p {
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        font-family: var(--main-font-bold);
+        font-size: 1.5rem;
+    }
 }
 
 .droppable-container__title {
@@ -21,4 +50,14 @@
     justify-content: center;
     align-items: center;
     gap: 20px;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }

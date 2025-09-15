@@ -8,6 +8,9 @@ interface Item {
   id: string
   content: string
   name: string
+  deadline: string
+  title: string;
+  status: "BS" | "US" | "NS" | string;
 }
 
 export function DroppableContainer({
@@ -38,9 +41,16 @@ export function DroppableContainer({
           items={items.map((item) => item.id)}
           strategy={verticalListSortingStrategy}
         >
-        <ul className="task-column-content">
+        <ul className={`task-column-content`}>
           {items.map((item) => (
-            <SortableItem id={item.id} key={item.id} content={item.content} name={item.name} activeId={activeId}/>
+            <SortableItem 
+            id={item.id} 
+            key={item.id} 
+            status={item.status}
+            deadline={item.deadline}
+            content={item.content} 
+            name={item.name} 
+            activeId={activeId}/>
           ))}
         </ul>
         </SortableContext>
@@ -48,7 +58,7 @@ export function DroppableContainer({
         {items.length === 0 && (
           <div className="">
             <p className="">
-              Drop items here
+              No Tasks
             </p>
           </div>
         )}

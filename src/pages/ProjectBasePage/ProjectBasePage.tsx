@@ -24,16 +24,23 @@ import {
 
 
 import "./ProjectBasePage.css"
+import './DroppableContainer.css'
+import './SortableItem.css'
 import { DroppableContainer } from './DroppableContainer'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
 import { useParams } from 'react-router'
 import { updateTask } from '../../common/task_requests'
+import { truncateString } from '../../common/truncate'
+
 
 interface Item {
   id: string
   content: string
   name: string
+  deadline: string
+  title: string;
+  status: "BS" | "US" | "NS" | string;
 }
 
 
@@ -48,7 +55,6 @@ function ItemOverlay({ children } : { children: React. ReactNode}) {
   return (
     <div>
       <div className='draggble-item overlay'>
-        <span>:</span>
         <span>{children}</span>
       </div>
     </div>
@@ -57,6 +63,7 @@ function ItemOverlay({ children } : { children: React. ReactNode}) {
 
 export default function MultipleContainers() {
   const { projectId } = useParams()
+  const [tasks, setTasks] = useState<Item[]>([])
   const [containers, setContainers] = useState<Container[]>([
     {
       id: 'base-status',
@@ -92,8 +99,8 @@ export default function MultipleContainers() {
         const baseTasks = allTasks.filter(task => task.status === "BS")
         const urgentTasks = allTasks.filter(task => task.status === "US") 
         const noStatusTasks = allTasks.filter(task => task.status === "NS")
-
-
+        
+        setTasks(allTasks)
         setContainers([
           {
             id: 'base-status',
@@ -309,7 +316,10 @@ export default function MultipleContainers() {
 
 
   return (
-    <div className="mx-auto w-full">
+    <div className="project-base-container__body">
+      <div className='task-base__title-body'>
+        create task
+      </div>
       {/* <h2 className="mb-4 text-xl font-bold dark:text-white">Kanb</h2> */}
 
       <DndContext
@@ -320,6 +330,12 @@ export default function MultipleContainers() {
         onDragEnd={handleDragEnd}
       >
         <div className="task-base__container-body">
+          <div className='task-base__container-info-table'>
+            <h2>Info Table</h2>
+            <p>count tasks: {Object.entries(tasks).length}</p>
+            <p>urgent tasks: {tasks.filter(task => task.status === "US").length}</p>
+          </div>
+
           {containers.map((container) => (
             <DroppableContainer
               key={container.id}
@@ -334,8 +350,9 @@ export default function MultipleContainers() {
           {
             activeId ? (
               <ItemOverlay>
-                <div>
-                  {getActiveItem()?.name}
+                <div className='draggble-item__container'>
+                  <div>{truncateString(getActiveItem()?.name, 10)}</div>
+                  {/* <div>{getActiveItem()?.deadline}</div> */}
                 </div>
               </ItemOverlay>
             ) : null

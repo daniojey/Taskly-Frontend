@@ -3,16 +3,21 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from '@dnd-kit/utilities'
 
 import './SortableItem.css'
+import { truncateString } from "../../common/truncate"
 
 export function SortableItem({
   id,
   content,
+  status,
+  deadline,
   name,
   activeId,
 }: {
   id: UniqueIdentifier,
   content: string,
   name: string,
+  status: string,
+  deadline: string,
   activeId: UniqueIdentifier | null
 }) {
 
@@ -24,6 +29,10 @@ export function SortableItem({
     transition,
     isDragging,
   } = useSortable({ id })
+
+  const logFunc = (e) =>  {
+    console.log('click item', e.target)
+  }
 
   const style = {
     border: "1px solid white",
@@ -38,12 +47,11 @@ export function SortableItem({
       {...attributes}
       {...listeners}
       className={activeId === id ? "draggble-item unactive" : 'draggble-item'}
+      onClick={logFunc}
     >
-      <div className="flex items-center gap-3">
-        <span className="text-gray-500 dark:text-gray-400">
-          ⋮
-        </span>
-        <span className="dark:text-gray-200">{name}</span>
+      <div className="draggble-item__container">
+        <span className="draggble-item__name">{truncateString(name, 10)}</span>
+        <span className="draggble-item__deadline">{deadline}</span>
       </div>
     </li>
   )
