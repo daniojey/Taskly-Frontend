@@ -23,7 +23,9 @@ export const updateTask = async (projectId, active, overContainerId) => {
         )
 
         console.log(response)
+        return true
     } catch (error) {
         console.error(error)
+        return false
     }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import {
   DndContext,
@@ -32,6 +32,7 @@ import { getAccessToken } from '../../../tokens_func'
 import { useParams } from 'react-router'
 import { updateTask } from '../../common/task_requests'
 import { truncateString } from '../../common/truncate'
+import CreateTaskWindow from '../../components/CreateTaskWindow/CreateTaskWindow'
 
 
 interface Item {
@@ -63,6 +64,8 @@ function ItemOverlay({ children } : { children: React. ReactNode}) {
 
 export default function MultipleContainers() {
   const { projectId } = useParams()
+  const [openCreateTask, setOpenCreateTask] = useState(false)
+  const [openDetailTask, setOpenDetailTask] = useState(false)
   const [tasks, setTasks] = useState<Item[]>([])
   const [containers, setContainers] = useState<Container[]>([
     {
@@ -82,9 +85,8 @@ export default function MultipleContainers() {
     },
   ])
 
-  useEffect(() => {
-    const getTasks = async () => {
-      try {
+  const getTasks = useCallback( async () => {
+    try {
         const response = await api.get(
           `api/v1/groups-projects/${projectId}/`,
           {headers: {
@@ -96,9 +98,9 @@ export default function MultipleContainers() {
         const allTasks = response.data.result.tasks
 
         // Фильтруем задачи по статусам
-        const baseTasks = allTasks.filter(task => task.status === "BS")
-        const urgentTasks = allTasks.filter(task => task.status === "US") 
-        const noStatusTasks = allTasks.filter(task => task.status === "NS")
+        const baseTasks = allTasks.filter((task: Item) => task.status === "BS")
+        const urgentTasks = allTasks.filter((task: Item) => task.status === "US") 
+        const noStatusTasks = allTasks.filter((task: Item) => task.status === "NS")
         
         setTasks(allTasks)
         setContainers([
@@ -122,11 +124,16 @@ export default function MultipleContainers() {
       } catch (error) {
         console.error(error)
       }
-    }
-
-    getTasks()
   }, [])
 
+  const handleTaskCreate = useCallback(() => {
+    getTasks()
+  }, [getTasks]);
+
+
+  useEffect(() => {
+    getTasks()
+  }, []);
 
 
   void setContainers
@@ -300,6 +307,16 @@ export default function MultipleContainers() {
         }
       }
 
+      // const update =  async () => {
+      //   const result = await updateTask(projectId, active, overContainerId)
+
+      //   if (result) {
+      //     getTasks()
+      //   }
+      // }
+
+      // update()
+
       updateTask(projectId, active, overContainerId)
 
       setActiveId(null)
@@ -314,12 +331,20 @@ export default function MultipleContainers() {
     return null
   }
 
+  const createTaskWindow = () => {
+    setOpenCreateTask(!openCreateTask)
+  }
+
 
   return (
     <div className="project-base-container__body">
       <div className='task-base__title-body'>
-        create task
+        <button onClick={createTaskWindow}>Create task</button>
       </div>
+
+      { openCreateTask && (
+        <CreateTaskWindow onClose={() => setOpenCreateTask(false)} onUpdate={() => handleTaskCreate()}projectId={projectId}/>
+      )}
       {/* <h2 className="mb-4 text-xl font-bold dark:text-white">Kanb</h2> */}
 
       <DndContext

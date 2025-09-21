@@ -1,13 +1,4 @@
-.task-base__title-body {
-    display: flex;
-    width: 96%;
-    margin: 20px auto;
-    box-sizing: border-box;
-    padding: 24px;
-    border: 0.3px solid rgb(255, 255, 255, 0.3);
-    background-color: rgb(15, 15, 15);
-    border-radius: 12px;
-}
+
 
 .project-base-container__body {
     display: flex;

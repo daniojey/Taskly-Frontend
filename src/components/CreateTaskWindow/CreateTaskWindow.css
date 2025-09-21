@@ -1,0 +1,168 @@
+.create-task-overlay {
+    position: absolute;
+    display: flex;
+    min-height: 100vh;
+    min-width: 100vw;
+    background-color: rgb(0, 0, 0, 0.8);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease-out;
+    pointer-events: none;
+}
+
+.create-task-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.create-task-overlay.close {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+.create-task__body {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 24px;
+    border-radius: 12px;
+    background-color: rgb(15, 15, 15);
+    transform: translateY(-50px);
+    opacity: 0;
+    animation: fadeInTransform 0.5s ease forwards;
+    animation-delay: 0.4s;
+    border: 0.3px solid rgb(255, 255, 255, 0.3);
+    box-shadow: 3px 3px 4px #ffffff;
+}
+
+.create-task__title {
+    position: relative;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    font-family: var(--main-font-bold);
+    font-size: 1.5rem;
+
+
+    label {
+        display: flex;
+        position: absolute;
+        height: 30px;
+        width: 30px;
+        font-size: 2rem;
+        top: 0;
+        right: 0;
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+
+        &:hover {
+            color: rgb(0, 137, 250);
+        }
+    }
+}
+
+.create-task__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: white;
+    z-index: 110;
+
+    label {
+        display: flex;
+        font-family: var(--main-font-bold);
+        font-size: 1.2rem;
+    }
+
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgb(0, 0, 0);
+        background-color: rgb(0, 137, 250);
+        padding: 10px 35px;
+        font-size: 1.1rem;
+        font-weight: 200;
+        border-radius: 12px;
+        margin-top: 20px;
+        transition: background-color 0.5s ease;
+
+        &:hover {
+            background-color: white;
+        }
+    }
+}
+
+
+/* Стиль 2: Неоморфизм */
+.neomorphism-input {
+    position: relative;
+    display: flex;
+    width: 100%;
+    max-width: 350px;
+    box-sizing: border-box;
+    appearance: none;
+    padding: 20px 25px;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    background: #000000;
+    box-shadow: inset 8px 8px 16px rgb(0, 137, 250), inset -8px -8px 16px rgb(0, 137, 250);
+    outline: none;
+    transition: all 0.3s ease;
+
+    &:focus {
+        box-shadow: inset 4px 4px 8px #d1d1d4, inset -4px -4px 8px #ffffff;
+    }
+
+    &::placeholder {
+        color: #a0a0a0;
+    }
+}
+
+select.neomorphism-input  {
+    background-image: url('../../assets/arrow_down.png');
+    background-size: 24px;
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+
+    &:focus {
+        background-image: url('../../assets/arrow_down_white.png');
+    }
+}
+
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInTransform {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+
+
+    75% {
+        transform: translateY(0px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}

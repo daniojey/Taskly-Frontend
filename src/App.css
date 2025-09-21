@@ -47,6 +47,12 @@
   animation: fadeOut 1.2s ease forwards;
 }
 
+input[type="datetime-local"]::-webkit-inner-spin-button,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+}
+
 @keyframes fadeOut {
   0% {
     opacity: 1;
