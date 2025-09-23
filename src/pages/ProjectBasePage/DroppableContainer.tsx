@@ -50,6 +50,7 @@ export function DroppableContainer({
             deadline={item.deadline}
             content={item.content} 
             name={item.name} 
+            data={item}
             activeId={activeId}/>
           ))}
         </ul>

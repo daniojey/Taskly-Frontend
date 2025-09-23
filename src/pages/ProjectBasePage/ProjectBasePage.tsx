@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
+
 import {
   DndContext,
   DragEndEvent,
@@ -22,6 +23,12 @@ import {
   arrayMove
 } from '@dnd-kit/sortable'
 
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query'
+
 
 import "./ProjectBasePage.css"
 import './DroppableContainer.css'
@@ -33,6 +40,7 @@ import { useParams } from 'react-router'
 import { updateTask } from '../../common/task_requests'
 import { truncateString } from '../../common/truncate'
 import CreateTaskWindow from '../../components/CreateTaskWindow/CreateTaskWindow'
+import DetailTaskWindow from '../../components/DetailTaskWindow/DetailTaskWindow'
 
 
 interface Item {
@@ -65,7 +73,6 @@ function ItemOverlay({ children } : { children: React. ReactNode}) {
 export default function MultipleContainers() {
   const { projectId } = useParams()
   const [openCreateTask, setOpenCreateTask] = useState(false)
-  const [openDetailTask, setOpenDetailTask] = useState(false)
   const [tasks, setTasks] = useState<Item[]>([])
   const [containers, setContainers] = useState<Container[]>([
     {
@@ -121,8 +128,11 @@ export default function MultipleContainers() {
           },
         ])
 
+        return await response.data.result
       } catch (error) {
         console.error(error)
+
+        return false
       }
   }, [])
 
@@ -335,6 +345,12 @@ export default function MultipleContainers() {
     setOpenCreateTask(!openCreateTask)
   }
 
+  
+  const { isPending, error, data} = useQuery({
+    queryKey: ['updateTasks'],
+    queryFn: getTasks
+  })
+
 
   return (
     <div className="project-base-container__body">
@@ -346,6 +362,7 @@ export default function MultipleContainers() {
         <CreateTaskWindow onClose={() => setOpenCreateTask(false)} onUpdate={() => handleTaskCreate()}projectId={projectId}/>
       )}
       {/* <h2 className="mb-4 text-xl font-bold dark:text-white">Kanb</h2> */}
+
 
       <DndContext
         sensors={sensors}
@@ -361,15 +378,16 @@ export default function MultipleContainers() {
             <p>urgent tasks: {tasks.filter(task => task.status === "US").length}</p>
           </div>
 
-          {containers.map((container) => (
-            <DroppableContainer
+            {containers.map((container) => (
+              <DroppableContainer
               key={container.id}
               id={container.id}
-              title={container.title}
-              items={container.items}
-              activeId={activeId}
-            />
-          ))}
+                title={container.title}
+                items={container.items}
+                activeId={activeId}
+                />
+              ))}
+
         </div>
         <DragOverlay>
           {

@@ -4,6 +4,8 @@ import { CSS } from '@dnd-kit/utilities'
 
 import './SortableItem.css'
 import { truncateString } from "../../common/truncate"
+import DetailTaskWindow from "../../components/DetailTaskWindow/DetailTaskWindow"
+import { useState } from "react"
 
 export function SortableItem({
   id,
@@ -12,6 +14,7 @@ export function SortableItem({
   deadline,
   name,
   activeId,
+  data,
 }: {
   id: UniqueIdentifier,
   content: string,
@@ -19,6 +22,7 @@ export function SortableItem({
   status: string,
   deadline: string,
   activeId: UniqueIdentifier | null
+  data: {}
 }) {
 
   const {
@@ -29,6 +33,8 @@ export function SortableItem({
     transition,
     isDragging,
   } = useSortable({ id })
+
+  const [openWindow, setOpenWindow] = useState(false)
 
   const logFunc = (e) =>  {
     console.log('click item', e.target)
@@ -41,18 +47,26 @@ export function SortableItem({
   }
 
   return (
+    <>
+
+    { openWindow && (
+      <DetailTaskWindow  data={data} onClose={() => setOpenWindow(false)} />
+    )}
+
     <li
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
       className={activeId === id ? "draggble-item unactive" : 'draggble-item'}
-      onClick={logFunc}
+      onClick={() => setOpenWindow(true)}
     >
       <div className="draggble-item__container">
         <span className="draggble-item__name">{truncateString(name, 10)}</span>
         <span className="draggble-item__deadline">{deadline}</span>
       </div>
     </li>
+
+    </>
   )
 }
