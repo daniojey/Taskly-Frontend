@@ -10,7 +10,25 @@
     box-sizing: border-box;
 }
 
+.delete-window__overlay {
+    display: flex;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+}
+
+.delete-window__overlay.show {
+    opacity: 1;
+    z-index: 500;
+}
+
 .task-base__title-body {
+    position: relative;
     display: flex;
     width: 96%;
     margin: 20px auto;
@@ -19,11 +37,11 @@
     border: 0.3px solid rgb(255, 255, 255, 0.3);
     background-color: rgb(15, 15, 15);
     border-radius: 12px;
-    justify-content: start;
+    justify-content: space-between;
     align-items: center;
 
 
-    button {
+    #createTask {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -39,7 +57,65 @@
             background-color: white;
         }
     }
+
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffff;
+        font-size: 1.3rem;
+        padding: 10px 12px;
+        border: 0.3px solid rgb(255, 255, 255, 0.3);
+        transition: border 0.4s ease-in-out;
+
+        &:hover {
+            border: 0.3px solid rgb(255, 255, 255, 0.8);
+        }
+    }
     
+}
+
+
+.task-base__title-more-info {
+    display: none;
+    position: absolute;
+    background-color: rgb(15, 15, 15);
+    border: 0.5px solid white;
+    z-index: 10000;
+    top: 50%;
+    right: 4%;
+    padding: 24px;
+    box-sizing: border-box;
+    border-radius: 12px;
+
+    #delete {
+        font-family: var(--main-font-bold);
+        border-bottom: 0.3px solid rgb(255, 255, 255, 0.3);
+        transition: color 0.4s ease-in-out, border 0.4s ease-out;
+        cursor: pointer;
+
+        &:hover {
+            color: red;
+            border-bottom: 0.3px solid red;
+        }
+    }
+
+    #settings, #info {
+        font-family: var(--main-font-bold);
+        border-bottom: 0.3px solid rgb(255, 255, 255, 0.3);
+        transition: color 0.4s ease-in-out, border 0.4s ease-out;
+        cursor: pointer;
+
+        &:hover {
+            color: rgb(0, 137, 250);
+            border-bottom: 0.3px solid rgb(0, 137, 250);
+        }
+    }
+}
+
+.task-base__title-more-info.show {
+    display: flex;
+    flex-direction: column;
 }
 
 

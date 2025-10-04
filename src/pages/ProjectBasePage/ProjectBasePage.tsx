@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 
 import {
@@ -41,6 +41,9 @@ import { updateTask } from '../../common/task_requests'
 import { truncateString } from '../../common/truncate'
 import CreateTaskWindow from '../../components/CreateTaskWindow/CreateTaskWindow'
 import DetailTaskWindow from '../../components/DetailTaskWindow/DetailTaskWindow'
+import DeleteWindow from '../../components/DeleteWindow/DeleteWindow'
+import DeleteWindowProject from '../../components/DeleteWindowProject/DeleteWindowProject'
+import { createPortal } from 'react-dom'
 
 
 interface Item {
@@ -72,8 +75,10 @@ function ItemOverlay({ children } : { children: React. ReactNode}) {
 
 export default function MultipleContainers() {
   const { projectId } = useParams()
+  const [moreWindow, setMoreWindow] = useState(false)
   const [openCreateTask, setOpenCreateTask] = useState(false)
   const [tasks, setTasks] = useState<Item[]>([])
+  const [deleteWindow, setDeleteWindow] = useState(false)
   const [containers, setContainers] = useState<Container[]>([
     {
       id: 'base-status',
@@ -136,9 +141,10 @@ export default function MultipleContainers() {
       }
   }, [])
 
+
   const handleTaskCreate = useCallback(() => {
     getTasks()
-  }, [getTasks]);
+  }, []);
 
 
   useEffect(() => {
@@ -317,17 +323,18 @@ export default function MultipleContainers() {
         }
       }
 
-      // const update =  async () => {
-      //   const result = await updateTask(projectId, active, overContainerId)
+      const update =  async () => {
+        const result = await updateTask(projectId, active, overContainerId)
 
-      //   if (result) {
-      //     getTasks()
-      //   }
-      // }
+        if (result) {
+          console.log('SUCCESS!')
+          await getTasks()
+        }
+      }
 
-      // update()
+      update()
 
-      updateTask(projectId, active, overContainerId)
+      // updateTask(projectId, active, overContainerId)
 
       setActiveId(null)
   }
@@ -352,10 +359,35 @@ export default function MultipleContainers() {
   })
 
 
+  const bodyClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+
+    if (e.target instanceof HTMLElement) {
+        if (!e.target.className.includes('task-base__title-more-info') && moreWindow) {
+          setMoreWindow(false);
+        }
+    }
+  }
+
   return (
-    <div className="project-base-container__body">
+    <div className="project-base-container__body" onClick={bodyClick}>
+      <div className={`delete-window__overlay ${deleteWindow ? 'show': ''}`}></div>
+
+      {deleteWindow && (
+        <DeleteWindowProject projectId={projectId} onClose={() => setDeleteWindow(false)}/>
+      )}
+
+
+
       <div className='task-base__title-body'>
-        <button onClick={createTaskWindow}>Create task</button>
+        <button id='createTask' onClick={createTaskWindow}>Create task</button>
+        <button onClick={() => setMoreWindow(!moreWindow)}>⋮</button>
+
+        <div className={`task-base__title-more-info ${moreWindow ? 'show' : ''}`} >
+          <p id='settings'>Settings</p>
+          <p id='info'>Info</p>
+          <p id='delete' onClick={() => setDeleteWindow(true)}>Delete Project</p>
+        </div>
+
       </div>
 
       { openCreateTask && (

@@ -1,0 +1,50 @@
+.push-notify-body{
+    display: flex;
+    position: absolute;
+    z-index: 1000;
+    border: 1px solid #7cb342;
+    border-radius: 20px;
+    background-color: #1a3a1a;
+    padding: 24px;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 2px rgba(124, 179, 66, 0.3);
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -250%);
+}
+
+
+.push-notify-body.open {
+    display: flex;
+    animation: tradeIn 0.5s ease-in-out forwards;
+    
+}
+
+.push-notify-body.closed {
+    display: flex;
+    transform: translate(-50%, -50%);
+    animation: tradeOut 0.5s ease-in-out forwards;
+}
+
+
+
+@keyframes tradeIn {
+        0% {
+            transform: translate(-50%, -250%);
+        }
+
+        100% {
+            transform: translate(-50%, -50%);
+        }
+    }
+
+
+@keyframes tradeOut {
+        0% {
+            transform: translate(-50%, -50%);
+        }
+
+        100% {
+            transform: translate(-50%, -250%);
+        }
+    }

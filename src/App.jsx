@@ -16,6 +16,7 @@ import GroupsPage from './pages/GroupsPage/GroupsPage'
 import GroupPageDetail from './pages/GroupPageDetail/GroupPageDetail'
 import ProjectBasePage from './pages/ProjectBasePage/ProjectBasePage'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import Notification from './components/Notification/Notification'
 
 const queryClient = new QueryClient()
 
@@ -26,7 +27,8 @@ function App() {
       <Router>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
-          
+
+            <Notification/>
             <Header />
 
             <Routes>

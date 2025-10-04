@@ -1,6 +1,9 @@
 .delete-window {
-    position: absolute;
+    position: fixed; /* Лучше fixed для модальных окон */
     display: flex;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -100%); /* Исправлено: одна функция с двумя параметрами */
     flex-direction: column;
     background-color: black;
     color: white;
@@ -10,7 +13,7 @@
     padding: 24px;
     box-sizing: border-box;
     border-radius: 12px;
-    animation: fadeInTransform 0.5s ease forwards;
+    animation: windowTransform 0.5s ease forwards;
 }
 
 .delete-window__body {
@@ -41,5 +44,23 @@
         &:hover {
             background-position: center;
         }
+    }
+}
+
+
+@keyframes windowTransform {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -100%);
+    }
+
+
+    75% {
+        transform: translate(-50%, -20%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
     }
 }
