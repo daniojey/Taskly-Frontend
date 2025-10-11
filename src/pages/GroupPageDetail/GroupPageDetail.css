@@ -59,6 +59,28 @@
     }
 }
 
+.group-detail__projects-body {
+    display: flex;
+    gap: 20px;
+
+    button {
+        display: flex;
+        color: white;
+        background-color: rgb(0, 137, 250);
+        padding: 10px 35px;
+        font-size: 1.1rem;
+        font-weight: 200;
+        border-radius: 12px;
+        transition: background-color 0.5s ease, color 0.5s ease-in-out;
+        font-family: var(--main-font-bold);
+
+        &:hover {
+            background-color: white;
+            color: rgb(0, 137, 250);
+        }
+    }
+}
+
 
 .group-detail__navigation-buttons {
     display: flex;

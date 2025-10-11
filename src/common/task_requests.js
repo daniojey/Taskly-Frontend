@@ -7,25 +7,30 @@ const mapStatus = {
     "urgent-status": 'US',
 }
 
-export const updateTask = async (projectId, active, overContainerId) => {
-    try {
+export const updateTask = async (projectId, active, overContainerId, taskStatus) => {
+    if (taskStatus !== mapStatus[overContainerId]) {
+        try {
 
-        const response = await api.post(
-            `api/v1/projects/${projectId}/tasks/${active.id}/update_status/`,
-            {
-                new_status: mapStatus[overContainerId]
-            },
-            {
-                headers: {
-                    Authorization: getAccessToken()
+            const response = await api.post(
+                `api/v1/projects/${projectId}/tasks/${active.id}/update_status/`,
+                {
+                    new_status: mapStatus[overContainerId]
+                },
+                {
+                    headers: {
+                        Authorization: getAccessToken()
+                    }
                 }
-            }
-        )
+            )
 
-        console.log(response)
-        return true
-    } catch (error) {
-        console.error(error)
+            console.log(response)
+            return true
+        } catch (error) {
+            console.error(error)
+            return false
+        }
+    } else {
         return false
     }
+    
 }

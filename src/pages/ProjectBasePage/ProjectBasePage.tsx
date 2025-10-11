@@ -281,6 +281,7 @@ export default function MultipleContainers() {
 
     console.log('activecontainer', activeContainerId, 'overContainer', overContainerId)
     console.log('activeId', active.id, 'overId', over.id)
+    console.log('ACTIVE ELEMENT', active)
 
     if (!activeContainerId || !overContainerId) {
       setActiveId(null)
@@ -324,7 +325,15 @@ export default function MultipleContainers() {
       }
 
       const update =  async () => {
-        const result = await updateTask(projectId, active, overContainerId)
+        const tasks = containers.map(
+          container => container.items.filter(
+              item => item.id === active.id
+          )
+        ).filter(array => array.length != 0)[0][0]
+
+         console.log('TASK FINDED', tasks)
+
+        const result = await updateTask(projectId, active, overContainerId, tasks.status)
 
         if (result) {
           console.log('SUCCESS!')
