@@ -1,12 +1,13 @@
 import React, { useState, useEffect, createContext, useMemo, useCallback } from "react";
 import { api } from "../api";
 import Cookies from "js-cookie";
-import { verifyToken } from "../tokens_func";
+import { getAccessToken, verifyToken } from "../tokens_func";
 
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+    const [notifications, setNotifications] = useState(null)
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(false)
     const [isLogin, setIsLogin] = useState(false)
@@ -15,7 +16,30 @@ export const AuthProvider = ({ children }) => {
     console.log('🔄 AuthProvider создается/перерендеривается') 
 
     useEffect(() => {
+        // localStorage.removeItem('refreshToken')
+        
+
         console.log('🚀 Инициализация сессии запущена')
+
+         const getNotifications = async () => {
+            console.log('🚀 Инициализация уведомлений')
+            try {
+                const response = await api.get(
+                    'api/v1/notifications/',
+                    {headers: {
+                        Authorization: getAccessToken()
+                    }}
+                )
+
+                console.log(response)
+                setNotifications(response.data.results)
+
+                return true
+            } catch (error) {
+                console.error(error)
+                return false
+            }
+        }
 
         const inicializeSession = async () => {
             setLoading(true)
@@ -47,6 +71,9 @@ export const AuthProvider = ({ children }) => {
                     if (response?.user) {
                         setUser(response?.user);
                         localStorage.setItem('user', JSON.stringify(response?.user))
+                        const resultNotify = await getNotifications()
+
+
                     } else {
                         setUser(null)
                         localStorage.removeItem('user')
@@ -55,21 +82,20 @@ export const AuthProvider = ({ children }) => {
                     setUser(null)
                     localStorage.removeItem('user')
                 } finally {
+                    setLoading(false)
+                    setTimeout(() => {
+                        setShowLoading(false)
+                    }, 1500)
                 }
 
 
             } catch (error) {
                 console.log(error)
-            } finally {
-                setLoading(false)
-                setTimeout(() => {
-                    setShowLoading(false)
-                }, 1500)
             }
         }
 
-
         inicializeSession()
+
     }, [])
 
     const login = useCallback(async (username, password) => {
@@ -134,8 +160,9 @@ export const AuthProvider = ({ children }) => {
         loading,
         isLogin,
         error,
-        showLoading
-    }), [user, login, logout, loading, isLogin, error, showLoading])
+        showLoading,
+        notifications
+    }), [user, login, logout, loading, isLogin, error, showLoading, notifications])
 
     return (
         <AuthContext.Provider value={contextValue}>

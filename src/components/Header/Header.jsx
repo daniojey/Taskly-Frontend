@@ -4,11 +4,13 @@ import { useContext } from 'react'
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router'
 import { AuthContext } from '../../AuthContext'
+import DynamicPngIcon from '../UI/icons/DynamicPngIcon'
 
 function Header() {
-    const { loading, user, logout} = useContext(AuthContext);
+    const { loading, user, logout, notifications} = useContext(AuthContext);
     const navigate = useNavigate()
-    console.log(loading, user)
+    // console.log(loading, user)
+    // console.log(notifications)
 
     const onLogout = () => {
         navigate('/', { replace: true})
@@ -16,6 +18,11 @@ function Header() {
             logout()
         }, 100)
     }
+
+    const notifyClick = () => {
+        navigate(`/profile/${user.username}/notification/`, { replace: true } )
+    }
+
 
     return (
         <div className="header">
@@ -36,7 +43,15 @@ function Header() {
                 )}
 
                 {!loading && user && (
-                    <button onClick={onLogout}>Logout</button>
+                    <div className='header-notify-and-logout'>
+
+                        {notifications !== null | undefined && notifications.length === 0 && (
+                            <DynamicPngIcon iconName="notifyIcon" onClick={notifyClick} width={28} height={28}/>
+                        ) || notifications.length > 0 && (
+                            <DynamicPngIcon iconName="notifyActiveIcon" onClick={notifyClick} width={28} height={28}/>
+                        )}
+                        <button onClick={onLogout}>Logout</button>
+                    </div>
                 )}
             </div>
         </div>

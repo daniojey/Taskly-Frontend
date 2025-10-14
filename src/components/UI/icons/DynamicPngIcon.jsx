@@ -1,9 +1,13 @@
 import groupIcon from '../../../assets/group.jpg'
 import defaultImageProfile from '../../../assets/default_image_profile.jpg'
+import notifyIcon from '../../../assets/notify.svg'
+import notifyActiveIcon from '../../../assets/notify_active.svg'
 
 const iconMap = {
     groupIcon: groupIcon,
-    defaultImageProfile: defaultImageProfile
+    defaultImageProfile: defaultImageProfile,
+    notifyIcon: notifyIcon,
+    notifyActiveIcon: notifyActiveIcon
 }
 
 const DynamicPngIcon = ({
