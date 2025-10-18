@@ -1,12 +1,25 @@
 .notifications-root {
     display: flex;
+    height: auto;
+    flex-direction: column;
     margin-top: 40px;
     box-sizing: border-box;
     width: 100%;
-    justify-content: center;
-    align-items: start;
+    justify-content: start;
+    align-items: center;
     overflow-y: auto;
 }
+
+
+.notifications-base-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: start;
+    align-items: center;
+}
+
+
 .notifications-body {
     display: flex;
     flex-direction: column;

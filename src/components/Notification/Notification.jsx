@@ -1,17 +1,9 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import './Notification.css'
 
 function Notification() {
     const token = localStorage.getItem('accessToken')
-
-    // const webSocketConnection = new WebSocket(
-    //     'ws://'
-    //     + 'localhost:8000'
-    //     + '/ws/chat/'
-    //     + 'bobiks'
-    //     + `/?token=${token}`,
-
-    // )
 
     const webSocketConnection = new WebSocket(
         'ws://'
@@ -23,7 +15,7 @@ function Notification() {
     const [notify, setNotify] = useState(null)
     const [hideNotify, setHideNotify] = useState(false)
 
-    const timers = new Map()
+    
 
 
     useEffect(

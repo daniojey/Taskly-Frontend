@@ -6,6 +6,7 @@ import './SortableItem.css'
 import { truncateString } from "../../common/truncate"
 import DetailTaskWindow from "../../components/DetailTaskWindow/DetailTaskWindow"
 import { useState } from "react"
+import TaskChat from "../../components/TaskChat/TaskChat"
 
 export function SortableItem({
   id,
@@ -36,9 +37,9 @@ export function SortableItem({
 
   const [openWindow, setOpenWindow] = useState(false)
 
-  const logFunc = (e) =>  {
-    console.log('click item', e.target)
-  }
+  // const logFunc = (e) =>  {
+  //   console.log('click item', e.target)
+  // }
 
   const style = {
     border: "1px solid white",
@@ -50,7 +51,8 @@ export function SortableItem({
     <>
 
     { openWindow && (
-      <DetailTaskWindow  data={data} onClose={() => setOpenWindow(false)} />
+      // <DetailTaskWindow  data={data} onClose={() => setOpenWindow(false)} />
+      <TaskChat data={data} onClose={() => setOpenWindow(false)}/>
     )}
 
     <li

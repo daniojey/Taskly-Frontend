@@ -44,12 +44,12 @@ function Header() {
 
                 {!loading && user && (
                     <div className='header-notify-and-logout'>
-
-                        {notifications !== null | undefined && notifications.length === 0 && (
-                            <DynamicPngIcon iconName="notifyIcon" onClick={notifyClick} width={28} height={28}/>
-                        ) || notifications.length > 0 && (
-                            <DynamicPngIcon iconName="notifyActiveIcon" onClick={notifyClick} width={28} height={28}/>
-                        )}
+                        <DynamicPngIcon 
+                        iconName={notifications?.length > 0 ? 'notifyActiveIcon' : 'notifyIcon'} 
+                        onClick={notifyClick} 
+                        width={28} 
+                        height={28}
+                        />
                         <button onClick={onLogout}>Logout</button>
                     </div>
                 )}
