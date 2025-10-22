@@ -124,3 +124,18 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   scrollbar-width: 20px; /* узкий скроллбар */
   scrollbar-color: rgb(100, 100, 100) rgb(15, 15, 15); /* ползунок и трек */
 }
+
+
+.sendIcon {
+  display: flex;
+  cursor: pointer;
+  border: 0.3px solid rgb(255, 255, 255, 0.3);
+  border-radius: 12px;
+  height: 100%;
+  padding: 8px 12px;
+  transition: transform 0.4s ease-in-out;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}
