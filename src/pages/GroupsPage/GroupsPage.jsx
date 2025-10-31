@@ -35,7 +35,12 @@ function GroupsPage() {
         try {
             const response = await api.post(
                 'api/v1/groups/',
-                {members_ids:[user.id], name: groupName},
+                {members:[user.id], name: groupName, owner: user.id},
+                {
+                    headers: {
+                        Authorization: getAccessToken()
+                    }
+                }
             )
 
             console.log(response)

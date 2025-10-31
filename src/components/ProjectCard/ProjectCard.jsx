@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router"
 
 
 function ProjectCard({ props }) {
-    const { id, title, tasks, create_at} = props
+    const { id, title, tasks, created_at} = props
     const navigate = useNavigate()
 
     const clickCard = async(e) => {
@@ -38,7 +38,7 @@ function ProjectCard({ props }) {
                         </div>
                     )}
                 </div>
-                <p className="created_date">{create_at}</p>
+                <p className="created_date">{created_at}</p>
             </div>
         </>
     )

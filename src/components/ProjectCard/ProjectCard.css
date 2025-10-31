@@ -3,6 +3,7 @@
     display: flex;
     box-sizing: border-box;
     min-width: 300px;
+    min-height: 425px;
     flex-direction: column;
     padding: 10px 10px 100px 10px;
     border: 0.2px solid rgb(255, 255, 255, 0.2);

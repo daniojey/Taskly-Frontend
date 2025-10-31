@@ -55,6 +55,7 @@ function CreateTaskWindow({ onClose, onUpdate, projectId }) {
         data = {
             ...data,
             project_id: projectId,
+            created_by: user.id
         }
 
         console.log('UPDATED data', data)

@@ -118,7 +118,7 @@ function NotificationPage() {
                         {state.data.results && state.data.results.length !== 0 && state.data.results.map((item, index) => (
                             <div key={index} className="notification-Item" style={{ animationDelay: `${index * 0.14}s` }}>
                                 <h2 className={`notification-type ${notifiType[item?.type] || ''}`}>{item?.type || <>other</>}</h2>
-                                <h3 className="notification-date">{item.created_date}</h3>
+                                <h3 className="notification-date">{item.created_at}</h3>
 
                                 <h3>{item.message}</h3>
                                 <p>description message</p>

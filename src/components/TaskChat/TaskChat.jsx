@@ -57,7 +57,6 @@ function messageReduce(state, action) {
             return { ...state, messages: [...state.messages, action.payload] }
 
         case "LOAD_MORE_MESSAGES":
-            console.log('Загрузка дополнительных сообщений', action.payload.results)
             return {
                 ...state,
                 messages: [...action.payload.results.reverse() , ...state.messages],
@@ -99,7 +98,7 @@ function TaskChat({ data, onClose }) {
     // Сохраняем позицию скролла перед загрузкой новых сообщений
     const saveScrollPosition = () => {
         if (messagesContainerRef.current) {
-            scrollPositionRef.current = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.scrollTop + 20;
+            scrollPositionRef.current = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.scrollTop + 30;
         }
     }
 
@@ -154,25 +153,24 @@ function TaskChat({ data, onClose }) {
     const callbackFunc = useCallback(async (entries) => {
         const [entry] = entries
 
-        console.log(loadingRef)
-
         const container = messagesContainerRef.current
         const hasScroll = container && container.scrollHeight > container.clientHeight
 
 
-         if (loadingRef.current === false && hasScroll && nextPageRef.current) {
-            console.log(entry.isIntersecting)
+        if (loadingRef.current === false && hasScroll && nextPageRef.current && entry.isIntersecting) {
+            loadingRef.current = true
 
             saveScrollPosition();
 
             const result = await loadMoreMessages(nextPageRef.current)
-            console.log(result)
             
             if (result) {
                 dispatch({ type: 'LOAD_MORE_MESSAGES', payload: result })
                 nextPageRef.current = result?.next
+                loadingRef.current = false
             } else {
                 console.error(result)
+                loadingRef.current = false
             }
         }
 
@@ -182,7 +180,8 @@ function TaskChat({ data, onClose }) {
     useEffect(() => {
         const observer = new IntersectionObserver(callbackFunc, {
             root: messagesContainerRef.current,
-            threshold: 0.1,
+            rootMargin: '100px 0px 0px 0px',
+            threshold: 0,
         });
 
         if (messagesStartRef.current) {

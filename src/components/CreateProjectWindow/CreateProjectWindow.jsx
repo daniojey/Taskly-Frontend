@@ -1,17 +1,19 @@
 import { createPortal } from 'react-dom'
 import './CreateProjectWindow.css'
 import '../CreateTaskWindow/CreateTaskWindow.css'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import * as yup from 'yup'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
+import { AuthContext } from '../../AuthContext'
 
 
 
 function CreateProjectWindow({ groupId, onClose, onUpdate }) {
     const [close, setClose] = useState(false)
+    const { user } = useContext(AuthContext)
 
     const schema = yup.object({
         title: yup.string().min(4),
@@ -53,7 +55,8 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }) {
 
         data = {
             ...data,
-            group: groupId
+            group: groupId,
+            owner: user.id
         }
 
         const createProject = async (data) => {
