@@ -23,7 +23,8 @@ const initialState = {
 const ACTIONS = {
     SET_PAGES: 'SET_PAGES',
     SET_DATA: 'SET_DATA',
-    SET_CURRENT_PAGE: 'SET_CURRENT_PAGE'
+    SET_CURRENT_PAGE: 'SET_CURRENT_PAGE',
+    NOTIFY_UPDATE: 'NOTIFY_UPDATE'
 }
 
 
@@ -36,6 +37,9 @@ function reducer(state, action) {
         case ACTIONS.SET_DATA:
             console.log('УСТАНОВКА ДАННЫХ', action.payload)
             return {...state, data: action.payload }
+
+        case ACTIONS.NOTIFY_UPDATE:
+            return {...state, data: {...state.data, results: state.data.results.filter(item => item.id !== action.payload)}}
     }
 }
 
@@ -106,9 +110,25 @@ function NotificationPage() {
 
     const notifiType = {
         task: 'task',
-        project: 'project'
+        project: 'project',
+        Invite: 'invite'
     }
 
+    const handleInviteButtons = async (notify, type) => {
+        try {
+            const response = await api.post(
+                `api/v1/groups/${notify.group_id}/processing_group_invite/`,
+                {notify: notify, type: type},
+                {headers: {
+                    Authorization: getAccessToken()
+                }}
+            )
+
+            dispatch({type: ACTIONS.NOTIFY_UPDATE, payload: notify.id})            
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     return (
         <>
@@ -117,16 +137,30 @@ function NotificationPage() {
                     <div className="notifications-body">
                         {state.data.results && state.data.results.length !== 0 && state.data.results.map((item, index) => (
                             <div key={index} className="notification-Item" style={{ animationDelay: `${index * 0.14}s` }}>
-                                <h2 className={`notification-type ${notifiType[item?.type] || ''}`}>{item?.type || <>other</>}</h2>
+                                <h2 className={`notification-type ${notifiType[item?.notify_type] || ''}`}>{item?.notify_type || <>other</>}</h2>
                                 <h3 className="notification-date">{item.created_at}</h3>
 
                                 <h3>{item.message}</h3>
                                 <p>description message</p>
+
+                                {item.notify_type === 'Invite' && (
+                                    <div className="notification-invite-block">
+                                        <button 
+                                        className="notification-invite-button active" 
+                                        onClick={() => handleInviteButtons(item, 'accept')}
+                                        >Accept</button>
+
+                                        <button 
+                                        className="notification-invite-button cancel"
+                                        onClick={() => handleInviteButtons(item, 'cancel')}
+                                        >Cancel</button>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
                 </div>
-                {state.pages?.length > 0 && (
+                {state.pages?.length > 0 && state.data.results.lenght !== 0 && (
                     <div className="pagination">
                         <button 
                         onClick={handlePreviousPage}

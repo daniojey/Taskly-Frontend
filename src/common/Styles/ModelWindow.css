@@ -1,0 +1,40 @@
+.window-overlay {
+    position: absolute;
+    display: flex;
+    min-height: 100vh;
+    min-width: 100vw;
+    background-color: rgb(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease-out;
+    pointer-events: none;
+}
+
+.window-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.window-overlay.close {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.window-body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 800px;
+    height: 100%;
+    max-height: 700px;
+    min-height: 700px;
+    background-color: rgb(21, 21, 21);
+    box-sizing: border-box;
+    padding: 24px;
+    border-radius: 12px;
+    border: 0.5px solid rgb(255, 255, 255, 0.8);
+}

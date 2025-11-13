@@ -72,6 +72,33 @@
     background-color: rgba(255, 255, 255, 0.356);
 }
 
+.notification-invite-block {
+    display: flex;
+    gap: 30px;
+}
+
+.notification-invite-button {
+    display: flex;
+    border: none;
+    transition: background-color 0.4s ease-in-out;
+}
+
+.notification-invite-button.active {
+    background-color: rgb(40, 141, 31);
+
+    &:hover {
+        background-color: rgb(134, 255, 123);
+    }
+}   
+
+.notification-invite-button.cancel {
+    background-color: rgb(153, 28, 28);
+
+    &:hover {
+        background-color: rgb(255, 138, 138);
+    }
+}
+
 .notification-date {
     position: absolute;
     font-family: var(--main-font-bold);

@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
 import ProjectCard from '../../components/ProjectCard/ProjectCard'
+import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.jsx'
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon'
@@ -13,6 +14,7 @@ import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProj
 function GroupPageDetail() {
     const [group, setGroup] = useState(null)
     const [groupWindow, setGroupWindow] = useState(false)
+    const [membersWindow, setMembersWindow] = useState(false)
     const [projects, setProjects] = useState([])
     const [members, setMembers] = useState([])
 
@@ -109,6 +111,10 @@ function GroupPageDetail() {
                 <CreateProjectWindow groupId={groupId} onClose={() => setGroupWindow(false)} onUpdate={() => handleUpdate()} />
             )}
 
+            {membersWindow && (
+                <AddMemberWindow groupId={groupId} onClose={() => setMembersWindow(false)}/>
+            )}
+
             <div className='group-detail__title'>
                 {group ? (
                     <>
@@ -145,8 +151,10 @@ function GroupPageDetail() {
                     </button>
                 </div>
 
-                <h2>Members</h2>
-
+                <div className='group-detail__members'>
+                    <h2>Members</h2>
+                    <button onClick={() => setMembersWindow(true)}>+</button>
+                </div>
             </div>
 
             <div className='group-detail__body'>
