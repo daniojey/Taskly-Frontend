@@ -1,55 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { useSearchParams } from "react-router";
 import './Notification.css'
+import { AuthContext } from "../../AuthContext";
 
 function Notification() {
     const token = localStorage.getItem('accessToken')
 
-    const webSocketConnection = new WebSocket(
-        'ws://'
-        + 'localhost:8000'
-        + '/ws/notifi'
-        + `/?token=${token}`
-    )
-
     const [notify, setNotify] = useState(null)
     const [hideNotify, setHideNotify] = useState(false)
+    const {updateNotify} = useContext(AuthContext)
 
-    
+    const webRef = useRef(null)
 
 
     useEffect(
         () => {
             const onOpen = () => console.log("Opened");
             const onError = () => console.log("Error");
-            const onMessage = (e) => {
+            const onMessage =  async (e) => {
                 console.log('EDATA',JSON.parse(e.data)?.message)
-
+                
+                await updateNotify()
                 setHideNotify(false)
                 setNotify(JSON.parse(e.data)?.message)
                 const timer = setTimeout(() => {
                     setHideNotify(true)
                 }, 6000)
-            }   
+            }
+            
 
-            webSocketConnection.addEventListener("open", onOpen);
-            webSocketConnection.addEventListener('message', onMessage)
-            webSocketConnection.addEventListener("error", onError);
+            const ws = new WebSocket(
+                'ws://'
+                + 'localhost:8000'
+                + '/ws/notifi'
+                + `/?token=${token}`
+            )
+
+            webRef.current = ws
+
+            ws.addEventListener("open", onOpen);
+            ws.addEventListener('message', onMessage)
+            ws.addEventListener("error", onError);
 
             return () => {
-                webSocketConnection.removeEventListener("open", onOpen);
-                webSocketConnection.removeEventListener("error", onError);
-
-                webSocketConnection.close();
-
-                // In case it hasn't been established yet before trying to close
-                webSocketConnection.addEventListener(
-                    "open",
-                    event => event.currentTarget.close()
-                );
+                console.log("Cleaning up WebSocket")
+                ws.removeEventListener("open", onOpen)
+                ws.removeEventListener("message", onMessage)
+                ws.removeEventListener("error", onError)
+                
+                // Закрываем соединение, если оно открыто
+                if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+                    ws.close()
+                }
             };
         },
-        [webSocketConnection]
+        []
     );
 
 

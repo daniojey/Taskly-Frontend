@@ -146,8 +146,10 @@
 .group-detail__member-container {
     display: flex;
     gap: 15px;
+    align-items: center;
+    justify-content: space-between;
 
-    img {
+    .image-profile {
         display: flex;
         width: 45px;
         height: 45px;
@@ -155,18 +157,16 @@
         border-radius: 50%;
     }
 
-    div {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: start;
-        font-family: var(--main-font);
-        font-weight: 700;
-    }
 
     p {
         margin: 0;
     }
+}
+
+.group-detail__member-body {
+    display: flex;
+    gap: 15px;
+    flex-direction: row;
 }
 
 

@@ -139,3 +139,21 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     transform: scale(1.1);
   }
 }
+
+.deleteIcon {
+  display: flex;
+}
+
+.delete-icon-container {
+  display: flex;
+  padding: 12px 16px;
+  border: 1px solid white;
+  border-radius: 12px;
+  background-color: rgb(168, 11, 11);
+  transition: background-color 0.4s ease-in-out, transform 0.4s ease-in-out;
+
+  &:hover{
+    background-color: rgb(245, 15, 15);
+    transform: scale(1.1);
+  }
+}

@@ -15,6 +15,22 @@ export const AuthProvider = ({ children }) => {
     const [showLoading, setShowLoading] = useState(true)
     console.log('🔄 AuthProvider создается/перерендеривается') 
 
+    const updateNotify = useCallback(async () => {
+            try {
+                const response = await api.get(
+                    'api/v1/notifications/',
+                    {headers: {
+                        Authorization: getAccessToken()
+                    }}
+                )
+
+                console.log(response)
+                setNotifications(response.data.results)
+            } catch (error) {
+                console.error(error)
+            }
+    }, [])
+
     useEffect(() => {
         // localStorage.removeItem('refreshToken')
         
@@ -161,8 +177,9 @@ export const AuthProvider = ({ children }) => {
         isLogin,
         error,
         showLoading,
-        notifications
-    }), [user, login, logout, loading, isLogin, error, showLoading, notifications])
+        notifications,
+        updateNotify
+    }), [user, login, logout, loading, isLogin, error, showLoading, notifications, updateNotify])
 
     return (
         <AuthContext.Provider value={contextValue}>

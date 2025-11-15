@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useRef, useCallback, useContext } from 'react'
 import './GroupPageDetail.css'
 import { useParams, useNavigate } from 'react-router'
 import { api } from '../../../api'
@@ -9,6 +9,9 @@ import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon'
 import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.jsx'
+import { AuthContext } from '../../AuthContext.jsx'
+import { delete_user_in_group } from '../../common/delete_member_in_group.js'
+import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.jsx'
 
 
 function GroupPageDetail() {
@@ -18,7 +21,10 @@ function GroupPageDetail() {
     const [projects, setProjects] = useState([])
     const [members, setMembers] = useState([])
 
-    console.log('MEMBERS', members)
+    const [selectedUser, setSelectedUser] = useState(null);
+
+    const { user } = useContext(AuthContext)
+
 
     const { groupId } = useParams()
 
@@ -112,7 +118,17 @@ function GroupPageDetail() {
             )}
 
             {membersWindow && (
-                <AddMemberWindow groupId={groupId} onClose={() => setMembersWindow(false)}/>
+                <AddMemberWindow groupId={groupId} onClose={() => setMembersWindow(false)} />
+            )}
+
+            {selectedUser && (
+                <DeleteWindowConfirmation
+                    groupId={groupId}
+                    userId={selectedUser.id}
+                    username={selectedUser.username}
+                    onClose={() => setSelectedUser(null)}
+                    onUpdate={() => handleUpdate()}
+                />
             )}
 
             <div className='group-detail__title'>
@@ -168,21 +184,32 @@ function GroupPageDetail() {
                 </div>
 
                 <div className='group-detail__body-members'>
-                    {members && members.map((user, index) => (
+                    {members && members.map((userItem, index) => (
                         <div className='group-detail__member-container' key={index}>
-                            {user.image_profile_url ? (
-                                <img src={user.image_profile_url} />
-                            ) : (
-                                <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} />
-                            )}
-                            <div>
-                                {user.last_name && user.first_name ? (
-                                    <p>{user.first_name} {user.last_name}</p>
+
+                            <div className='group-detail__member-body'>
+                                {userItem.image_profile_url ? (
+                                    <img src={userItem.image_profile_url} />
                                 ) : (
-                                    <p>{user.username}</p>
+                                    <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} className='image-profile' />
                                 )}
-                                <p>{user.last_login}</p>
+                                <div>
+                                    {userItem.last_name && userItem.first_name ? (
+                                        <p>{userItem.first_name} {userItem.last_name}</p>
+                                    ) : (
+                                        <p>{userItem.username}</p>
+                                    )}
+                                    <p>{userItem.last_login}</p>
+                                </div>
                             </div>
+
+                            {group.owner === user.id && user.id !== userItem.id && (
+                                <div className='delete-icon-container' onClick={() => setSelectedUser(userItem)}>
+                                    <DynamicPngIcon iconName='deleteBucketIcon' />
+                                </div>
+
+
+                            )}
                         </div>
                     ))}
                 </div>
