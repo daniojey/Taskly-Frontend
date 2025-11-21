@@ -10,7 +10,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon'
 import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.jsx'
 import { AuthContext } from '../../AuthContext.jsx'
-import { delete_user_in_group } from '../../common/delete_member_in_group.js'
 import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.jsx'
 
 
@@ -20,6 +19,8 @@ function GroupPageDetail() {
     const [membersWindow, setMembersWindow] = useState(false)
     const [projects, setProjects] = useState([])
     const [members, setMembers] = useState([])
+
+    const navigate = useNavigate()
 
     const [selectedUser, setSelectedUser] = useState(null);
 
@@ -109,7 +110,11 @@ function GroupPageDetail() {
         return () => {
             container.removeEventListener('wheel', handleWheel);
         };
-    }, []); // пустой массив зависимостей означает, что эффект выполнится только при монтировании
+    }, []);
+
+    const openGroupLogs = () => {
+        navigate(`/group/${groupId}/logs/`)
+    }
 
     return (
         <div className='base-container'>
@@ -135,6 +140,10 @@ function GroupPageDetail() {
                 {group ? (
                     <>
                         <h2>{group.name}</h2>
+
+                        {user.id === group.owner && (
+                            <button onClick={() => openGroupLogs()}>Group logs</button>
+                        )}
                     </>
                 ) : (
                     <>

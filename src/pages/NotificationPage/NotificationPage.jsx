@@ -179,7 +179,7 @@ function NotificationPage() {
                             value={item} 
                             onClick={(e) => handleSetPage(e.target.value)}
                             className={`pagination-button ${state.currentPage === item ? 'active': ''}`}
-                            disabled={state.currentPage === item}
+                            disabled={parseInt(page) === item}
                             >
                             {item}
                             </button>

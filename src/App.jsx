@@ -18,6 +18,7 @@ import ProjectBasePage from './pages/ProjectBasePage/ProjectBasePage'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import Notification from './components/Notification/Notification'
 import NotificationPage from './pages/NotificationPage/NotificationPage'
+import GroupLogsPage from './pages/GroupLogsPage/GroupLogsPage'
 
 const queryClient = new QueryClient()
 
@@ -46,6 +47,12 @@ function App() {
                     <GroupPageDetail/>
                   </ProtectedRoute>
               } />
+
+              <Route path='/group/:groupId/logs' element={
+                <ProtectedRoute>
+                  <GroupLogsPage />
+                </ProtectedRoute>
+              }/>
 
               <Route path='/projects/:projectId' element={
                 <ProtectedRoute>
