@@ -1,0 +1,52 @@
+.group-logs-card-body {
+    display: flex;
+    width: 400px;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    padding: 16px;
+    box-sizing: border-box;
+    box-shadow: 2px 2px 1px 1px rgba(255, 255, 255, 0.6);
+
+
+    h3 {
+        display: flex;
+        margin: 0;
+        font-size: 1.4rem;
+        font-family: var(--main-font-bold);
+    }
+
+    p {
+        margin: 0;
+    }
+
+    #created_date {
+        display: flex;
+        width: 100%;
+        justify-content: end;
+        align-items: center;
+        font-family: var(--main-font-bold);
+    }
+}
+
+.group-logs-card-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+
+.group-logs-context-body {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    width: 100%;
+    opacity: 0;
+    transition: height 0.3s ease-in-out, opacity 0.1s ease-out;
+}
+
+.group-logs-context-body.active {
+    opacity: 1;
+    transition: height 0.3s ease-in-out, opacity 0.5s ease-out;
+}

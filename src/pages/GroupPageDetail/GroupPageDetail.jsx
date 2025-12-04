@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef, useCallback, useContext } from 'react'
 import './GroupPageDetail.css'
 import { useParams, useNavigate } from 'react-router'
-import { api } from '../../../api'
-import { getAccessToken } from '../../../tokens_func'
-import ProjectCard from '../../components/ProjectCard/ProjectCard'
+import { api } from '../../../api.js'
+import { getAccessToken } from '../../../tokens_func.js'
+import ProjectCard from '../../components/ProjectCard/ProjectCard.jsx'
 import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.jsx'
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon'
+import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon.jsx'
 import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.jsx'
 import { AuthContext } from '../../AuthContext.jsx'
 import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.jsx'
