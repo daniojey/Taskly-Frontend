@@ -40,17 +40,33 @@
 
 .task-chat__message-body {
     display: flex;
+    flex-direction: column;
     position: relative;
+    justify-content: end;
+    align-items: start;
 }
 
 .task-chat__message-body.user {
-    justify-content: end;
-    text-align: start;
+    align-items: end;
 
     .task-chat__message {
+        display: flex;
         padding: 8px 12px 8px 12px;
         background-color: rgb(23, 23, 23);
         border: 1px solid rgb(0, 137, 250);
+    }
+}
+
+.task-chat__images-body {
+    display: flex;
+
+    img {
+        display: flex;
+        height: 5rem;
+        width: 4rem;
+        border-radius: 12px;
+        object-fit: fill;
+        cursor: pointer;
     }
 }
 
@@ -65,7 +81,7 @@
 }
 
 .task-chat__message {
-    display: block;
+    display: flex;
     width: auto;
     max-width: 80%;
     background-color: rgb(23, 23, 23);
@@ -74,11 +90,49 @@
     border-radius: 5px;
 }
 
+.task-chat__files-preview-body {
+    display: flex;
+    gap: 15px;
+    padding: 20px 10px;
+}
+
+.files-preview-container {
+    display: flex;
+    position: relative;
+
+    span {
+        display: flex;
+        position: absolute;
+        height: 16px;
+        width: 16px;
+        right: 0;
+        top: 0;
+        background-color: black;
+        border: 0.5px solid white;
+        transition: transform 0.4s ease-in-out, color 0.4s ease-out;
+        border-radius: 50%;
+        z-index: 2;
+        justify-content: center;
+        align-items: center;
+        padding: 4px;
+        cursor: pointer;
+
+        &:hover {
+            color: rgb(180, 40, 40);
+            transform: scale(1.1);
+        }
+    }
+}
+
 
 .task-chat__form {
     display: flex;
     margin-top: 20px;
     gap: 15px;
+
+    input[type="file"] {
+        display: none;
+    }
 
     button {
         display: flex;
@@ -92,6 +146,22 @@
     }
 }
 
+
+.clips-file-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 0.3px solid rgb(255, 255, 255, 0.3);
+    border-radius: 12px;
+    height: 100%;
+    padding: 8px 12px;
+    transition: transform 0.4s ease-in-out;
+
+    &:hover {
+        transform: scale(1.1);
+    }
+}
 
 .task-chat__input {
     display: flex;

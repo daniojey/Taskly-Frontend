@@ -182,3 +182,28 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     border: 1px solid rgb(0, 137, 250);
   }
 }
+
+.preview-file-image {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 60px;
+  height: 80px;
+  object-fit: fill;
+  border-radius: 12px;
+  border: 0.1px solid rgba(255, 255, 255, 0.1);
+  transform: scale(0);
+  animation: scaleIn 0.4s ease-in-out forwards;
+}
+
+
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}

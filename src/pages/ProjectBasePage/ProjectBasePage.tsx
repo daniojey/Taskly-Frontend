@@ -142,15 +142,14 @@ export default function MultipleContainers() {
   }, [])
 
 
+  // useEffect(() => {
+  //   getTasks()
+  // }, []);
+
+
   const handleTaskCreate = useCallback(() => {
     getTasks()
   }, []);
-
-
-  useEffect(() => {
-    getTasks()
-  }, []);
-
 
   void setContainers
 

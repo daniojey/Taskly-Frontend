@@ -5,6 +5,7 @@ import notifyActiveIcon from '../../../assets/notify_active.svg'
 import deleteBucketIcon from '../../../assets/delete-24.png'
 import filtersIcon from '../../../assets/filters-icon.png'
 import arrowDownWhite from '../../../assets/arrow_down_white.png'
+import clipsFile from '../../../assets/clips_file.png'
 
 const iconMap = {
     groupIcon: groupIcon,
@@ -13,7 +14,8 @@ const iconMap = {
     notifyActiveIcon: notifyActiveIcon,
     deleteBucketIcon: deleteBucketIcon,
     filtersIcon: filtersIcon,
-    arrowDownWhite: arrowDownWhite
+    arrowDownWhite: arrowDownWhite,
+    clipsFile: clipsFile
 }
 
 const DynamicPngIcon = ({
