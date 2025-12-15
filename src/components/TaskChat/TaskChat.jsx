@@ -8,6 +8,7 @@ import DynamicSvgIcon from "../UI/icons/DynamicSvgIcon"
 import { api } from "../../../api"
 import { getAccessToken } from "../../../tokens_func"
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon"
+import FullscreenImage from "../FullscreenImage/FullscreenImage"
 
 
 async function loadMoreMessages(nextUrl) {
@@ -57,7 +58,12 @@ function messageReduce(state, action) {
 
         case "UPDATE_MESSAGES":
 
-            let fix_images = action.payload?.images_urls.map(url => `${import.meta.env.VITE_REACT_APP_API_BASE_URL_IMAGES}${url}`)
+            let fix_images = action.payload?.images_urls.map(item => {
+                return {
+                ...item,
+                "url": `${import.meta.env.VITE_REACT_APP_API_BASE_URL_IMAGES}${item.url}`
+            }})
+            console.log(fix_images)
             let message = action.payload
             message.images_urls = fix_images
             return { ...state, messages: [...state.messages, message] }
@@ -95,6 +101,7 @@ function TaskChat({ data, onClose }) {
     const [taskData, setTaskData] = useState(data);
     const [messageText, setMessageText] = useState(null)
     const [state, dispatch] = useReducer(messageReduce, initialState)
+    const [activeImageWindow, setActiveImageWindow] = useState(false)
 
     const webSocketRef = useRef(null)
 
@@ -107,6 +114,7 @@ function TaskChat({ data, onClose }) {
     const nextPageRef = useRef(null)
     const scrollPositionRef = useRef(0)
     const inputFilesRef = useRef(null)
+    const activeImageRef = useRef(null)
 
     const token = localStorage.getItem('accessToken')
 
@@ -358,6 +366,12 @@ function TaskChat({ data, onClose }) {
     return (
         createPortal(
             <div className={`create-task-overlay ${close ? "close" : 'open'}`} onClick={closeOverlay}>
+
+                {activeImageWindow && (
+                    <FullscreenImage imageData={activeImageRef.current} onClose={() => setActiveImageWindow(false)}/>
+                )}
+
+
                 <div className='chat-task__body'>
                     <div className='task-chat__title'>
                         <h2>{taskData?.name}</h2>
@@ -369,8 +383,11 @@ function TaskChat({ data, onClose }) {
                             <div className={`task-chat__message-body ${item?.user?.id === user.id ? 'user' : ''}`} key={index}>
 
                                 <div className="task-chat__images-body">
-                                    {item?.images_urls.length > 0 && item.images_urls.map(url => (
-                                        <img src={url}></img>
+                                    {item?.images_urls && item.images_urls.map(item => (
+                                        <img src={item.url} key={item.id} onClick={() => {
+                                            activeImageRef.current = item
+                                            setActiveImageWindow(true)
+                                        }}></img>
                                     ))}
                                 </div>
                                 <p className="task-chat__message-username">{item?.user?.id !== user.id ? item?.user?.username : ''}</p>
