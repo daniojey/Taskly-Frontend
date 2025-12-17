@@ -9,6 +9,7 @@ import { api } from "../../../api"
 import { getAccessToken } from "../../../tokens_func"
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon"
 import FullscreenImage from "../FullscreenImage/FullscreenImage"
+import RightClickMenuComponent from "../RightClickMenuComponent/RightClickMenuComponent"
 
 
 async function loadMoreMessages(nextUrl) {
@@ -24,10 +25,10 @@ async function loadMoreMessages(nextUrl) {
         )
 
         console.log(response.data)
-        return response.data  // ← Возвращаем data, а не response
+        return response.data 
     } catch (error) {
         console.error('Error loading more messages:', error)
-        return null  // ← Явно возвращаем null в случае ошибки
+        return null
     }
 
 }
@@ -38,8 +39,11 @@ const initialState = {
     loading: true,
     isHistoryLoading: false,
     error: null,
-    inputFiles: []
+    inputFiles: [],
+    contextMenuData: null,
+    answerMessage: new Map(),
 };
+
 
 function messageReduce(state, action) {
     switch (action.type) {
@@ -91,6 +95,15 @@ function messageReduce(state, action) {
 
         case 'CLEAR_INPUT_FILES':
             return {...state, inputFiles: []}
+
+        case "SET_CONTEXT_MENU_DATA":
+            return {...state, contextMenuData: action.payload}
+
+        case 'SET_ANSWER_MESSAGE':
+            return {...state, answerMessage: action.payload}
+
+        default:
+            return {...state}
     }
 }
 
@@ -148,7 +161,6 @@ function TaskChat({ data, onClose }) {
         // Прокручиваем в самый низ страничку
         loadingRef.current = true
 
-        console.log('LOADING', loadingRef)
         const getMessages = async () => {
             try {
                 const response = await api.get(`api/v1/chat-messages/${taskData.id}/`)
@@ -270,12 +282,15 @@ function TaskChat({ data, onClose }) {
 
         setTimeout(() => {
             onClose()
-            console.log(close)
         }, 400)
     }
 
 
     const closeOverlay = (e) => {
+        if (state.answerMessage && !e.target.className.includes('context-right-menu')) {
+            dispatch({ type: 'SET_CONTEXT_MENU_DATA', payload: null})
+        }
+
         if (e.target.className.includes('create-task-overlay ')) {
             CloseWindow()
         } else if (e.target.className.includes('task-detail__opacity-filter') && deleteWindow) {
@@ -287,14 +302,23 @@ function TaskChat({ data, onClose }) {
         e.preventDefault()
 
         if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
-
-            const metadata = {
-                type: 'message_metadata',
-                message: messageText,
-                taskId: taskData.id,
-                filesCount: state.inputFiles.length,
-                messageId: Date.now()
+            
+            let metadata = {
+                    type: 'message_metadata',
+                    message: messageText,
+                    taskId: taskData.id,
+                    filesCount: state.inputFiles.length,
+                    messageId: Date.now()
+                }
+            
+            if (state.answerMessage) {
+                console.log(state.answerMessage)
+                metadata = {...metadata, answerToMessage: {
+                    'id': state.answerMessage.get('id'),
+                    'text': state.answerMessage.get('text')
+                }}
             }
+            
 
             webSocketRef.current.send(JSON.stringify(metadata));
 
@@ -314,7 +338,6 @@ function TaskChat({ data, onClose }) {
 
                 webSocketRef.current.send(JSON.stringify(fileMetadata))
                 
-                console.log('FILE', file)
                 const arrayBuffer = await file.file.arrayBuffer();
                 webSocketRef.current.send(arrayBuffer)
             }
@@ -326,13 +349,9 @@ function TaskChat({ data, onClose }) {
 
             textInputRef.current.value = '';
             dispatch({ type: 'CLEAR_INPUT_FILES' })
-
+            dispatch({ type: 'SET_ANSWER_MESSAGE', payload: new Map()})
 
         }
-        // if (webSocketRef.current && webSocketRef.current.readyState == WebSocket.OPEN) {
-        //     webSocketRef.current.send(JSON.stringify({ 'message': messageText, 'taskID': taskData.id }))
-        //     textInputRef.current.value = ''
-        // }
     }
 
 
@@ -358,10 +377,19 @@ function TaskChat({ data, onClose }) {
     }
 
     const deleteFile = (fileIndex) => {
-        console.log(fileIndex)
         dispatch({ type: 'DELETE_INPUT_FILE', payload: fileIndex})
     } 
 
+    const setAnswerMessage = (message_data) => {
+        dispatch({ type: 'SET_ANSWER_MESSAGE', payload: message_data})
+    }
+
+    const handleContextMenu = (e) => {
+        if (e.target.tagName == 'P' && !e.target.className.includes('task-chat__message-username')) {
+            e.preventDefault()
+            dispatch({ type: 'SET_CONTEXT_MENU_DATA', payload: e})
+        }
+    }
 
     return (
         createPortal(
@@ -371,16 +399,20 @@ function TaskChat({ data, onClose }) {
                     <FullscreenImage imageData={activeImageRef.current} onClose={() => setActiveImageWindow(false)}/>
                 )}
 
+                {state.contextMenuData && (
+                    <RightClickMenuComponent event={state.contextMenuData} setMessage={setAnswerMessage}/>
+                )}
+
 
                 <div className='chat-task__body'>
                     <div className='task-chat__title'>
                         <h2>{taskData?.name}</h2>
                     </div>
 
-                    <div className="task-chat__field" ref={messagesContainerRef}>
+                    <div className="task-chat__field" ref={messagesContainerRef} onContextMenu={handleContextMenu}>
                         <div ref={messagesStartRef}></div>
-                        {state.messages.length > 0 && state.messages.map((item, index) => (
-                            <div className={`task-chat__message-body ${item?.user?.id === user.id ? 'user' : ''}`} key={index}>
+                        {state.messages.length > 0 && state.messages.map(item => (
+                            <div className={`task-chat__message-body ${item?.user?.id === user.id ? 'user' : ''}`} key={item.id}>
 
                                 <div className="task-chat__images-body">
                                     {item?.images_urls && item.images_urls.map(item => (
@@ -390,15 +422,22 @@ function TaskChat({ data, onClose }) {
                                         }}></img>
                                     ))}
                                 </div>
-                                <p className="task-chat__message-username">{item?.user?.id !== user.id ? item?.user?.username : ''}</p>
-                                <p className={`task-chat__message ${item?.user?.id ? 'user' : ''}`}>{item?.message}</p>
+
+                                
+                                <div className={`task-chat__message-content ${item?.user?.id == user.id ? 'user' : ''}`}>
+                                    {!Array.isArray(item?.answer_to) && (
+                                        <p className="task-chat__answer" key={item.answer_to.id}>{item.answer_to.text}</p>
+                                    )}
+
+                                    <p className={`task-chat__message ${item?.user?.id ? 'user' : ''}`} id={item.id}>{item?.message}</p>
+                                </div>
                             </div>
                         ))}
                         <div ref={messagesEndRef}/>
                     </div>
                     
-                    { state.inputFiles.length > 0 && (
-                         <div className="task-chat__files-preview-body">
+                    { state.inputFiles && (
+                         <div className={`task-chat__files-preview-body ${state.inputFiles.length > 0 ? 'open' : ''}`}>
                             {state.inputFiles.map((item, index) => (
                                 <div className="files-preview-container" key={index}>
                                     <span onClick={() => deleteFile(item.index)}>X</span>
@@ -408,6 +447,14 @@ function TaskChat({ data, onClose }) {
                         </div>
                     )}
                    
+                    
+                    {state.answerMessage && (
+                        <div className="task-chat__answer-body">
+                            <div className={`task-chat__answer-content ${state.answerMessage.get('text') ? 'open': ''}`}>
+                                <div className="task-chat__answer-title">{state.answerMessage.get('text')}</div>
+                            </div>
+                        </div>
+                    )}
 
                     <form className="task-chat__form" onSubmit={change} >
                         <input ref={inputFilesRef} type="file" accept="image/*" onChange={changeSelectFiles} multiple/>
