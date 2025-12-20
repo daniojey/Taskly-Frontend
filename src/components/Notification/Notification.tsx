@@ -3,6 +3,17 @@ import { useSearchParams } from "react-router";
 import './Notification.css'
 import { AuthContext } from "../../AuthContext";
 
+interface NotificationData {
+  message: string;
+  type?: 'info' | 'warning' | 'error' | 'success';
+  timestamp?: string;
+  // добавь другие поля, если они есть
+}
+
+interface AuthenticateWebsoket extends WebSocket {
+    token?: string;
+}
+
 function Notification() {
     const token = localStorage.getItem('accessToken')
 
@@ -10,19 +21,20 @@ function Notification() {
     const [hideNotify, setHideNotify] = useState(false)
     const {updateNotify} = useContext(AuthContext)
 
-    const webRef = useRef(null)
+    const webRef = useRef<AuthenticateWebsoket | null>(null)
 
 
     useEffect(
         () => {
             const onOpen = () => console.log("Opened");
             const onError = () => console.log("Error");
-            const onMessage =  async (e) => {
+            const onMessage =  async (e: MessageEvent) => {
                 console.log('EDATA',JSON.parse(e.data)?.message)
+                const dataNotify = e.data
                 
                 await updateNotify()
                 setHideNotify(false)
-                setNotify(JSON.parse(e.data)?.message)
+                setNotify(JSON.parse(dataNotify)?.message)
                 const timer = setTimeout(() => {
                     setHideNotify(true)
                 }, 6000)

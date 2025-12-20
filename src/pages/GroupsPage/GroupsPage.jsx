@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from "react"
 import { api } from "../../../api"
 import { getAccessToken } from "../../../tokens_func"
-import GroupCard from "../../components/GroupCard/GroupCard"
+import GroupCard from "../../components/GroupCard/GroupCard.tsx"
 import './GroupPage.css'
 import { useSearchParams } from "react-router"
 import { AuthContext } from "../../AuthContext"

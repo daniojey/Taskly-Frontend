@@ -1,13 +1,22 @@
 import { createPortal } from 'react-dom'
 import './RightClickMenuComponent.css'
+import { MouseEvent, Dispatch, SetStateAction } from 'react'
 
-function RightClickMenuComponent ({ event, setMessage }) {
+// Интерфейс для пропсов компонента
+interface RightClickMenuComponentProps {
+  event: MouseEvent<HTMLElement>; // или конкретного элемента
+  setMessage: Dispatch<SetStateAction<Map<string, string | null>>>;
+}
+
+function RightClickMenuComponent({ event, setMessage}: RightClickMenuComponentProps) {
     const { pageX, pageY } = event
     console.log(pageX, pageY)
 
-    const messageData = new Map()
-    messageData.set('id', event.target.id)
-    messageData.set('text', event.target.textContent)
+    const target = event.target as HTMLElement
+
+    const messageData = new Map<string, string | null>()
+    messageData.set('id', target.id || '')
+    messageData.set('text', target.textContent)
 
 
     console.log(messageData)

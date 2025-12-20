@@ -3,9 +3,13 @@ import { getAccessToken } from '../../../tokens_func'
 import { useQueryClient } from '@tanstack/react-query';
 import './DeleteWindow.css'
 
+interface DeleteWindowProps {
+    data: any;
+    onClose: () => void;
+    onCloseWindow: () => void;
+}
 
-
-function DeleteWindow({ data, onClose, onCloseWindow }) {
+function DeleteWindow({ data, onClose, onCloseWindow }: DeleteWindowProps) {
     const queryClient = useQueryClient();
 
     const deleteTask = async () => {

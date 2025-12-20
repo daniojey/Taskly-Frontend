@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, InputHTMLAttributes } from "react";
 import './AddMembersWindow.css'
 import '../../common/Styles/ModelWindow.css'
 import { createPortal } from "react-dom";
@@ -6,7 +6,7 @@ import { api } from "../../../api";
 import { getAccessToken } from "../../../tokens_func";
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon";
 
-const searchUsers = async(input, groupId) => {
+const searchUsers = async(input: string, groupId: number) => {
     try {
         const response = await api.post(
             'api/v1/users/search_users/',
@@ -18,12 +18,14 @@ const searchUsers = async(input, groupId) => {
 
         console.log(response)
         return response.data
-    } catch (error) {
-        throw new Error(error?.message)
+    } catch (error: any) {
+        if (error instanceof Error) {
+            throw new Error(error?.message)
+        }
     }
 }
 
-const sendInviteGroup = async (user_id, group_id) => {
+const sendInviteGroup = async (user_id: number, group_id: number) => {
     try {
         const response = await api.post(
             `api/v1/groups/${group_id}/user_invite_group/`,
@@ -36,14 +38,30 @@ const sendInviteGroup = async (user_id, group_id) => {
         console.log(response)
         return await response.data
     } catch (error) {
-        throw new Error(error)
+        if (error instanceof Error) {
+            throw new Error(error?.message)
+        }
     }
 }
 
-function AddMemberWindow({ onClose, groupId }) {
-    const [searchText, setSearchText] = useState(null)
+interface AddMemberWindowProps {
+    onClose: () => void;
+    groupId: number;
+}
+
+interface User {
+    id: number;
+    username: string;
+    in_group: boolean;
+    image_profile_url: string | null;
+    is_invite_send: boolean
+}
+
+
+function AddMemberWindow({ onClose, groupId }: AddMemberWindowProps) {
+    const [searchText, setSearchText] = useState<string| null>(null)
     const [closeWindow, setCloseWindow] = useState(false)
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState<User[]>([])
 
     const timers = new Map()
 
@@ -55,18 +73,21 @@ function AddMemberWindow({ onClose, groupId }) {
         }, 500)
     }
 
-    const handleClickOverlay = (e) => {
-        if (e.target.className.includes('window-overlay')) {
+    const handleClickOverlay = (e : React.MouseEvent<HTMLElement>) => {
+        const target = e.target as HTMLElement
+
+        if (target.className.includes('window-overlay')) {
             onCloseWindow()
         }
     }
 
-    const handleChangeInput = (e) => {
+    const handleChangeInput = (e: React.ChangeEvent) => {
+        const target = e.target as HTMLInputElement
 
         const timer = setTimeout(async () => {
-            setSearchText(e.target.value)
-            console.log(e.target.value)
-            const  result = await searchUsers(e.target.value, groupId)
+            setSearchText(target.value)
+            console.log(target.value)
+            const  result = await searchUsers(target.value, groupId)
             console.log('RESULTS', result.results)
             setUsers(result.results)
         
@@ -80,7 +101,7 @@ function AddMemberWindow({ onClose, groupId }) {
         timers.set('timer', timer) 
     }
 
-    const handleClickInviteButton = async (user_id) => {
+    const handleClickInviteButton = async (user_id: number) => {
         console.log(user_id)
         const result = await sendInviteGroup(user_id, groupId)
 
