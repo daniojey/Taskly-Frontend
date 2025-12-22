@@ -5,7 +5,16 @@ import './DeleteWindowConfirmation.css'
 import { delete_user_in_group } from "../../common/delete_member_in_group"
 
 
-function DeleteWindowConfirmation ({ groupId, userId, username, onClose, onUpdate}) {
+interface DeleteWindowConfirmationProps {
+    groupId: number;
+    userId: number;
+    username: string;
+    onClose: () => void;
+    onUpdate: () => void;
+}
+
+
+function DeleteWindowConfirmation ({ groupId, userId, username, onClose, onUpdate}: DeleteWindowConfirmationProps) {
     const [closeWindow, setCloseWindow] = useState(false)
 
     const onCloseWindow =  () => {
@@ -16,13 +25,14 @@ function DeleteWindowConfirmation ({ groupId, userId, username, onClose, onUpdat
         }, 500)
     }
     
-    const handleClickOverlay = (e) => {
-        if (e.target.className.includes('window-overlay')) {
+    const handleClickOverlay = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement
+        if (target.className.includes('window-overlay')) {
             onCloseWindow()
         }
     }
 
-    const onClickDeleteButton = async (userId, groupId) => {
+    const onClickDeleteButton = async (userId: number, groupId: number) => {
         console.log('DELETE')
 
         const result = await delete_user_in_group(userId, groupId)

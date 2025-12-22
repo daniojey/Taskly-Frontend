@@ -1,9 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 import './GroupLogsCard.css'
 import DynamicPngIcon from '../UI/icons/DynamicPngIcon'
 
+interface GroupLogsCardProps {
+    data: {
+        event: string;
+        event_type: string;
+        anchor_username: string;
+        data?: {} | null,
+        created_at: string;
+        };
+    showContext: boolean
+}
 
-function GroupLogsCard ({ data, showContext }) {
+function GroupLogsCard ({ data, showContext }: GroupLogsCardProps) {
     const {
         event,
         event_type,
@@ -13,12 +23,13 @@ function GroupLogsCard ({ data, showContext }) {
     } = data
 
     const [context, setContext] = useState(showContext)
-    const [contentHeight, setContentHeight] = useState(0);
-    const contextRef = useRef()
+    const [contentHeight, setContentHeight] = useState<number>(0);
+    const contextRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        setContentHeight(contextRef.current.scrollHeight)
-    }, [data])
+        setContentHeight(contextRef.current?.scrollHeight || 0);
+
+    }, [data]);
 
     useEffect(() => {
         setContext(showContext)

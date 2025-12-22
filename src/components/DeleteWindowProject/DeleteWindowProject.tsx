@@ -3,13 +3,16 @@ import './DeleteWindowProject.css'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
 
+interface DeleteWindowProjectProps {
+    projectId: number;
+    onClose: () => void;
+}
 
-
-function DeleteWindowProject({ projectId, onClose, }) {
+function DeleteWindowProject({ projectId, onClose, }: DeleteWindowProjectProps) {
     const navigate = useNavigate()
 
 
-    const projectDelete = async (projectId) => {
+    const projectDelete = async (projectId: number) => {
         try {
             const response = await api.delete(`api/v1/groups-projects/${projectId}/`,
                 {headers: {

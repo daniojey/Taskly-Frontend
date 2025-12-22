@@ -5,12 +5,39 @@ import { getAccessToken } from "../../../tokens_func"
 import './GroupLogsPage.css'
 import DynamicPngIcon from "../../components/UI/icons/DynamicPngIcon"
 import * as yup from 'yup'
-import { useForm } from "react-hook-form"
+import { Resolver, SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import GroupLogsCard from "../../components/GroupLogsCard/GroupLogsCard"
 
+interface LogItem {
+    id: number;
+    event: string;
+    event_type: string;
+    group_name: string;
+    anchor_username: string;
+    created_at: string;
+    data?: {};
+}
+
+interface UrlParams {
+    page: string;
+    dateStart: string | null;
+    dateOut: string | null; 
+    username: string | null;
+    groupName: string | null;
+    eventType: string | null;
+}
+
+interface YupFormData {
+    'date-start': string;
+    'date-out': string;
+    'username': string;
+    'group-name': string;
+    'event-type': string;
+}
+
 function GroupLogsPage () {
-    const [logs, setLogs] = useState([])
+    const [logs, setLogs] = useState<LogItem[]>([])
     const [openFilters, setOpenFilters] = useState(false)
     const [searchParams, setSearchParams] = useSearchParams()
     const [showContextLogs, setShowContextLogs] = useState(false)
@@ -28,8 +55,8 @@ function GroupLogsPage () {
         handleSubmit,
         watch,
         formState: { errors }
-    } = useForm({
-        resolver: yupResolver(schema)
+    } = useForm<YupFormData>({
+        resolver: yupResolver(schema) as Resolver<YupFormData>
     })
 
     const { groupId } = useParams()
@@ -41,7 +68,7 @@ function GroupLogsPage () {
     const groupName = searchParams.get('group-name') || null
     const eventType = searchParams.get('event-type') || null
 
-    const buildUrl = (page, dateStart, dateOut, username, groupName, eventType) => {
+    const buildUrl = ({page, dateStart, dateOut, username, groupName, eventType} : UrlParams) => {
         const url = `api/v1/group/${groupId}/logs`
         const params = new URLSearchParams()
 
@@ -62,7 +89,14 @@ function GroupLogsPage () {
         const getGroupLogs = async () => {
             try {
                 const response = await api.get(
-                    buildUrl(page, dateStart, dateOut, username, groupName, eventType),
+                    buildUrl({
+                        page: page, 
+                        dateStart: dateStart, 
+                        dateOut: dateOut, 
+                        username: username, 
+                        groupName: groupName, 
+                        eventType: eventType
+                    }),
                     {headers: {
                         Authorization: getAccessToken()
                     }}
@@ -79,24 +113,24 @@ function GroupLogsPage () {
         getGroupLogs()
     }, [page, searchParams])
 
-    const checkOpenFilters = (e) => {
+    const checkOpenFilters = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement
 
-        if (openFilters && e.target.className.includes('logs-base-container')) {
+        if (openFilters && target.className.includes('logs-base-container')) {
             setOpenFilters(false)
         }
     }
 
-    const openDateTimeWidget = async (e) => {
-        e.target.showPicker()
-    }
 
-    const submitFilters = async (data) => {
+    const submitFilters = async (data: YupFormData) => {
         console.log(data)
         const params = new URLSearchParams
 
         for (let item in data) {
-            if (data[item]) {
-                params.set(item, data[item])
+                 const key = item as keyof YupFormData
+                 const value = data[key]
+            if (value && typeof value === 'string') {
+                params.set(key, value)
             }
         }
 
@@ -116,7 +150,10 @@ function GroupLogsPage () {
                         <label htmlFor="date-start">Date start</label>
                         <input
                         {...register('date-start')} 
-                        onClick={openDateTimeWidget} 
+                        onClick={(e) => {
+                            const target = e.target as HTMLInputElement
+                            target.showPicker()
+                        }} 
                         className="datetime-base-style"
                         type="datetime-local" 
                         name="date-start" 
@@ -129,7 +166,10 @@ function GroupLogsPage () {
                         <input
                         {...register('date-out')}
                         className="datetime-base-style"  
-                        onClick={openDateTimeWidget} 
+                        onClick={(e) => {
+                            const target = e.target as HTMLInputElement
+                            target.showPicker()
+                        }}  
                         type="datetime-local" 
                         name="date-out" 
                         id="date-out"
@@ -190,7 +230,7 @@ function GroupLogsPage () {
             </div>
 
             <div className="logs-base-container" onClick={checkOpenFilters}>
-                {logs && logs.length > 0 && logs.map((item) => (
+                {logs.length > 0 && logs.map((item) => (
                     <GroupLogsCard data={item} key={item.id} showContext={showContextLogs}/>
                 ))}
             </div>

@@ -5,10 +5,21 @@ import DynamicPngIcon from "../UI/icons/DynamicPngIcon"
 import { api } from "../../../api"
 import { truncateString } from "../../common/truncate"
 
-function FullscreenImage ({ imageData, onClose }) {
+interface ImageData {
+    id: number;
+    url: string;
+    filename: string;
+}
+
+interface FullscreenImageProps<T> {
+    imageData: T;
+    onClose: () => void;
+}
+
+function FullscreenImage ({ imageData, onClose }: FullscreenImageProps<ImageData>) {
     const { id, url, filename} = imageData
 
-    const [closeWindow, setCloseWindow] = useState(false)
+    const [closeWindow, setCloseWindow] = useState<boolean>(false)
 
     const handleClose = () => {
         setCloseWindow(true)
@@ -18,8 +29,9 @@ function FullscreenImage ({ imageData, onClose }) {
         }, 400)
     }
 
-    const handleCloseOverlay = (e) => {
-        if (e.target.className.includes('full-screen-image__body') || e.target.className.includes('full-screen-image__image')) {
+    const handleCloseOverlay = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement
+        if (target.className.includes('full-screen-image__body') || target.className.includes('full-screen-image__image')) {
             handleClose()
         }
     }
@@ -69,7 +81,7 @@ function FullscreenImage ({ imageData, onClose }) {
                         <div className="full-screen-image__header-title">{truncateString(filename, 50)}</div>
 
                         <div className="full-screen-image__haeder-body">
-                            <DynamicPngIcon iconName="downloadIcon" onClick={(e) => clickDownloadImage()}/>
+                            <DynamicPngIcon iconName="downloadIcon" onClick={() => clickDownloadImage()}/>
 
                             <div onClick={() => onClose()}>X</div>
                         </div>
