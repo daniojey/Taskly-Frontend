@@ -1,5 +1,5 @@
 import './CreateTaskWindow.css'
-import { useForm } from 'react-hook-form'
+import { Resolver, SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup';
 import {yupResolver} from '@hookform/resolvers/yup'
 import { useContext, useState } from 'react';
@@ -7,33 +7,50 @@ import { AuthContext} from '../../AuthContext'
 import { api } from '../../../api';
 import { getAccessToken } from '../../../tokens_func';
 
+interface CreateTaskWindowProps {
+    onClose: () => void;
+    onUpdate: () => void;
+    projectId: number;
+}
 
-function CreateTaskWindow({ onClose, onUpdate, projectId }) {
+type TaskStatus = 'NS' | 'BS'| 'US'
+
+interface YupFormData {
+    name: string;
+    description?: string;
+    status: TaskStatus;
+    deadline: string;
+}
+
+interface FormData extends YupFormData {
+    project_id: number;
+    created_by: number;
+}
+
+
+function CreateTaskWindow({ onClose, onUpdate, projectId }: CreateTaskWindowProps) {
     const { user } = useContext(AuthContext)
-    const [close, setClose] = useState(false)
+    const [close, setClose] = useState<boolean>(false)
 
     const schema = yup.object({
         name: yup.string().min(3).max(30).required(),
         description: yup.string().min(0).max(500),
-        status: yup.string().test(
-            'testbase',
-            (value, context) => {
-                console.log(value)
-                console.log(context)
-
-                return value
-            }
-        )
-
+        status: yup.mixed<TaskStatus>().oneOf(['NS', 'BS', 'US'] as const).defined(),
+        deadline: yup.string().required(),
     })
+
+    type TaskData = yup.InferType<typeof schema>
 
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors }
-    } = useForm({
-        resolver: yupResolver(schema)
+    } = useForm<TaskData>({
+        resolver: yupResolver(schema) as Resolver<TaskData>,
+        defaultValues: {
+            description: '',
+            status: 'NS'
+        }
     })
 
 
@@ -48,11 +65,11 @@ function CreateTaskWindow({ onClose, onUpdate, projectId }) {
 
 
 
-    const submitForm = async (data) => {
+    const submitForm: SubmitHandler<YupFormData> = async (data) => {
         // e.preventDefault()
         console.log(user)
         console.log('form NOt fetch', data)
-        data = {
+        const formData: FormData = {
             ...data,
             project_id: projectId,
             created_by: user.id
@@ -60,7 +77,7 @@ function CreateTaskWindow({ onClose, onUpdate, projectId }) {
 
         console.log('UPDATED data', data)
         
-        const createTask = async (data) => {
+        const createTask = async (formData: FormData) => {
             try {
                 const response = await api.post(
                     `api/v1/projects/${projectId}/tasks/`,
@@ -79,16 +96,17 @@ function CreateTaskWindow({ onClose, onUpdate, projectId }) {
         }
 
 
-        createTask(data)
+        createTask(formData)
     }
 
 
 
-    const clickOverlay = (e) => {
+    const clickOverlay = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement
 
-        console.log(e.target.className)
+        console.log(target.className)
 
-        if (e.target.className.includes('create-task-overlay')) {
+        if (target.className.includes('create-task-overlay')) {
             CloseWindow()
         }
     }
@@ -106,21 +124,19 @@ function CreateTaskWindow({ onClose, onUpdate, projectId }) {
                     className='neomorphism-input' 
                     type="text" 
                     id="name" 
-                    name='name' 
                     placeholder='task name' 
                     {...register('name')}
                     />
 
                     <textarea 
                     id='description'
-                    name='description'
                     className='neomorphism-input'  
                     placeholder='description' 
                     {...register('description')}
                     ></textarea>
                     
                     <label htmlFor="status">Status</label>
-                    <select name="status" className='neomorphism-input' defaultValue="NS" id="status" {...register('status')}>
+                    <select className='neomorphism-input' defaultValue="NS" id="status" {...register('status')}>
                         <option value="NS">No status</option>
                         <option value="BS">Base status</option>
                         <option value="US">Urgent status</option>
@@ -131,7 +147,6 @@ function CreateTaskWindow({ onClose, onUpdate, projectId }) {
                     className='neomorphism-input'  
                     type="datetime-local" 
                     onFocus={(e) => e.target.showPicker()} 
-                    name='deadline' 
                     id='deadline' 
                     {...register('deadline')}/>
                     <button type='submit'>Create Task</button>

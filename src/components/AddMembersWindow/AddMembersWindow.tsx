@@ -60,7 +60,7 @@ interface User {
 
 function AddMemberWindow({ onClose, groupId }: AddMemberWindowProps) {
     const [searchText, setSearchText] = useState<string| null>(null)
-    const [closeWindow, setCloseWindow] = useState(false)
+    const [closeWindow, setCloseWindow] = useState<boolean>(false)
     const [users, setUsers] = useState<User[]>([])
 
     const timers = new Map()

@@ -3,16 +3,22 @@ import './CreateProjectWindow.css'
 import '../CreateTaskWindow/CreateTaskWindow.css'
 import { useContext, useState } from 'react'
 import * as yup from 'yup'
-import { useForm } from 'react-hook-form'
+import { useForm, SubmitHandler, Resolver } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
 import { AuthContext } from '../../AuthContext'
 
+interface CreateProjectWindowProps {
+    groupId: number;
+    onClose: () => void;
+    onUpdate: () => void;
+}
 
 
-function CreateProjectWindow({ groupId, onClose, onUpdate }) {
-    const [close, setClose] = useState(false)
+
+function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindowProps) {
+    const [close, setClose] = useState<boolean>(false)
     const { user } = useContext(AuthContext)
 
     const schema = yup.object({
@@ -20,13 +26,24 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }) {
         description: yup.string().max(400)
     })
 
+    type ProjectData = yup.InferType<typeof schema>
+
+    interface FormData extends ProjectData {
+        group: number;
+        owner: number;
+    }
+
     const {
         register,
         handleSubmit,
         watch,
         formState: { errors }
-    } = useForm({
-        resolver: yupResolver(schema)
+    } = useForm<ProjectData>({
+        resolver: yupResolver(schema) as Resolver<ProjectData>,
+        defaultValues: {
+            title: '',
+            description: ''
+        }
     })
 
     // const formSubmit
@@ -42,28 +59,31 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }) {
         }, 400)
     }
 
-    const clickOverlay = (e) => {
+    const clickOverlay = (e: React.MouseEvent<HTMLElement>) => {
+        
+        const target = e.target as HTMLElement
 
-        if (e.target.className.includes('create-task-overlay')) {
+
+        if (target.className.includes('create-task-overlay')) {
             CloseWindow()
         }
     }
 
 
-    const handleForm = async (data) => {
+    const handleForm: SubmitHandler<ProjectData> = async (data) => {
         console.log(data)
 
-        data = {
+        const apiData: FormData = {
             ...data,
             group: groupId,
             owner: user.id
         }
 
-        const createProject = async (data) => {
+        const createProject = async (apiData: FormData) => {
             try {
                 const response = await api.post(
                     'api/v1/groups-projects/',
-                    {...data},
+                    {...apiData},
                     {headers: {
                         Authorization: getAccessToken()
                     }}
@@ -84,7 +104,7 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }) {
         }
 
 
-        createProject(data)
+        createProject(apiData)
     }
 
     return (
@@ -99,7 +119,6 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }) {
                         <input 
                         className='neomorphism-input'
                         type="text" 
-                        name='title' 
                         id='title' 
                         placeholder='title'
                         { ...register('title')}
@@ -107,7 +126,6 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }) {
 
                         <textarea 
                         className='neomorphism-input'
-                        name="description" 
                         id="description" 
                         placeholder='description'
                         {...register('description')}

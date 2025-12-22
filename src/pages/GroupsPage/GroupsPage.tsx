@@ -1,21 +1,51 @@
 import { useEffect, useState, useContext } from "react"
-import { api } from "../../../api"
-import { getAccessToken } from "../../../tokens_func"
+import { api } from "../../../api.js"
+import { getAccessToken } from "../../../tokens_func.js"
 import GroupCard from "../../components/GroupCard/GroupCard.tsx"
 import './GroupPage.css'
 import { useSearchParams } from "react-router"
-import { AuthContext } from "../../AuthContext"
+import { AuthContext } from "../../AuthContext.jsx"
+
+interface Members {
+    email: string;
+    first_name: string;
+    id: number;
+    image_profile: string | null;
+    image_profile_url: string | null;
+    in_group: boolean;
+    in_invite_send: boolean;
+    last_login: string;
+    last_name: string;
+    username: string
+}
+
+interface Projects {
+    created_at: string;
+    description: string;
+    group_name: string;
+    id: number;
+    title: string;
+}
+
+interface GroupItem {
+    id: number;
+    name: string;
+    members: Members[];
+    projects: Projects[];
+    created: true | null
+
+}
 
 function GroupsPage() {
-    const [groups, setGroups] = useState([])
+    const [groups, setGroups] = useState<GroupItem[]>([])
     const [searchParams, setSearchParams] = useSearchParams()
-    const [createForm, setCreateForm] = useState(null) 
-    const [groupName, setGroupName] = useState(null)
+    const [createForm, setCreateForm] = useState<boolean>(false) 
+    const [groupName, setGroupName] = useState<string | null>(null)
     const {user} = useContext(AuthContext)
 
     // const filter = searchParams.get('filter') || ''
 
-    const onChange = async (e) => {
+    const onChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (e.target.value) {
             const param = new URLSearchParams()
             param.set('f', e.target.value)
@@ -26,7 +56,7 @@ function GroupsPage() {
         }
     }
 
-    const submitForm = async (e) => {
+    const submitForm = async (e: React.FormEvent) => {
         e.preventDefault()
 
         // console.log(typeof user)
@@ -110,7 +140,11 @@ function GroupsPage() {
 
             <form className={createForm ? "group-form-body active" : "group-form-body"} onSubmit={submitForm}>
                 <h2>Come up with a name for the group</h2>
-                <input type="text" placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} required/>
+                <input type="text" placeholder="Group name" onChange={(e) => {
+                    const target = e.target as HTMLInputElement
+                    setGroupName(target.value)} 
+                }
+                required/>
                 <button type="submit">Create Group</button>
             </form>
             
@@ -120,7 +154,6 @@ function GroupsPage() {
                     <GroupCard 
                     props={{index, ...item}} 
                     key={index} 
-                    index={index}
                     />
                 ))}
             </div>

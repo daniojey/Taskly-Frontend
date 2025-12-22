@@ -7,16 +7,25 @@ import { useSearchParams } from "react-router"
 import { buildUrl } from "./common/build_url"
 import { getVisiblePages } from "./common/getVisiblePages"
 
+type NotifyType = 'task' | 'project' | 'invite';
 
+interface NotificationItem {
+    id: number;
+    message: string | null;
+    created_at: string | null;
+    user?: {} | null | [];
+    notify_type: NotifyType;
+    group_id: number | null;
+}
 
-const initialState = {
-    data: {
-        count: null,
-        next: null,
-        previous: null,
-        results: []
+interface InitialStateData {
+     data: {
+        count: number | null,
+        next: string | null,
+        previous: string | null,
+        results: NotificationItem[]
     },
-    pages: []
+    pages: number[]
 }
 
 
@@ -28,18 +37,47 @@ const ACTIONS = {
 }
 
 
-function reducer(state, action) {
+type ActionTypes = 
+    | {type: "SET_PAGES", payload: number[]}
+    | {type: 'SET_DATA', payload: {
+        count: number | null,
+        next: string | null,
+        previous: string | null,
+        results: any[]
+    }
+    }
+    | {type: 'NOTIFY_UPDATE', payload: number}
+
+
+
+const initialState: InitialStateData= {
+    data: {
+        count: null,
+        next: null,
+        previous: null,
+        results: []
+    },
+    pages: []
+}
+
+
+
+
+function reducer(state: InitialStateData, action: ActionTypes): InitialStateData {
     switch (action.type) {
-        case ACTIONS.SET_PAGES:
+        case "SET_PAGES":
             console.log('УСТАНОВКА СТРАНИЦ')
             return { ...state, pages: action.payload }
 
-        case ACTIONS.SET_DATA:
+        case "SET_DATA":
             console.log('УСТАНОВКА ДАННЫХ', action.payload)
             return {...state, data: action.payload }
 
         case ACTIONS.NOTIFY_UPDATE:
             return {...state, data: {...state.data, results: state.data.results.filter(item => item.id !== action.payload)}}
+
+        default:
+            return state
     }
 }
 
@@ -67,11 +105,10 @@ function NotificationPage() {
                 {/* set pagination pages */ }
                 const countPages = Math.ceil(response.data.count / response.data.items_per_page)
                 const allPages = Array.from({ 'length': countPages }, (_, i) => i + 1)
-                dispatch({ type: ACTIONS.SET_PAGES, payload: allPages })
+                dispatch({ type: "SET_PAGES", payload: allPages })
 
                 {/* set Notification */ }
-                // setNotify(response.data.results)
-                dispatch({ type: ACTIONS.SET_DATA, payload: response.data})
+                dispatch({ type: "SET_DATA", payload: response.data})
             } catch (error) {
                 console.error(error)
             }
@@ -82,7 +119,7 @@ function NotificationPage() {
 
 
     {/* function set page in pagination */ }
-    const handleSetPage = (pageNumber) => {
+    const handleSetPage = (pageNumber: string) => {
         const params = new URLSearchParams()
         params.set('page', pageNumber)
         setSearchParams(params)
@@ -108,13 +145,13 @@ function NotificationPage() {
         }
     }
 
-    const notifiType = {
+    const notifiType: Record<NotifyType, string> = {
         task: 'task',
         project: 'project',
-        Invite: 'invite'
+        invite: 'invite'
     }
 
-    const handleInviteButtons = async (notify, type) => {
+    const handleInviteButtons = async (notify: NotificationItem, type: string) => {
         try {
             const response = await api.post(
                 `api/v1/groups/${notify.group_id}/processing_group_invite/`,
@@ -124,7 +161,7 @@ function NotificationPage() {
                 }}
             )
 
-            dispatch({type: ACTIONS.NOTIFY_UPDATE, payload: notify.id})            
+            dispatch({type: "NOTIFY_UPDATE", payload: notify.id})            
         } catch (error) {
             console.log(error)
         }
@@ -143,7 +180,7 @@ function NotificationPage() {
                                 <h3>{item.message}</h3>
                                 <p>description message</p>
 
-                                {item.notify_type === 'Invite' && (
+                                {notifiType[item.notify_type] === 'Invite' && (
                                     <div className="notification-invite-block">
                                         <button 
                                         className="notification-invite-button active" 
@@ -160,7 +197,7 @@ function NotificationPage() {
                         ))}
                     </div>
                 </div>
-                {state.pages?.length > 0 && state.data.results.lenght !== 0 && (
+                {state.pages?.length > 0 && state.data.results.length !== 0 && (
                     <div className="pagination">
                         <button 
                         onClick={handlePreviousPage}
@@ -177,8 +214,12 @@ function NotificationPage() {
                             <button 
                             key={item} 
                             value={item} 
-                            onClick={(e) => handleSetPage(e.target.value)}
-                            className={`pagination-button ${state.currentPage === item ? 'active': ''}`}
+                            onClick={(e) => {
+                                const target = e.target as HTMLButtonElement;
+                                handleSetPage(target.value);
+                            }}
+                            // className={`pagination-button ${state.currentPage === item ? 'active': ''}`}
+                            className={`pagination-button`}
                             disabled={parseInt(page) === item}
                             >
                             {item}
