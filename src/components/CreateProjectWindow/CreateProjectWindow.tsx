@@ -10,7 +10,7 @@ import { getAccessToken } from '../../../tokens_func'
 import { AuthContext } from '../../AuthContext'
 
 interface CreateProjectWindowProps {
-    groupId: number;
+    groupId: string;
     onClose: () => void;
     onUpdate: () => void;
 }
@@ -29,7 +29,7 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
     type ProjectData = yup.InferType<typeof schema>
 
     interface FormData extends ProjectData {
-        group: number;
+        group: string;
         owner: number;
     }
 

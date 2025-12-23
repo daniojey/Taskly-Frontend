@@ -6,7 +6,7 @@ import { delete_user_in_group } from "../../common/delete_member_in_group"
 
 
 interface DeleteWindowConfirmationProps {
-    groupId: number;
+    groupId: string;
     userId: number;
     username: string;
     onClose: () => void;
@@ -32,7 +32,7 @@ function DeleteWindowConfirmation ({ groupId, userId, username, onClose, onUpdat
         }
     }
 
-    const onClickDeleteButton = async (userId: number, groupId: number) => {
+    const onClickDeleteButton = async (userId: number, groupId: string) => {
         console.log('DELETE')
 
         const result = await delete_user_in_group(userId, groupId)

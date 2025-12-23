@@ -43,7 +43,7 @@ type ActionTypes =
         count: number | null,
         next: string | null,
         previous: string | null,
-        results: any[]
+        results: NotificationItem[]
     }
     }
     | {type: 'NOTIFY_UPDATE', payload: number}
@@ -180,7 +180,7 @@ function NotificationPage() {
                                 <h3>{item.message}</h3>
                                 <p>description message</p>
 
-                                {notifiType[item.notify_type] === 'Invite' && (
+                                {notifiType[item.notify_type] === 'invite' && (
                                     <div className="notification-invite-block">
                                         <button 
                                         className="notification-invite-button active" 

@@ -6,7 +6,7 @@ import { api } from "../../../api";
 import { getAccessToken } from "../../../tokens_func";
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon";
 
-const searchUsers = async(input: string, groupId: number) => {
+const searchUsers = async(input: string, groupId: string) => {
     try {
         const response = await api.post(
             'api/v1/users/search_users/',
@@ -25,7 +25,7 @@ const searchUsers = async(input: string, groupId: number) => {
     }
 }
 
-const sendInviteGroup = async (user_id: number, group_id: number) => {
+const sendInviteGroup = async (user_id: number, group_id: string) => {
     try {
         const response = await api.post(
             `api/v1/groups/${group_id}/user_invite_group/`,
@@ -46,7 +46,7 @@ const sendInviteGroup = async (user_id: number, group_id: number) => {
 
 interface AddMemberWindowProps {
     onClose: () => void;
-    groupId: number;
+    groupId: string;
 }
 
 interface User {
@@ -88,6 +88,7 @@ function AddMemberWindow({ onClose, groupId }: AddMemberWindowProps) {
             setSearchText(target.value)
             console.log(target.value)
             const  result = await searchUsers(target.value, groupId)
+            console.log(result)
             console.log('RESULTS', result.results)
             setUsers(result.results)
         

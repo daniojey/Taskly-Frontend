@@ -4,32 +4,49 @@ import { useParams, useNavigate } from 'react-router'
 import { api } from '../../../api.js'
 import { getAccessToken } from '../../../tokens_func.js'
 import ProjectCard from '../../components/ProjectCard/ProjectCard.jsx'
-import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.jsx'
+import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.js'
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, UserIcon } from 'lucide-react';
 import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon.jsx'
-import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.jsx'
+import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.js'
 import { AuthContext } from '../../AuthContext.jsx'
-import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.jsx'
+import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.js'
+
+interface UserItem {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+    image_profile_url: string;
+    last_login: string;
+}
+
+
+interface GroupItem<T>{
+    id: number;
+    owner: T extends true ? {}: null;
+    name: string;
+
+}
 
 
 function GroupPageDetail() {
-    const [group, setGroup] = useState(null)
+    const [group, setGroup] = useState<GroupItem<UserItem> | null>(null)
     const [groupWindow, setGroupWindow] = useState(false)
     const [membersWindow, setMembersWindow] = useState(false)
     const [projects, setProjects] = useState([])
-    const [members, setMembers] = useState([])
+    const [members, setMembers] = useState<UserItem[]>([])
 
     const navigate = useNavigate()
 
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
 
     const { user } = useContext(AuthContext)
 
 
-    const { groupId } = useParams()
+    const { groupId  = ''} = useParams<string>()
 
-    const scrollContainerRef = useRef(null)
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 
     const scrollLeft = () => {
         if (scrollContainerRef.current) {
@@ -88,7 +105,7 @@ function GroupPageDetail() {
         if (!container) return;
 
         // Функция-обработчик события wheel (колесико мыши)
-        const handleWheel = (event) => {
+        const handleWheel = (event: WheelEvent) => {
 
             const canScrollHorizontally = container.scrollWidth > container.clientWidth;
 
@@ -105,7 +122,7 @@ function GroupPageDetail() {
             }
         };
 
-        container.addEventListener('wheel', handleWheel, { passive: false });
+        container.addEventListener('wheel', (handleWheel), { passive: false });
 
         return () => {
             container.removeEventListener('wheel', handleWheel);
@@ -212,7 +229,7 @@ function GroupPageDetail() {
                                 </div>
                             </div>
 
-                            {group.owner === user.id && user.id !== userItem.id && (
+                            {group && group.owner === user.id && user.id !== userItem.id && (
                                 <div className='delete-icon-container' onClick={() => setSelectedUser(userItem)}>
                                     <DynamicPngIcon iconName='deleteBucketIcon' />
                                 </div>
