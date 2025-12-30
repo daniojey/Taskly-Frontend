@@ -5,6 +5,7 @@ import GroupCard from "../../components/GroupCard/GroupCard.tsx"
 import './GroupPage.css'
 import { useSearchParams } from "react-router"
 import { AuthContext } from "../../AuthContext.jsx"
+import AddMembersModelWindow from "../../components/AddMembersModelWindow/AddMembersModelWindow.tsx"
 
 interface Members {
     email: string;
@@ -42,6 +43,8 @@ function GroupsPage() {
     const [createForm, setCreateForm] = useState<boolean>(false) 
     const [groupName, setGroupName] = useState<string | null>(null)
     const {user} = useContext(AuthContext)
+    const [addMembersWindow, setAddMembersWindow] = useState<boolean>(false)
+
 
     // const filter = searchParams.get('filter') || ''
 
@@ -56,16 +59,20 @@ function GroupsPage() {
         }
     }
 
-    const submitForm = async (e: React.FormEvent) => {
-        e.preventDefault()
+    const onCreateGroup = async (members_ids: number[] | null = null) => {
+        let members_data: number[] = [user.id]
 
-        // console.log(typeof user)
-        // console.log(groupName)
+        if (members_ids) {
+            members_data = [...members_ids, user.id]
+        } else {
+            members_data = [user.id]
+        }
+
 
         try {
             const response = await api.post(
                 'api/v1/groups/',
-                {members:[user.id], name: groupName, owner: user.id},
+                {members: members_data, name: groupName, owner: user.id},
                 {
                     headers: {
                         Authorization: getAccessToken()
@@ -81,6 +88,37 @@ function GroupsPage() {
                 ...response.data.result
             }
             setGroups(groups => [data, ...groups]);
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const submitForm = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        // console.log(typeof user)
+        // console.log(groupName)
+
+        try {
+            // const response = await api.post(
+            //     'api/v1/groups/',
+            //     {members:[user.id], name: groupName, owner: user.id},
+            //     {
+            //         headers: {
+            //             Authorization: getAccessToken()
+            //         }
+            //     }
+            // )
+
+            // console.log(response)
+
+            // // setGroups({response.data.result})
+            // const data = {
+            //     created: true,
+            //     ...response.data.result
+            // }
+            // setGroups(groups => [data, ...groups]);
+            setAddMembersWindow(true)
         } catch (error) {
             console.error(error)
         }
@@ -111,6 +149,11 @@ function GroupsPage() {
 
     return (
         <div className="base-container">
+
+            {addMembersWindow && (
+                <AddMembersModelWindow onClose={() => setAddMembersWindow(false)} onCreateGroup={onCreateGroup}/>
+            )}
+
             <div className="group-navigation-block">
                 <div className="group-navigation-block__filter">
                     <label htmlFor="filters">Filter</label>

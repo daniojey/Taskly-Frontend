@@ -44,8 +44,8 @@ function GroupCard({ props}: GroupCardProps) {
         navigate(`/groups/${id}/`)
     }
 
-    const membersGet = members ? Object.keys(members).length | 0 : 'Error'
-    const projectsGet = projects ? Object.keys(projects).length | 0 : 'Error'
+    const membersGet = members ? Object.keys(members).length: 0
+    const projectsGet = projects ? Object.keys(projects).length : 0
 
     return (
         <>
