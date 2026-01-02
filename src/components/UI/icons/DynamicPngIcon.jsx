@@ -7,6 +7,7 @@ import filtersIcon from '../../../assets/filters-icon.png'
 import arrowDownWhite from '../../../assets/arrow_down_white.png'
 import clipsFile from '../../../assets/clips_file.png'
 import downloadIcon from '../../../assets/download_icon.png'
+import backGroundIcon from  '../../../assets/blue_background.png'
 
 const iconMap = {
     groupIcon: groupIcon,
@@ -17,7 +18,8 @@ const iconMap = {
     filtersIcon: filtersIcon,
     arrowDownWhite: arrowDownWhite,
     clipsFile: clipsFile,
-    downloadIcon: downloadIcon
+    downloadIcon: downloadIcon,
+    backGroundIcon: backGroundIcon,
 }
 
 const DynamicPngIcon = ({

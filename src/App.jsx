@@ -11,6 +11,7 @@ import Header from './components/Header/Header'
 import Homepage from './pages/HomePage/HomePage'
 import ProfilePage from './pages/ProfilePage/ProfilePage'
 import LoginPage from './pages/LoginPage/LoginPage'
+import RegistrationPage from './pages/RegistrationPage/RegistrationPage'
 import ProtectedRoute from './ProtectedRoute'
 import GroupsPage from './pages/GroupsPage/GroupsPage'
 import GroupPageDetail from './pages/GroupPageDetail/GroupPageDetail'
@@ -36,6 +37,7 @@ function App() {
             <Routes>
               <Route path='/' element={<Homepage />} />
               <Route path='/profile/' element={<ProfilePage />} />
+              <Route path='/register/' element={<RegistrationPage />}/>
               <Route path='/login' element={<LoginPage />} />
               <Route path='/groups/' element={
                   <ProtectedRoute>
