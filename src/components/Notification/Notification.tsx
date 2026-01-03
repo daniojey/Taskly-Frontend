@@ -2,12 +2,12 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { useSearchParams } from "react-router";
 import './Notification.css'
 import { AuthContext } from "../../AuthContext";
+import { useWebSocket } from "../../common/hooks/webSocketHook";
 
 interface NotificationData {
   message: string;
   type?: 'info' | 'warning' | 'error' | 'success';
   timestamp?: string;
-  // добавь другие поля, если они есть
 }
 
 interface AuthenticateWebsoket extends WebSocket {
@@ -23,12 +23,13 @@ function Notification() {
 
     const webRef = useRef<AuthenticateWebsoket | null>(null)
 
+    const { isConnected } = useWebSocket({
+        url: 'ws://'
+                + 'localhost:8000'
+                + '/ws/notifi'
+                + `/?token=${token}`,
 
-    useEffect(
-        () => {
-            const onOpen = () => console.log("Opened");
-            const onError = () => console.log("Error");
-            const onMessage =  async (e: MessageEvent) => {
+        onMessage:  async (e: MessageEvent) => {
                 console.log('EDATA',JSON.parse(e.data)?.message)
                 const dataNotify = e.data
                 
@@ -38,38 +39,17 @@ function Notification() {
                 const timer = setTimeout(() => {
                     setHideNotify(true)
                 }, 6000)
-            }
-            
+            },
 
-            const ws = new WebSocket(
-                'ws://'
-                + 'localhost:8000'
-                + '/ws/notifi'
-                + `/?token=${token}`
-            )
+        onOpen: () => console.log('Уведомления подключены'),
+        onError: (error) => console.error('Ошибка уведомлений:', error),
+        onClose: () => console.log('Уведомления отключены'),
 
-            webRef.current = ws
+        reconnectInterval: 300,
+        maxReconnectAttempt: 10,
 
-            ws.addEventListener("open", onOpen);
-            ws.addEventListener('message', onMessage)
-            ws.addEventListener("error", onError);
-
-            return () => {
-                console.log("Cleaning up WebSocket")
-                ws.removeEventListener("open", onOpen)
-                ws.removeEventListener("message", onMessage)
-                ws.removeEventListener("error", onError)
-                
-                // Закрываем соединение, если оно открыто
-                if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-                    ws.close()
-                }
-            };
-        },
-        []
-    );
-
-
+    })
+  
     return (
         <>
             {notify && (
