@@ -8,6 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
 import { AuthContext } from '../../AuthContext'
+import { useModalClose } from '../../common/hooks/closeOverlay'
 
 interface CreateProjectWindowProps {
     groupId: string;
@@ -18,8 +19,12 @@ interface CreateProjectWindowProps {
 
 
 function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindowProps) {
-    const [close, setClose] = useState<boolean>(false)
     const { user } = useContext(AuthContext)
+    const { 
+        handleCloseWindow,
+        closeWindow, 
+        isClosing 
+    } = useModalClose({ onClose: onClose, delay: 400, className: "create-task-overlay"})
 
     const schema = yup.object({
         title: yup.string().min(4),
@@ -50,25 +55,6 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
 
     console.log('ID группы', groupId)
 
-    const CloseWindow = () => {
-        setClose(true)
-
-        setTimeout(() => {
-            onClose()
-            console.log(close)
-        }, 400)
-    }
-
-    const clickOverlay = (e: React.MouseEvent<HTMLElement>) => {
-        
-        const target = e.target as HTMLElement
-
-
-        if (target.className.includes('create-task-overlay')) {
-            CloseWindow()
-        }
-    }
-
 
     const handleForm: SubmitHandler<ProjectData> = async (data) => {
         console.log(data)
@@ -94,7 +80,7 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
 
                 if (response.status === 201) {
                     onUpdate()
-                    CloseWindow()
+                    closeWindow()
                 }
                 
                 
@@ -109,11 +95,11 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
 
     return (
         createPortal(
-            <div className={`create-task-overlay ${close ? "close" : 'open'}`} onClick={clickOverlay}>
+            <div className={`create-task-overlay ${isClosing ? "close" : 'open'}`} onClick={handleCloseWindow}>
                 <div className='create-task__body'>
                     <div className='create-task__title'>
                         <h2>Create Project</h2>
-                        <label onClick={CloseWindow}>x</label>
+                        <label onClick={closeWindow}>x</label>
                     </div>
                     <form className='create-task__form' onSubmit={handleSubmit(handleForm)}>
                         <input 

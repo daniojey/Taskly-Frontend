@@ -129,8 +129,6 @@ export const AuthProvider = ({ children }) => {
 
             console.log(response.data)
             localStorage.setItem('accessToken', response.data.access)
-            localStorage.setItem('refreshToken', response.data.refresh)
-
 
 
             const userResponse = await api.post(
@@ -159,7 +157,17 @@ export const AuthProvider = ({ children }) => {
         
         try {
             localStorage.removeItem('accessToken')
-            localStorage.removeItem('refreshToken')
+            const response = await api.post(
+                'api/v1/token/logout/',
+                {},
+                {},
+            )
+
+            if (response.status === 200) {
+                console.log('SUCCESS!')
+            } 
+
+
         } catch (error) {
             console.error(error)
         }

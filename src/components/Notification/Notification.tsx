@@ -10,18 +10,12 @@ interface NotificationData {
   timestamp?: string;
 }
 
-interface AuthenticateWebsoket extends WebSocket {
-    token?: string;
-}
-
 function Notification() {
     const token = localStorage.getItem('accessToken')
-
-    const [notify, setNotify] = useState(null)
+    const [notify, setNotify] = useState<string | null>(null)
     const [hideNotify, setHideNotify] = useState(false)
     const {updateNotify} = useContext(AuthContext)
 
-    const webRef = useRef<AuthenticateWebsoket | null>(null)
 
     const { isConnected } = useWebSocket({
         url: 'ws://'
@@ -29,6 +23,7 @@ function Notification() {
                 + '/ws/notifi'
                 + `/?token=${token}`,
 
+        enabled: !!token,
         onMessage:  async (e: MessageEvent) => {
                 console.log('EDATA',JSON.parse(e.data)?.message)
                 const dataNotify = e.data
@@ -45,7 +40,7 @@ function Notification() {
         onError: (error) => console.error('Ошибка уведомлений:', error),
         onClose: () => console.log('Уведомления отключены'),
 
-        reconnectInterval: 300,
+        reconnectInterval: 600,
         maxReconnectAttempt: 10,
 
     })

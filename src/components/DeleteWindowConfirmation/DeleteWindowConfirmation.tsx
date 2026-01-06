@@ -3,6 +3,7 @@ import { useState } from "react"
 import '../../common/Styles/ModelWindow.css'
 import './DeleteWindowConfirmation.css'
 import { delete_user_in_group } from "../../common/delete_member_in_group"
+import { useModalClose } from "../../common/hooks/closeOverlay"
 
 
 interface DeleteWindowConfirmationProps {
@@ -15,22 +16,8 @@ interface DeleteWindowConfirmationProps {
 
 
 function DeleteWindowConfirmation ({ groupId, userId, username, onClose, onUpdate}: DeleteWindowConfirmationProps) {
-    const [closeWindow, setCloseWindow] = useState(false)
+    const { closeWindow, handleCloseWindow, isClosing} = useModalClose({ onClose: onClose, delay: 500, className: 'window-overlay'})
 
-    const onCloseWindow =  () => {
-        setCloseWindow(true)
-
-        setTimeout(() => {
-            onClose()
-        }, 500)
-    }
-    
-    const handleClickOverlay = (e: React.MouseEvent) => {
-        const target = e.target as HTMLElement
-        if (target.className.includes('window-overlay')) {
-            onCloseWindow()
-        }
-    }
 
     const onClickDeleteButton = async (userId: number, groupId: string) => {
         console.log('DELETE')
@@ -41,7 +28,7 @@ function DeleteWindowConfirmation ({ groupId, userId, username, onClose, onUpdat
 
         if (result === 200) {
             onUpdate()
-            onCloseWindow()
+            closeWindow()
         }
         
     }
@@ -49,8 +36,8 @@ function DeleteWindowConfirmation ({ groupId, userId, username, onClose, onUpdat
     return (
          createPortal(
             <div 
-            className={`window-overlay ${closeWindow ? 'close' : 'open'}`} 
-            onClick={handleClickOverlay}
+            className={`window-overlay ${isClosing ? 'close' : 'open'}`} 
+            onClick={handleCloseWindow}
             >
 
                 <div className="delete-confirmation-window__body">
@@ -58,7 +45,7 @@ function DeleteWindowConfirmation ({ groupId, userId, username, onClose, onUpdat
 
                     <div className="delete-confirmation-button__container">
                         <button id="active" onClick={() => onClickDeleteButton(userId, groupId)}>Yes</button>
-                        <button id="cancel" onClick={onCloseWindow}>No.. Cancel</button>
+                        <button id="cancel" onClick={closeWindow}>No.. Cancel</button>
                     </div>
                 </div>
             </div>

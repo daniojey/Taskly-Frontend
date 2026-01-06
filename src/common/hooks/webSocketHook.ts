@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 
 interface useWebSocketOptions {
     url: string;
+    enabled: boolean;
     onMessage?: (event: MessageEvent) => void;
     onOpen?: () => void;
     onError?: (error: Event) => void;
@@ -16,6 +17,7 @@ export const useWebSocket = ({
     onOpen,
     onError,
     onClose,
+    enabled = true,
     reconnectInterval = 3000,
     maxReconnectAttempt = 10
 }: useWebSocketOptions) => {
@@ -23,7 +25,7 @@ export const useWebSocket = ({
     const reconnectTimeoutRef = useRef<number>(0);
     const reconnectAttemptsRef = useRef(0);
     const [isConnected, setIsConnected] = useState(false);
-    const shouldConnectRef = useRef(true);
+    const shouldConnectRef = useRef(enabled);
 
     const onMessageRef = useRef(onMessage);
     const onOpenRef = useRef(onOpen);
@@ -38,11 +40,12 @@ export const useWebSocket = ({
     }, [onMessage, onOpen, onError, onClose]);
 
     const connect = useCallback(() => {
-        if (!shouldConnectRef.current) return;
 
-        if (wsRef.current) {
-            wsRef.current.close();
-        }
+        if (!shouldConnectRef.current || !enabled) return;
+
+        // if (wsRef.current) {
+        //     wsRef.current.close();
+        // }
 
         try {
             console.log('Подключаемся к WebSocket...');
@@ -90,7 +93,7 @@ export const useWebSocket = ({
         } catch (error) {
             console.error('Не удалось создать WebSocket:', error);
         }
-    }, [url, reconnectInterval, maxReconnectAttempt]);
+    }, [url, enabled, reconnectInterval, maxReconnectAttempt]);
 
     const disconnect = useCallback(() => {
         shouldConnectRef.current = false;
@@ -116,8 +119,13 @@ export const useWebSocket = ({
     }, []);
 
     useEffect(() => {
-        shouldConnectRef.current = true;
-        connect();
+        shouldConnectRef.current = enabled;
+
+        if (enabled) {
+            connect();
+        } else {
+            disconnect()
+        }
 
         return () => {
             shouldConnectRef.current = false;
@@ -131,7 +139,7 @@ export const useWebSocket = ({
                 wsRef.current = null;
             }
         };
-    }, [url]);
+    }, [url, enabled]);
 
     return {
         isConnected,
