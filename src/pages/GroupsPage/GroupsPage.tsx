@@ -7,32 +7,12 @@ import { useSearchParams } from "react-router"
 import { AuthContext } from "../../AuthContext.jsx"
 import AddMembersModelWindow from "../../components/AddMembersModelWindow/AddMembersModelWindow.tsx"
 
-interface Members {
-    email: string;
-    first_name: string;
-    id: number;
-    image_profile: string | null;
-    image_profile_url: string | null;
-    in_group: boolean;
-    in_invite_send: boolean;
-    last_login: string;
-    last_name: string;
-    username: string
-}
-
-interface Projects {
-    created_at: string;
-    description: string;
-    group_name: string;
-    id: number;
-    title: string;
-}
 
 interface GroupItem {
     id: number;
     name: string;
-    members: Members[];
-    projects: Projects[];
+    count_members: number;
+    count_projects: number;
     created: true | null
 
 }
@@ -45,8 +25,6 @@ function GroupsPage() {
     const {user} = useContext(AuthContext)
     const [addMembersWindow, setAddMembersWindow] = useState<boolean>(false)
 
-
-    // const filter = searchParams.get('filter') || ''
 
     const onChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (e.target.value) {
@@ -81,8 +59,6 @@ function GroupsPage() {
             )
 
             console.log(response)
-
-            // setGroups({response.data.result})
             const data = {
                 created: true,
                 ...response.data.result
@@ -95,39 +71,11 @@ function GroupsPage() {
 
     const submitForm = async (e: React.FormEvent) => {
         e.preventDefault()
-
-        // console.log(typeof user)
-        // console.log(groupName)
-
-        try {
-            // const response = await api.post(
-            //     'api/v1/groups/',
-            //     {members:[user.id], name: groupName, owner: user.id},
-            //     {
-            //         headers: {
-            //             Authorization: getAccessToken()
-            //         }
-            //     }
-            // )
-
-            // console.log(response)
-
-            // // setGroups({response.data.result})
-            // const data = {
-            //     created: true,
-            //     ...response.data.result
-            // }
-            // setGroups(groups => [data, ...groups]);
-            setAddMembersWindow(true)
-        } catch (error) {
-            console.error(error)
-        }
-        
+        setAddMembersWindow(true)
     }
 
-
     useEffect(() => {
-        const url = 'api/v1/groups/?' + searchParams.toString();
+        const url = searchParams.toString() ?  'api/v1/groups/?' + searchParams.toString() : 'api/v1/groups/';
 
         const  getGroups = async () => {
             try {
@@ -138,7 +86,7 @@ function GroupsPage() {
                     }},
                 )
                 console.log(response)
-                setGroups(response.data.result)
+                setGroups(response.data.results)
             } catch (error) {
                 console.error(error)
             }

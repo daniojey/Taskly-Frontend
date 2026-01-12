@@ -80,9 +80,9 @@ function GroupPageDetail() {
 
 
             console.log(response.data)
-            setGroup(response.data.result)
-            setProjects(response.data.result?.projects)
-            setMembers(response.data.result?.members)
+            setGroup(response.data.results)
+            setProjects(response.data.results?.projects)
+            setMembers(response.data.results?.members)
         } catch (error) {
             console.error(error)
         }
@@ -215,7 +215,7 @@ function GroupPageDetail() {
 
                             <div className='group-detail__member-body'>
                                 {userItem.image_profile_url ? (
-                                    <img src={userItem.image_profile_url} />
+                                    <img src={userItem.image_profile_url} className='image-profile' />
                                 ) : (
                                     <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} className='image-profile' />
                                 )}

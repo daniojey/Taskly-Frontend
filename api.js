@@ -41,7 +41,6 @@ api.interceptors.response.use(
         originalConfig.headers.Authorization = `Bearer ${newAccessToken}`;
 
         if (originalConfig.url.includes('/token/verify/')) {
-          console.log('ВЕРИФИКАЦИЯ ТОКЕНА')
           const configData = JSON.parse(originalConfig.data)
           configData.token = newAccessToken
           originalConfig.data = JSON.stringify(configData)

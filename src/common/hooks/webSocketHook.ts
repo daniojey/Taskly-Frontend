@@ -43,10 +43,6 @@ export const useWebSocket = ({
 
         if (!shouldConnectRef.current || !enabled) return;
 
-        // if (wsRef.current) {
-        //     wsRef.current.close();
-        // }
-
         try {
             console.log('Подключаемся к WebSocket...');
             const ws = new WebSocket(url);

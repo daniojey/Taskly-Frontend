@@ -131,7 +131,6 @@ function TaskChat({ data, onClose }) {
 
     const token = localStorage.getItem('accessToken')
 
-
     // Сохраняем позицию скролла перед загрузкой новых сообщений
     const saveScrollPosition = () => {
         if (messagesContainerRef.current) {
@@ -311,7 +310,7 @@ function TaskChat({ data, onClose }) {
                     messageId: Date.now()
                 }
             
-            if (state.answerMessage) {
+            if (state.answerMessage.size > 0) {
                 console.log(state.answerMessage)
                 metadata = {...metadata, answerToMessage: {
                     'id': state.answerMessage.get('id'),
@@ -425,7 +424,7 @@ function TaskChat({ data, onClose }) {
 
                                 
                                 <div className={`task-chat__message-content ${item?.user?.id == user.id ? 'user' : ''}`}>
-                                    {!Array.isArray(item?.answer_to) && (
+                                    {Object.keys(item.answer_to).length > 0 && (
                                         <p className="task-chat__answer" key={item.answer_to.id}>{item.answer_to.text}</p>
                                     )}
 
