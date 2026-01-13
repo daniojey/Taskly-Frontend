@@ -8,6 +8,8 @@ import arrowDownWhite from '../../../assets/arrow_down_white.png'
 import clipsFile from '../../../assets/clips_file.png'
 import downloadIcon from '../../../assets/download_icon.png'
 import backGroundIcon from  '../../../assets/blue_background.png'
+import settingsIcon from '../../../assets/settings_icon.png'
+import statisticIcon from "../../../assets/statistic_icon.png"
 
 const iconMap = {
     groupIcon: groupIcon,
@@ -20,6 +22,8 @@ const iconMap = {
     clipsFile: clipsFile,
     downloadIcon: downloadIcon,
     backGroundIcon: backGroundIcon,
+    settingsIcon: settingsIcon,
+    statisticIcon: statisticIcon
 }
 
 const DynamicPngIcon = ({

@@ -18,11 +18,15 @@ export function DroppableContainer({
   title,
   items,
   activeId,
+  groupId,
+  projectId
 }: {
   id: string
   title: string
   items: Item[]
   activeId: UniqueIdentifier | null
+  groupId: string | undefined
+  projectId: string | undefined
 }) {
   const { setNodeRef } = useDroppable({
     id,
@@ -51,7 +55,9 @@ export function DroppableContainer({
             content={item.content} 
             name={item.name} 
             data={item}
-            activeId={activeId}/>
+            activeId={activeId}
+            groupId={groupId}
+            projectId={projectId}/>
           ))}
         </ul>
         </SortableContext>

@@ -74,7 +74,7 @@ function ItemOverlay({ children } : { children: React. ReactNode}) {
 }
 
 export default function MultipleContainers() {
-  const { projectId } = useParams()
+  const { projectId, groupId } = useParams<string>()
   const [moreWindow, setMoreWindow] = useState(false)
   const [openCreateTask, setOpenCreateTask] = useState(false)
   const [tasks, setTasks] = useState<Item[]>([])
@@ -399,7 +399,7 @@ export default function MultipleContainers() {
       </div>
 
       { openCreateTask && (
-        <CreateTaskWindow onClose={() => setOpenCreateTask(false)} onUpdate={() => handleTaskCreate()}projectId={projectId}/>
+        <CreateTaskWindow onClose={() => setOpenCreateTask(false)} onUpdate={() => handleTaskCreate()} projectId={projectId}/>
       )}
       {/* <h2 className="mb-4 text-xl font-bold dark:text-white">Kanb</h2> */}
 
@@ -425,6 +425,8 @@ export default function MultipleContainers() {
                 title={container.title}
                 items={container.items}
                 activeId={activeId}
+                groupId={groupId}
+                projectId={projectId}
                 />
               ))}
 

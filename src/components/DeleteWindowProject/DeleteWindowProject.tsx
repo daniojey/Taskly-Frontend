@@ -4,15 +4,15 @@ import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
 
 interface DeleteWindowProjectProps {
-    projectId: number;
+    projectId: string | undefined;
     onClose: () => void;
 }
 
-function DeleteWindowProject({ projectId, onClose, }: DeleteWindowProjectProps) {
+function DeleteWindowProject({ projectId, onClose}: DeleteWindowProjectProps) {
     const navigate = useNavigate()
 
 
-    const projectDelete = async (projectId: number) => {
+    const projectDelete = async (projectId: string | undefined) => {
         try {
             const response = await api.delete(`api/v1/groups-projects/${projectId}/`,
                 {headers: {

@@ -202,7 +202,7 @@ function GroupPageDetail() {
             <div className='group-detail__body'>
                 <div className='group-detail__body-projects' ref={scrollContainerRef}>
                     {projects && projects.map((project, index) => (
-                        <ProjectCard props={project} key={index} />
+                        <ProjectCard props={project} key={index} groupId={groupId} />
                         // <div className='grs' key={index}>{project.title}</div>
                     )
 

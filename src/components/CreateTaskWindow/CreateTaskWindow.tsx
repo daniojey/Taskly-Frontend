@@ -11,7 +11,7 @@ import { useModalClose } from '../../common/hooks/closeOverlay';
 interface CreateTaskWindowProps {
     onClose: () => void;
     onUpdate: () => void;
-    projectId: number;
+    projectId: string | undefined;
 }
 
 type TaskStatus = 'NS' | 'BS'| 'US'
@@ -24,7 +24,7 @@ interface YupFormData {
 }
 
 interface FormData extends YupFormData {
-    project_id: number;
+    project_id: string | undefined;
     created_by: number;
 }
 

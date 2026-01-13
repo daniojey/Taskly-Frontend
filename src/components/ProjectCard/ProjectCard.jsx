@@ -2,7 +2,7 @@ import "./ProjectCard.css"
 import { Link, useNavigate } from "react-router"
 
 
-function ProjectCard({ props }) {
+function ProjectCard({ props, groupId }) {
     const { id, title, tasks, created_at} = props
     const navigate = useNavigate()
 
@@ -14,7 +14,7 @@ function ProjectCard({ props }) {
 
         console.log('CLICK CARD')
         console.log(e.target.tagName)
-        navigate(`/projects/${id}/`)
+        navigate(`/projects/${id}/group/${groupId}/`)
     }
 
     return (

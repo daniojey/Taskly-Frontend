@@ -56,7 +56,7 @@ function App() {
                 </ProtectedRoute>
               }/>
 
-              <Route path='/projects/:projectId' element={
+              <Route path='/projects/:projectId/group/:groupId/' element={
                 <ProtectedRoute>
                   <ProjectBasePage/>
                 </ProtectedRoute>

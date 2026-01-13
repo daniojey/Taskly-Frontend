@@ -10,6 +10,7 @@ import { getAccessToken } from "../../../tokens_func"
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon"
 import FullscreenImage from "../FullscreenImage/FullscreenImage"
 import RightClickMenuComponent from "../RightClickMenuComponent/RightClickMenuComponent"
+import TaskSettingsComponent from "../TaskSettingsComponent/TaskSettingsComponent"
 
 
 async function loadMoreMessages(nextUrl) {
@@ -42,6 +43,7 @@ const initialState = {
     inputFiles: [],
     contextMenuData: null,
     answerMessage: new Map(),
+    openTaskSettings: false
 };
 
 
@@ -102,12 +104,15 @@ function messageReduce(state, action) {
         case 'SET_ANSWER_MESSAGE':
             return {...state, answerMessage: action.payload}
 
+        case "SET_TASK_SETTINGS_WINDOW":
+            return {...state, openTaskSettings: action.payload}
+
         default:
             return {...state}
     }
 }
 
-function TaskChat({ data, onClose }) {
+function TaskChat({ data, onClose, groupId, projectId }) {
     const { user } = useContext(AuthContext)
 
     const [close, setClose] = useState(false)
@@ -402,10 +407,23 @@ function TaskChat({ data, onClose }) {
                     <RightClickMenuComponent event={state.contextMenuData} setMessage={setAnswerMessage}/>
                 )}
 
+                {state.openTaskSettings && (
+                    <TaskSettingsComponent 
+                    onClose={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: false})}
+                    taskId={taskData.id}
+                    projectId={projectId}
+                    groupId={groupId}
+                    />
+                )}
+
 
                 <div className='chat-task__body'>
                     <div className='task-chat__title'>
                         <h2>{taskData?.name}</h2>
+                        <div className="task-chat__admin-icons">
+                            <DynamicPngIcon iconName="statisticIcon"/>
+                            <DynamicPngIcon iconName="settingsIcon" onClick={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: true})}/>
+                        </div>
                     </div>
 
                     <div className="task-chat__field" ref={messagesContainerRef} onContextMenu={handleContextMenu}>

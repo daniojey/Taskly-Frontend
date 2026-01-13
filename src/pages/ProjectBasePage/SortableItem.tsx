@@ -16,6 +16,8 @@ export function SortableItem({
   name,
   activeId,
   data,
+  groupId,
+  projectId
 }: {
   id: UniqueIdentifier,
   content: string,
@@ -24,6 +26,8 @@ export function SortableItem({
   deadline: string,
   activeId: UniqueIdentifier | null
   data: {}
+  groupId: string | undefined
+  projectId: string | undefined
 }) {
 
   const {
@@ -52,7 +56,7 @@ export function SortableItem({
 
     { openWindow && (
       // <DetailTaskWindow  data={data} onClose={() => setOpenWindow(false)} />
-      <TaskChat data={data} onClose={() => setOpenWindow(false)}/>
+      <TaskChat data={data} onClose={() => setOpenWindow(false)} groupId={groupId} projectId={projectId}/>
     )}
 
     <li

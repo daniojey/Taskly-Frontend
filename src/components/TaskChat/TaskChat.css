@@ -1,14 +1,37 @@
 .task-chat__title {
     display: flex;
+    justify-content: space-between;
     margin: 10px 0;
     font-family: var(--main-font-bold);
     font-size: 1.3rem;
+    align-items: center;
 
     h2 {
         margin: 0;
     }
 }
 
+.task-chat__admin-icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+
+    img {
+        display: flex;
+        height: 24px;
+        width: 24px;
+        border: 1px solid white;
+        border-radius: 12px;
+        padding: 8px;
+        transition: transform 0.3s ease-out;
+        cursor: pointer;
+
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+}
 
 .chat-task__body {
     display: flex;
