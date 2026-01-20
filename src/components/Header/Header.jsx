@@ -5,12 +5,13 @@ import { useNavigate } from 'react-router'
 import { Link } from 'react-router'
 import { AuthContext } from '../../AuthContext'
 import DynamicPngIcon from '../UI/icons/DynamicPngIcon'
+import TaskTimerComponent from '../TaskTimerComponent/TaskTimerComponent'
+import { OneTimerContext } from '../../OneTimerContext'
 
 function Header() {
     const { loading, user, logout, notifications} = useContext(AuthContext);
+    const { isPaused } = useContext(OneTimerContext)
     const navigate = useNavigate()
-    // console.log(loading, user)
-    // console.log(notifications)
 
     const onLogout = () => {
         navigate('/', { replace: true})
@@ -30,12 +31,13 @@ function Header() {
                 <Link className="header-title-name" to='/'>Taskly</Link>
             </div>
             <div className="header-body">
-                <Link to='/'>About</Link>
                 {!loading && user && (
                     <Link to='/groups/'>Groups</Link>
                 )}
-                <Link>Docs</Link>
-                <Link>Guide</Link>
+                
+                {!isPaused && (
+                    <TaskTimerComponent taskId={null} shortVersion={true}/>
+                )}
             </div>
             <div className="header-authenticate-body">
                 {!loading && !user && (

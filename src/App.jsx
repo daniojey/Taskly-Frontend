@@ -20,6 +20,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import Notification from './components/Notification/Notification'
 import NotificationPage from './pages/NotificationPage/NotificationPage'
 import GroupLogsPage from './pages/GroupLogsPage/GroupLogsPage'
+import { OneTimerProvider } from './OneTimerContext'
 
 const queryClient = new QueryClient()
 
@@ -29,6 +30,7 @@ function App() {
     <>
       <Router>
         <AuthProvider>
+          <OneTimerProvider>
           <QueryClientProvider client={queryClient}>
 
             <Notification/>
@@ -70,6 +72,7 @@ function App() {
               
             </Routes>
           </QueryClientProvider>
+          </OneTimerProvider>
         </AuthProvider>
       </Router>
     </>

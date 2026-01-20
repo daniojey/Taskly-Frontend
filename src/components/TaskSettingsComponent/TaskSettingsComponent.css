@@ -1,3 +1,9 @@
+.task-performers-title {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+}
+
 .performers-body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

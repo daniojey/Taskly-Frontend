@@ -11,6 +11,7 @@ import DynamicPngIcon from "../UI/icons/DynamicPngIcon"
 import FullscreenImage from "../FullscreenImage/FullscreenImage"
 import RightClickMenuComponent from "../RightClickMenuComponent/RightClickMenuComponent"
 import TaskSettingsComponent from "../TaskSettingsComponent/TaskSettingsComponent"
+import TaskTimerComponent from "../TaskTimerComponent/TaskTimerComponent"
 
 
 async function loadMoreMessages(nextUrl) {
@@ -421,6 +422,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                     <div className='task-chat__title'>
                         <h2>{taskData?.name}</h2>
                         <div className="task-chat__admin-icons">
+                            <TaskTimerComponent taskId={taskData.id} taskName={taskData.name}/>
                             <DynamicPngIcon iconName="statisticIcon"/>
                             <DynamicPngIcon iconName="settingsIcon" onClick={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: true})}/>
                         </div>

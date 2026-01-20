@@ -80,10 +80,14 @@ function TaskSettingsComponent({ onClose, taskId, projectId, groupId }: TaskSett
             style={{ zIndex: 1100 }}
             onClick={handleCloseWindow}>
                 <div className="window-body">
-                    <h2>Settings</h2>
+                    <div className="task-performers-title">
+                        <h2>Performers</h2>
+                        <button>select All</button>
+                        <button>unselect All</button>
+                    </div>
                     <div className="performers-body">
                         {usersData.length > 0 && usersData.map(item => (
-                            <div className="user-item-card">
+                            <div className="user-item-card" key={item.id}>
                                 <p>{item.username}</p>
 
                                 <input 
