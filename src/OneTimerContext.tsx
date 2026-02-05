@@ -34,6 +34,18 @@ const updateSession = async ( sessionId: number | null, time: number) => {
     }
 }
 
+const endSession = async ( sessionId: number | null, time: number) => {
+    try {
+        const response = await api.post(
+            `api/v1/task-sessions/${sessionId}/end_session/`,
+            {},
+            {headers: {Authorization: getAccessToken()}}
+        )
+    } catch (error) {
+        throw error
+    }
+}
+
 interface OneTimerContextType {
     startTimer: (taskId: number) => void;
     pauseTimer: () => void;
@@ -132,12 +144,10 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
         setStartTime(0)
         pauseTimeRef.current = 0
         setIsPaused(true)
-        await saveResults()
+        const time = pauseTimeRef.current + (Date.now() - startTime)
+        await endSession(sessionIdRef.current, time)
     }
 
-    const saveResults = async () => {
-        console.log('Saved')
-    }
 
     const getElapsed = () => {
         if (isPaused) {

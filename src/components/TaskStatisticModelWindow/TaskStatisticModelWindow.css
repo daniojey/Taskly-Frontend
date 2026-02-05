@@ -1,0 +1,37 @@
+.task-statistic__button-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.statistic-button {
+    display: flex;
+    width: 50%;
+    justify-content: end;
+    border: 0.1px solid rgba(255, 255, 255, 0.5);
+}
+
+.statistic-button.active {
+    border: 1px solid rgb(0, 137, 250);
+    color: rgb(0, 137, 250);
+}
+
+.diagram-button {
+    display: flex;
+    width: 50%;
+    justify-content: start;
+    border: 0.1px solid rgba(255, 255, 255, 0.5);
+}
+
+.statistic-button:focus,
+.diagram-button:focus {
+    outline: none;
+}
+
+.diagram-button.active {
+    border: 1px solid rgb(150, 27, 27);
+    color: rgb(150, 27, 27);
+}
+

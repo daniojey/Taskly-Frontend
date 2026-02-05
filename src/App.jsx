@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router'
 
-import { api } from '../api'
 import { AuthProvider } from './AuthContext'
 
 import './App.css'

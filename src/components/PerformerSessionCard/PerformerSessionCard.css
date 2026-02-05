@@ -1,0 +1,48 @@
+.image-profile {
+    display: flex;
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.performer-session__card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    border-radius: 8px;
+    border: 0.1px solid rgb(255, 255, 255, 0.4);
+    padding: 12px;
+    box-sizing: border-box;
+    box-shadow: 5px 2px 2px rgb(255, 255, 255, 0.4);
+    transition: box-shadow 0.4s ease-out, border 0.4s ease-in-out;
+    transform: scale(0);
+    animation: scaleIn 0.6s ease-in-out forwards;
+    
+    &:hover {
+        border-color: rgb(0, 137, 250);
+        box-shadow: 5px 2px 2px rgb(0, 137, 250);
+    }
+}
+
+.performer-session__title {
+    display: flex;
+    gap: 20px;
+    justify-content: start;
+    align-items: center;
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+    }
+
+    75% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

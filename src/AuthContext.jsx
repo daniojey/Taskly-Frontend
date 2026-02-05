@@ -99,9 +99,10 @@ export const AuthProvider = ({ children }) => {
                     localStorage.removeItem('user')
                 } finally {
                     setLoading(false)
-                    setTimeout(() => {
-                        setShowLoading(false)
-                    }, 1500)
+                    // setTimeout(() => {
+                    //     setShowLoading(false)
+                    // }, 1500)
+                    setShowLoading(false)
                 }
 
 

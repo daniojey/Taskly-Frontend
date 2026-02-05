@@ -12,6 +12,7 @@ import FullscreenImage from "../FullscreenImage/FullscreenImage"
 import RightClickMenuComponent from "../RightClickMenuComponent/RightClickMenuComponent"
 import TaskSettingsComponent from "../TaskSettingsComponent/TaskSettingsComponent"
 import TaskTimerComponent from "../TaskTimerComponent/TaskTimerComponent"
+import TaskStatisticModelWindow from "../TaskStatisticModelWindow/TaskStatisticModelWindow"
 
 
 async function loadMoreMessages(nextUrl) {
@@ -44,7 +45,8 @@ const initialState = {
     inputFiles: [],
     contextMenuData: null,
     answerMessage: new Map(),
-    openTaskSettings: false
+    openTaskSettings: false,
+    openTaskStatistic: false,
 };
 
 
@@ -107,6 +109,9 @@ function messageReduce(state, action) {
 
         case "SET_TASK_SETTINGS_WINDOW":
             return {...state, openTaskSettings: action.payload}
+
+        case 'SET_TASK_STATISTIC_WINDOW':
+            return {...state, openTaskStatistic: action.payload}
 
         default:
             return {...state}
@@ -408,6 +413,13 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                     <RightClickMenuComponent event={state.contextMenuData} setMessage={setAnswerMessage}/>
                 )}
 
+                {state.openTaskStatistic && (
+                    <TaskStatisticModelWindow 
+                    taskId={taskData.id}
+                    onClose={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: false})}
+                    />
+                )}
+
                 {state.openTaskSettings && (
                     <TaskSettingsComponent 
                     onClose={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: false})}
@@ -423,7 +435,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                         <h2>{taskData?.name}</h2>
                         <div className="task-chat__admin-icons">
                             <TaskTimerComponent taskId={taskData.id} taskName={taskData.name}/>
-                            <DynamicPngIcon iconName="statisticIcon"/>
+                            <DynamicPngIcon iconName="statisticIcon"onClick={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: true})}/>
                             <DynamicPngIcon iconName="settingsIcon" onClick={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: true})}/>
                         </div>
                     </div>
