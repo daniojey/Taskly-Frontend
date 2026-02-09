@@ -4,4 +4,27 @@
     height: 100%;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 25px 30px;
+    overflow-y: auto;
+}
+
+.sessions-filters-body {
+    display: flex;
+    gap: 5%;
+    width: 100%;
+    padding: 16px 0px;
+    box-sizing: border-box;
+
+    select {
+        font-family: var(--main-font);
+        display: flex;
+        padding: 6px 12px;
+        padding-right: 12px;
+        background-color: rgba(255, 255, 255, 0.542);
+        color: black;
+        transition: background-color 0.4s ease-in-out;
+
+        &:focus {
+            background-color: white;
+        }
+    }
 }
