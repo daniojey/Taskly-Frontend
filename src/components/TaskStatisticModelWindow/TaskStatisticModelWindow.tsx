@@ -3,6 +3,7 @@ import { createPortal } from "react-dom"
 import { useModalClose } from "../../common/hooks/closeOverlay";
 import TaskSessionComponent from "../TaskSessionComponent/TaskSessionComponent";
 import './TaskStatisticModelWindow.css'
+import DiagramSessionComponent from "../DiagramSessionComponent/DiagramSessionComponent";
 
 type TabNames = 'sessions' | 'diagram';
 
@@ -62,7 +63,7 @@ function TaskStatisticModelWindow({ taskId, onClose}: TaskStatisticModelWindowPr
                 )}
 
                 {diagramTab === true && (
-                    <></>
+                    <DiagramSessionComponent taskId={taskId}/>
                 )}
             </div>
         </div>
