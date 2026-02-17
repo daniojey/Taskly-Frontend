@@ -34,6 +34,10 @@ function Header() {
                 {!loading && user && (
                     <Link to='/groups/'>Groups</Link>
                 )}
+
+                {!loading && user && (
+                   <Link to='/active-tasks/'>Active Tasks</Link>
+                )}
                 
                 {!isPaused && (
                     <TaskTimerComponent taskId={null} shortVersion={true}/>

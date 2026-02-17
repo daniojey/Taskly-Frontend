@@ -126,6 +126,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     const [messageText, setMessageText] = useState(null)
     const [state, dispatch] = useReducer(messageReduce, initialState)
     const [activeImageWindow, setActiveImageWindow] = useState(false)
+    const [isActiveTask, setIsActiveTask] = useState(false)
 
     const webSocketRef = useRef(null)
 
@@ -158,13 +159,17 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     }
 
     useEffect(() => {
+       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [state.messages])
+ 
+
+    useEffect(() => {
         if (state.isHistoryLoading) {
             // Восстанавливаем позицию после подгрузки истории
             restoreScrollPosition();
             dispatch({ type: 'RESET_HISTORY_LOADING_FLAG' });
         }
     }, [state.messages, state.isHistoryLoading]); // Срабатывает при изменении messages
-
 
     useEffect(() => {
         dispatch({ type: 'START_LOADING' })
@@ -175,7 +180,6 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             try {
                 const response = await api.get(`api/v1/chat-messages/${taskData.id}/`)
                 console.log('RESPONSE ', response)
-                // setMessages(response.data.results.reverse())
                 dispatch({ type: "SET_MESSAGE_RESPONSE", payload: response.data })
                 nextPageRef.current = response.data.next
             } catch (error) {
@@ -183,6 +187,21 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             }
         }
 
+        const getIsActiveTask = async () => {
+            try {
+                const response = await api.get(
+                    `api/v1/tasks/${taskData.id}/get_is_active_task/`,
+                    {headers: {Authorization: getAccessToken()}}
+                )
+
+                console.log(response)
+                setIsActiveTask(response.data?.results)
+            } catch (error) {
+                throw error
+            }
+        }
+
+        getIsActiveTask()
         getMessages()
 
         setTimeout(() => {
@@ -257,11 +276,6 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                 const data = JSON.parse(e.data)
                 // setMessages(messages => [...messages, data])
                 dispatch({ type: 'UPDATE_MESSAGES', payload: data?.message })
-
-                setTimeout(() => {
-                    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-                }, 400)
-                // textRef.current.textContent =  textRef.current.textContent + JSON.parse(e.data)?.message + '\n'
             }
 
             webSocketConnection.addEventListener("open", onOpen);
@@ -401,6 +415,21 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         }
     }
 
+    const changeIsActiveTask = async (e) => {
+        try {
+            const response = await api.post(
+                `api/v1/tasks/${taskData.id}/change_active_task/`,
+                {},
+                {headers: {Authorization: getAccessToken()}}
+            )
+
+            console.log(response)
+            setIsActiveTask(response.data.results)
+        } catch (error) {
+            throw error
+        }
+    }
+
     return (
         createPortal(
             <div className={`create-task-overlay ${close ? "close" : 'open'}`} onClick={closeOverlay}>
@@ -435,6 +464,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                         <h2>{taskData?.name}</h2>
                         <div className="task-chat__admin-icons">
                             <TaskTimerComponent taskId={taskData.id} taskName={taskData.name}/>
+                            <DynamicPngIcon iconName={isActiveTask ? 'kidStar' : 'kidStarHollow'} onClick={(e) => changeIsActiveTask(e)} />
                             <DynamicPngIcon iconName="statisticIcon"onClick={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: true})}/>
                             <DynamicPngIcon iconName="settingsIcon" onClick={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: true})}/>
                         </div>

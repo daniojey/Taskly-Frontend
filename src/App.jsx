@@ -19,6 +19,7 @@ import Notification from './components/Notification/Notification'
 import NotificationPage from './pages/NotificationPage/NotificationPage'
 import GroupLogsPage from './pages/GroupLogsPage/GroupLogsPage'
 import { OneTimerProvider } from './OneTimerContext'
+import ActiveTaskPage from './pages/ActiveTaskPage/ActiveTaskPage'
 
 const queryClient = new QueryClient()
 
@@ -66,6 +67,10 @@ function App() {
                 <ProtectedRoute>
                   <NotificationPage/>
                 </ProtectedRoute>
+              }/>
+
+              <Route path='/active-tasks/' element={
+                <ActiveTaskPage />
               }/>
               
             </Routes>

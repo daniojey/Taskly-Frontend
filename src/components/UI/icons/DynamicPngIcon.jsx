@@ -10,6 +10,8 @@ import downloadIcon from '../../../assets/download_icon.png'
 import backGroundIcon from  '../../../assets/blue_background.png'
 import settingsIcon from '../../../assets/settings_icon.png'
 import statisticIcon from "../../../assets/statistic_icon.png"
+import kidStarHollow from '../../../assets/kid_star_hollow.png'
+import kidStar from '../../../assets/kid_star.png'
 
 const iconMap = {
     groupIcon: groupIcon,
@@ -23,7 +25,9 @@ const iconMap = {
     downloadIcon: downloadIcon,
     backGroundIcon: backGroundIcon,
     settingsIcon: settingsIcon,
-    statisticIcon: statisticIcon
+    statisticIcon: statisticIcon,
+    kidStarHollow: kidStarHollow,
+    kidStar: kidStar,
 }
 
 const DynamicPngIcon = ({
