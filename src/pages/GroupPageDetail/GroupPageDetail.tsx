@@ -24,7 +24,7 @@ interface UserItem {
 
 interface GroupItem<T>{
     id: number;
-    owner: T extends true ? {}: null;
+    is_owner: T extends true ? {}: null;
     name: string;
 
 }
@@ -158,7 +158,7 @@ function GroupPageDetail() {
                     <>
                         <h2>{group.name}</h2>
 
-                        {user.id === group.owner && (
+                        {group.is_owner === true && (
                             <button onClick={() => openGroupLogs()}>Group logs</button>
                         )}
                     </>
@@ -229,7 +229,7 @@ function GroupPageDetail() {
                                 </div>
                             </div>
 
-                            {group && group.owner === user.id && user.id !== userItem.id && (
+                            {group && group.is_owner === true && userItem.id !== user.id && (
                                 <div className='delete-icon-container' onClick={() => setSelectedUser(userItem)}>
                                     <DynamicPngIcon iconName='deleteBucketIcon' />
                                 </div>
