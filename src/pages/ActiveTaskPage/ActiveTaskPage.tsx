@@ -3,6 +3,8 @@ import { api } from "../../../api"
 import { getAccessToken } from "../../../tokens_func"
 import './ActiveTaskPage.css'
 import ActiveTaskDetail from "../../components/ActiveTaskDetail/ActiveTaskDetail"
+import LoaderComponent from "../../components/LoaderComponent/LoaderComponent"
+import { useLoader } from "../../common/hooks/loaderHook"
 
 interface TaskItem {
     id: number;
@@ -25,6 +27,7 @@ interface ActiveItem {
 function ActiveTaskPage() {
     const [activeTasks, setActiveTasks] = useState<ActiveItem[]>([])
     const [detailTask, setDetailTask] = useState<TaskItem | null>(null)
+    const {loading, closeLoading, onCloseLoading} = useLoader()
 
     useEffect(() => { 
         const getActiveTasks = async () => {
@@ -38,6 +41,8 @@ function ActiveTaskPage() {
                 setActiveTasks(response.data.results)
             } catch (error) {
                 throw error
+            } finally {
+               onCloseLoading()
             }
         }
 
@@ -46,24 +51,33 @@ function ActiveTaskPage() {
 
     return (
         <div className="active-tasks__body">
-            <div className="active-tasks__container">
-                {activeTasks.length > 0 && activeTasks.map((item, index) => (
-                    <div 
-                    className={`active-task__card ${detailTask?.id === item?.task?.id ? 'active' : ''}`}
-                    onClick={() => setDetailTask(item.task)}
-                    key={index}
-                    >
-                        <h2>Task name: {item?.task?.name}</h2>
-                        <h4>Project name: {item?.task?.project_name}</h4>
-                        <p>{item?.date_add}</p>
-                    </div>
-                ))}
-            </div>
-            <div className="active-tasks__detaiil">
-                {detailTask && (
-                    <ActiveTaskDetail task={detailTask} onClose={() => setDetailTask(null)}/>
-                )}
-            </div>
+            {loading ? (
+                <LoaderComponent onClose={closeLoading} />
+            ) : (
+                <>
+                <div className="active-tasks__container">
+                   {activeTasks.length > 0 && activeTasks.map((item, index) => (
+                        <div 
+                        className={`active-task__card ${detailTask?.id === item?.task?.id ? 'active' : ''}`}
+                        onClick={() => setDetailTask(item.task)}
+                        key={index}
+                        style={{ animationDelay: `${index * 0.1}s`}}
+                        >
+                            <h2>Task name: {item?.task?.name}</h2>
+                            <h4>Project name: {item?.task?.project_name}</h4>
+                            <p>{item?.date_add}</p>
+                        </div>
+                    ))}
+                </div>
+                <div className="active-tasks__detaiil">
+                    {detailTask && (
+                        <ActiveTaskDetail task={detailTask} onClose={() => setDetailTask(null)}/>
+                    )}
+                </div>
+                </>
+            )}
+            
+           
         </div>
     )
 }
