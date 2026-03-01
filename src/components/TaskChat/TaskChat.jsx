@@ -1,7 +1,5 @@
 import { createPortal } from "react-dom"
 import { useState, useEffect, useCallback, useReducer } from "react"
-import { useContext } from "react"
-import { AuthContext } from '../../AuthContext'
 import { useRef } from "react"
 import './TaskChat.css'
 import DynamicSvgIcon from "../UI/icons/DynamicSvgIcon"
@@ -13,6 +11,7 @@ import RightClickMenuComponent from "../RightClickMenuComponent/RightClickMenuCo
 import TaskSettingsComponent from "../TaskSettingsComponent/TaskSettingsComponent"
 import TaskTimerComponent from "../TaskTimerComponent/TaskTimerComponent"
 import TaskStatisticModelWindow from "../TaskStatisticModelWindow/TaskStatisticModelWindow"
+import { useUser } from "../../common/stores/AuthStore"
 
 
 async function loadMoreMessages(nextUrl) {
@@ -119,8 +118,7 @@ function messageReduce(state, action) {
 }
 
 function TaskChat({ data, onClose, groupId, projectId }) {
-    const { user } = useContext(AuthContext)
-
+    const user = useUser((state) => state.user)
     const [close, setClose] = useState(false)
     const [taskData, setTaskData] = useState(data);
     const [messageText, setMessageText] = useState(null)
@@ -143,14 +141,12 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
     const token = localStorage.getItem('accessToken')
 
-    // Сохраняем позицию скролла перед загрузкой новых сообщений
     const saveScrollPosition = () => {
         if (messagesContainerRef.current) {
             scrollPositionRef.current = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.scrollTop + 30;
         }
     }
 
-    // Восстанавливаем позицию скролла после обновления сообщений
     const restoreScrollPosition = () => {
         if (messagesContainerRef.current && scrollPositionRef.current > 0) {
             const newScrollTop = messagesContainerRef.current.scrollHeight - scrollPositionRef.current;
@@ -165,15 +161,13 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
     useEffect(() => {
         if (state.isHistoryLoading) {
-            // Восстанавливаем позицию после подгрузки истории
             restoreScrollPosition();
             dispatch({ type: 'RESET_HISTORY_LOADING_FLAG' });
         }
-    }, [state.messages, state.isHistoryLoading]); // Срабатывает при изменении messages
+    }, [state.messages, state.isHistoryLoading]); 
 
     useEffect(() => {
         dispatch({ type: 'START_LOADING' })
-        // Прокручиваем в самый низ страничку
         loadingRef.current = true
 
         const getMessages = async () => {
@@ -374,7 +368,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             textInputRef.current.value = '';
             dispatch({ type: 'CLEAR_INPUT_FILES' })
             dispatch({ type: 'SET_ANSWER_MESSAGE', payload: new Map()})
-
+            setMessageText(null)
         }
     }
 
@@ -484,14 +478,17 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                                     ))}
                                 </div>
 
+                                {item?.message && (
+                                    <div className={`task-chat__message-content ${item?.user?.id == user.id ? 'user' : ''}`}>
+                                        {Object.keys(item.answer_to).length > 0 && (
+                                            <p className="task-chat__answer" key={item.answer_to.id}>{item.answer_to.text}</p>
+                                        )}
+                                        
+                                        
+                                        <p className={`task-chat__message ${item?.user?.id ? 'user' : ''}`} id={item.id}>{item?.message}</p>
+                                    </div>
+                                )}
                                 
-                                <div className={`task-chat__message-content ${item?.user?.id == user.id ? 'user' : ''}`}>
-                                    {Object.keys(item.answer_to).length > 0 && (
-                                        <p className="task-chat__answer" key={item.answer_to.id}>{item.answer_to.text}</p>
-                                    )}
-
-                                    <p className={`task-chat__message ${item?.user?.id ? 'user' : ''}`} id={item.id}>{item?.message}</p>
-                                </div>
                             </div>
                         ))}
                         <div ref={messagesEndRef}/>
@@ -522,7 +519,12 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                         <input ref={textInputRef} className="task-chat__input" type="text" onChange={(e) => setMessageText(e.target.value)} />
                         {/* <button type="submit">send</button> */}
                         <DynamicPngIcon iconName='clipsFile' height={24} width={24} className="clips-file-icon" onClick={() => inputFilesRef.current.click()}/>
-                        <DynamicSvgIcon size={28} className="sendIcon" color="#ffffffff" onClick={change}>
+                        <DynamicSvgIcon 
+                        size={28} 
+                        className={`sendIcon`} 
+                        color="#ffffffff" 
+                        onClick={change}
+                        >
                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                         </DynamicSvgIcon>
                     </form>

@@ -1,13 +1,15 @@
 import { useContext, useEffect } from "react"
 import { useNavigate } from "react-router"
 import { AuthContext } from "./AuthContext"
+import { useUser } from "./common/stores/AuthStore"
 
 interface ProtectedRouteProps {
     children: HTMLElement
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-    const {showLoading, user} = useContext(AuthContext)
+    const user = useUser((state) => state.user)
+    const {showLoading} = useContext(AuthContext)
     const navigate = useNavigate()
 
     useEffect(() => {

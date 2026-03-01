@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback, useContext } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import './GroupPageDetail.css'
 import { useParams, useNavigate } from 'react-router'
 import { api } from '../../../api.js'
@@ -9,8 +9,8 @@ import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.
 import { ChevronLeft, ChevronRight, UserIcon } from 'lucide-react';
 import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon.jsx'
 import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.js'
-import { AuthContext } from '../../AuthContext.jsx'
 import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.js'
+import { useUser } from '../../common/stores/AuthStore.jsx'
 
 interface UserItem {
     id: number;
@@ -41,7 +41,7 @@ function GroupPageDetail() {
 
     const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
 
-    const { user } = useContext(AuthContext)
+    const user  = useUser((state) => state.user)
 
 
     const { groupId  = ''} = useParams<string>()
@@ -229,7 +229,7 @@ function GroupPageDetail() {
                                 </div>
                             </div>
 
-                            {group && group.is_owner === true && userItem.id !== user.id && (
+                            {group && group.is_owner === true && userItem.id !== user?.id && (
                                 <div className='delete-icon-container' onClick={() => setSelectedUser(userItem)}>
                                     <DynamicPngIcon iconName='deleteBucketIcon' />
                                 </div>

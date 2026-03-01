@@ -2,13 +2,15 @@ import React, { useState, useEffect, createContext, useMemo, useCallback } from 
 import { api } from "../api";
 import Cookies from "js-cookie";
 import { getAccessToken, verifyToken } from "../tokens_func";
+import { useUser } from "./common/stores/AuthStore";
 
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+    const removeUser = useUser((state) => state.removeUser)
+    const {user, setUser} = useUser()
     const [notifications, setNotifications] = useState(null)
-    const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(false)
     const [isLogin, setIsLogin] = useState(false)
     const [error, setError] = useState(null)
@@ -32,9 +34,6 @@ export const AuthProvider = ({ children }) => {
     }, [])
 
     useEffect(() => {
-        // localStorage.removeItem('refreshToken')
-        
-
         console.log('🚀 Инициализация сессии запущена')
 
          const getNotifications = async () => {
@@ -63,17 +62,7 @@ export const AuthProvider = ({ children }) => {
                 try {
                     const response = await api.get('api/v1/csrf/')
 
-                    // const data =await response.data
-                    // console.log(data.csrfToken)
-                    // console.log(response.headers)
-
                     const data = await response.data
-
-                    // if (data) {
-                    //     console.log(Cookies.get('csrftoken'))
-                    // }
-                    // const newToken = response.headers['csrftoken'];
-                    // document.cookie = `csrftoken=${newToken}; Path=/; Secure; SameSite=None`;
                 } catch (error) {
                     console.log(error)
                 }
@@ -91,17 +80,14 @@ export const AuthProvider = ({ children }) => {
 
 
                     } else {
-                        setUser(null)
+                        removeUser()
                         localStorage.removeItem('user')
                     }
                 } catch (err) {
-                    setUser(null)
+                    removeUser()
                     localStorage.removeItem('user')
                 } finally {
                     setLoading(false)
-                    // setTimeout(() => {
-                    //     setShowLoading(false)
-                    // }, 1500)
                     setShowLoading(false)
                 }
 
@@ -131,7 +117,6 @@ export const AuthProvider = ({ children }) => {
             console.log(response.data)
             localStorage.setItem('accessToken', response.data.access)
 
-
             const userResponse = await api.post(
                 'api/v1/token/verify/',
                 {
@@ -145,7 +130,7 @@ export const AuthProvider = ({ children }) => {
             console.log(userResponse.user)
             return true
         } catch (error) {
-            console.error('Ошибка выхода:', err);
+            console.error('Ошибка входа:', err);
             setError(err);
             return false
         } finally {
@@ -173,7 +158,7 @@ export const AuthProvider = ({ children }) => {
             console.error(error)
         }
 
-        setUser(null)
+        removeUser()
 
         console.log('ВСЁ удалено')
     }, [])

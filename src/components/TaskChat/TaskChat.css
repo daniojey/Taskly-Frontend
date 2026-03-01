@@ -30,7 +30,7 @@
         &:hover {
             transform: scale(1.1);
         }
-    }
+    }    
 }
 
 .chat-task__body {
@@ -193,6 +193,11 @@
 
     input[type="file"] {
         display: none;
+    }
+
+    .disable {
+        pointer-events: none;
+        border: black;
     }
 
     button {
