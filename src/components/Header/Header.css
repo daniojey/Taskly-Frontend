@@ -3,17 +3,14 @@
     box-sizing: border-box;
     width: 96%;
     justify-content: space-between;
-    background-color: rgb(0, 0, 0, 0.2);
     margin: 20px auto;
-    padding: 13px 17px;
-    border-radius: 15px;
-    border: 0.3px solid rgb(255, 255, 255, 0.2);
     z-index: 900;
 }
 
 
 .header-title {
     display: flex;
+    color: #FFFF !important;
     margin: 0px;
     padding: 0px;
     font-size: 1.5rem;
@@ -23,11 +20,22 @@
     a {
         margin: 0px;
         display: flex;
-        color: #fff;
         justify-content: center;
         align-items: center;
         font-weight: 1000 !important;
     }
+}
+
+.header-title-name {
+    color: #FFFFFF;
+    margin: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 1000 !important;
+    font-size: 1.5rem;
+    padding: 0px;
+    font-family: Trebuchet MS, sans-serif;
 }
 
 
@@ -37,14 +45,32 @@
 
     a {
         display: flex;
-        color: #fff;
+        color: #EBD6FB;
         padding: 0px;
         margin: 0px;
         justify-content: center;
         align-items: center;
         font-size: 1rem;
         font-weight: 100;
-        font-family: Courier, monospace;
+        font-family: Trebuchet MS, sans-serif;
+        position: relative;
+        text-decoration: none;
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: -3px; 
+            left: 50%;
+            width: 0%;
+            height: 1.5px;
+            background-color: #EBD6FB;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+        }
+
+        &:hover::after {
+            width: 100%;
+        }
     }
 }
 
@@ -56,18 +82,17 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        color: black;
-        background-color: white;
+        color: #FFFFFF;
+        background-color: #5b57d9;
         border-radius: 12px;
         padding: 8px 10px;
         font-size: 0.9rem;
         font-weight: 600;
         font-family: Arial, sans-serif;
-        transition: color 0.3s ease, background-color 0.4s ease;
+        transition: background-color 0.4s ease;
 
         &:hover {
-            background-color: rgb(0, 126, 243);
-            color: white;
+            background-color: #4441b1;
         }
     }
 }
@@ -81,6 +106,8 @@
     justify-content: center;
 
     img {
+        height: 24px;
+        width: 22px;
         cursor: pointer;
         transition: transform 0.3s ease-in-out;
 

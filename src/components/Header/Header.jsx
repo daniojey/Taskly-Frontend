@@ -1,5 +1,4 @@
 import './Header.css'
-// import { loading, user} from AuthContext
 import { useContext } from 'react'
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router'
