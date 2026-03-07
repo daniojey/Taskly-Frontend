@@ -1,17 +1,24 @@
 import { useTimer } from "../../common/hooks/timerHook";
+import { useTaskTimer } from "../../common/stores/TaskStore";
 import './TaskTimerComponent.css'
 
 function TaskTimerComponent( {taskId, taskName, shortVersion = false }) {
+    const taskIdActive = useTaskTimer((state) => state.taskId)
+    const activeTimer = useTaskTimer((state) => state.timerActive)
     const timer = useTimer(taskId)
 
     return(
         <div className="timer-body">
         
-        <div className="timer-time">
-            {timer.formatted.formatted}
-        </div>
+        
+        {taskId === taskIdActive && (
+            <div className="timer-time">
+                {timer?.formatted?.formatted}
+            </div>
+        )}
 
-        {!shortVersion && (
+
+        {!shortVersion && (taskId === taskIdActive || !activeTimer) && (
             <div className="timer-button-body">
             {!timer.isRunning ? (
             <button

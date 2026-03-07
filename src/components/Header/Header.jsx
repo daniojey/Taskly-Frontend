@@ -7,10 +7,12 @@ import { AuthContext } from '../../AuthContext'
 import DynamicPngIcon from '../UI/icons/DynamicPngIcon'
 import TaskTimerComponent from '../TaskTimerComponent/TaskTimerComponent'
 import { OneTimerContext } from '../../OneTimerContext'
+import { useTaskTimer } from '../../common/stores/TaskStore'
 
 function Header() {
     const { loading, user, logout, notifications} = useContext(AuthContext);
     const { isPaused } = useContext(OneTimerContext)
+    const taskId = useTaskTimer((state) => state.taskId)
     const navigate = useNavigate()
 
     const onLogout = () => {
@@ -40,7 +42,7 @@ function Header() {
                 )}
                 
                 {!isPaused && (
-                    <TaskTimerComponent taskId={null} shortVersion={true}/>
+                    <TaskTimerComponent taskId={taskId} shortVersion={true}/>
                 )}
             </div>
             <div className="header-authenticate-body">

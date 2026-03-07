@@ -1,6 +1,7 @@
 import { createContext, useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { getAccessToken } from "../tokens_func";
+import { useTaskTimer } from "./common/stores/TaskStore";
 
 const startSession = async ( taskId: number) => {
     try {
@@ -74,6 +75,7 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
     const [activeTaskId, setActiveTaskId] = useState<null | number>(null)
     const originalTitleRef = useRef<string>(document.title)
     const sessionIdRef = useRef<number | null>(null)
+    const { setTaskId, removeTaskId, setActiveTimer, removeActiveTimer } = useTaskTimer()
 
     useEffect(() => {
         intervalRef.current = setInterval(() => {
@@ -82,12 +84,10 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
 
         return () => {
             clearInterval(intervalRef.current)
-            // Восстанавливаем оригинальный title при размонтировании
             document.title = originalTitleRef.current
         }
     }, [])
 
-    // Обновляем title при изменении времени или состояния паузы
     useEffect(() => {
         if (!isPaused) {
             const { formatted } = getFormattedTime()
@@ -98,9 +98,8 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
         } else {
             document.title = originalTitleRef.current
         }
-    }, [isPaused, startTime]) // Зависимости срабатывают при старте/паузе/резюме
+    }, [isPaused, startTime])
 
-    // Принудительное обновление title каждую секунду при активном таймере
     useEffect(() => {
         if (!isPaused && startTime > 0) {
             const { formatted } = getFormattedTime()
@@ -109,7 +108,6 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
     })
 
     if (updateNumber > 30 && !isPaused) {
-        console.log('number is rated')
         const time = pauseTimeRef.current + (Date.now() - startTime)
         updateSession(sessionIdRef.current, time)
         forceUpdate(0)
@@ -126,6 +124,8 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
             setStartTime(Date.now())
             pauseTimeRef.current = 0
             setIsPaused(false)
+            setTaskId(taskId)
+            setActiveTimer(true)
         }
 
     }
@@ -144,6 +144,8 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
         setStartTime(0)
         pauseTimeRef.current = 0
         setIsPaused(true)
+        removeTaskId()
+        removeActiveTimer()
         const time = pauseTimeRef.current + (Date.now() - startTime)
         await endSession(sessionIdRef.current, time)
     }

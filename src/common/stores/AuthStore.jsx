@@ -6,7 +6,3 @@ export const useUser = create((set) => ({
     setUser: (data) => set((state) => ({ user: data })),
     removeUser: () => set(() => ({ user: null}))
 })) 
-
-export const useLogin = create((set) => ({
-    user: null
-}))
