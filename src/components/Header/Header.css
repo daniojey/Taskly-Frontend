@@ -36,6 +36,11 @@
     font-size: 1.5rem;
     padding: 0px;
     font-family: Trebuchet MS, sans-serif;
+    transition: color 0.3s ease-in-out;
+
+    &:hover {
+        color:  #EBD6FB;
+    }
 }
 
 

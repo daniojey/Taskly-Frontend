@@ -24,9 +24,11 @@ function GroupsPage() {
     const [groupName, setGroupName] = useState<string | null>(null)
     const {user} = useContext(AuthContext)
     const [addMembersWindow, setAddMembersWindow] = useState<boolean>(false)
+    const [selectValue, setSelectValue] = useState<string | null>(null)
 
 
     const onChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectValue(e.target.value)
         if (e.target.value) {
             const param = new URLSearchParams()
             param.set('f', e.target.value)
@@ -35,6 +37,7 @@ function GroupsPage() {
             const param = new URLSearchParams();
             setSearchParams(param)
         }
+        e.target.blur()
     }
 
     const onCreateGroup = async (members_ids: number[] | null = null) => {
@@ -64,6 +67,8 @@ function GroupsPage() {
                 ...response.data.result
             }
             setGroups(groups => [data, ...groups]);
+            setGroupName('')
+            setCreateForm(false)
         } catch (error) {
             console.error(error)
         }
@@ -104,13 +109,13 @@ function GroupsPage() {
 
             <div className="group-navigation-block">
                 <div className="group-navigation-block__filter">
-                    <label htmlFor="filters">Filter</label>
-                    <select name="filters" id="filters" onChange={onChange}>
-                        <option value="">Default</option>
+                    <select name="filters" id="filters" className={selectValue ? 'has-value' : ''} onChange={onChange}>
+                        <option value="">{selectValue ? 'Default': ''}</option>
                         <option value="A-z">A-z</option>
                         <option value="Z-a">Z-a</option>
                         <option value="created">created Data</option>
                     </select>
+                    <label htmlFor="filters">Filter</label>
                 </div>
                 
 
@@ -131,7 +136,7 @@ function GroupsPage() {
 
             <form className={createForm ? "group-form-body active" : "group-form-body"} onSubmit={submitForm}>
                 <h2>Come up with a name for the group</h2>
-                <input type="text" placeholder="Group name" onChange={(e) => {
+                <input type="text" placeholder="..." onChange={(e) => {
                     const target = e.target as HTMLInputElement
                     setGroupName(target.value)} 
                 }

@@ -6,11 +6,12 @@
     border-radius: 12px;
     background-color: black;
     color: rgb(255, 255, 255);
+    background: 
+        linear-gradient(to bottom right, #1a1a2e,#1a1a2e, #5b57d9) padding-box;
     padding: 26px 24px 24px 24px;
+    border: 1px solid #21213b;
     box-sizing: border-box;
     flex-direction: column;
-    border: 0.5px solid rgb(0, 137, 250);
-    box-shadow: 2px 3px 3px rgb(0, 137, 250);
     transition: all 0.3s ease-out;
     transform: scale(0);
     animation: scaleIn 0.5s ease forwards;
@@ -19,12 +20,14 @@
     &:hover {
         border-color: #ffff;
         box-shadow: 1px 2px 2px #ffff;
+        background: 
+            linear-gradient(to bottom right, #1a1a2e,#5b57d9, #1a1a2e) padding-box;
     }
 }
 
 .group-card__body.created {
-    border: 0.5px solid rgb(65, 255, 90);
-    box-shadow: 2px 3px 3px rgb(65, 255, 90);
+    border: 0.5px solid #5b57d9;
+    box-shadow: 2px 3px 3px #5b57d9;
 
     &:hover {
         border-color: #ffff;

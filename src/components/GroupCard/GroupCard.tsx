@@ -31,7 +31,6 @@ function GroupCard({ props}: GroupCardProps) {
             className={props?.created ? "group-card__body created" : "group-card__body" }
             style={{ animationDelay: `${index * 0.15}s` }} 
             >
-                <DynamicPngIcon iconName="groupIcon" className="groupIcon"/>
                 <div className="group-card__body-text">
                     <h3>{name}</h3>
                     <p>members: {count_members}</p>

@@ -2,7 +2,7 @@ import { useTimer } from "../../common/hooks/timerHook";
 import { useTaskTimer } from "../../common/stores/TaskStore";
 import './TaskTimerComponent.css'
 
-function TaskTimerComponent( {taskId, taskName, shortVersion = false }) {
+function TaskTimerComponent( {taskId, taskName, shortVersion = false, onClick }) {
     const taskIdActive = useTaskTimer((state) => state.taskId)
     const activeTimer = useTaskTimer((state) => state.timerActive)
     const timer = useTimer(taskId)

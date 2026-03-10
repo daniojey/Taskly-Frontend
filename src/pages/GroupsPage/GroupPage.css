@@ -2,34 +2,28 @@
     display: flex;
     width: 100%;
     max-width: 1300px;
-    padding: 24px;
+    padding: 16px 40px;
     box-sizing: border-box;
     border-radius: 12px;
-    margin: 20px auto;
+    margin: 20px auto 10px auto;
     font-family: var(--main-font);
     align-items: center;
     justify-content: space-between;
-    animation: borderAnimated 1.5s ease-in-out forwards;
     animation-delay: 0.3s;
 
     button {
         display: flex;
-        color: rgb(0, 0, 0);
-        background-color: rgb(0, 137, 250);
+        background-color: #5b57d9;
         padding: 10px 35px;
         font-size: 1.1rem;
-        font-weight: 200;
+        font-weight: 900;
         border-radius: 12px;
         transition: background-color 0.5s ease;
         font-family: var(--main-font-bold);
 
         &:hover {
-            background-color: white;
+            background-color: #4441b1;
         }
-    }
-
-    &:hover {
-        animation: borderAnimated 1.5s ease-in-out infinite forwards;
     }
 }
 
@@ -37,11 +31,32 @@
 .group-navigation-block__filter {
     display: flex;
     align-items: center;
+    position: relative;
 
     label {
+        position: absolute;
         display: flex;
-        font-size: 1.3rem;
+        box-sizing: border-box;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        
+        font-size: 1rem;
+        background-color: transparent;
+        padding: 5px;
         margin-right: 10px;
+        font-family: var(--main-font-bold);
+        font-weight: 900;
+        
+        pointer-events: none;
+        transition: top 0.3s ease, transform 0.3s ease, font-size 0.3s ease, background-color 0.6s ease;
+    }
+
+    select:focus + label,
+    select.has-value + label {
+        top: -15px;
+        transform: translateY(0);
+        font-size: 0.8rem;
     }
 
     select {
@@ -50,22 +65,23 @@
         color: #FFF;
         font-family: Roboto;
         font-size: 18px;
-        font-style: normal;
+        font-style: var(--main-font-bold);
         font-weight: 400;
-        line-height: 146%; /* 26.28px */
-        background: rgb(0, 0, 0);
-        border: 1px solid rgb(0, 137, 250);
+        line-height: 146%;
+        background: #2c2b5b;
+        border: 1px solid #2c2b5b;
         border-radius: 12px;
-        appearance: none; /* Убираем стандартную стрелочку */
-        background-image: url('https://teststepbucket.s3.amazonaws.com/icons/create_test_arrow.svg'); /* Добавляем свою стрелку */
+        appearance: none;
+        background-image: url('https://teststepbucket.s3.amazonaws.com/icons/create_test_arrow.svg');
         background-repeat: no-repeat;
-        background-position: right 10px center; /* Положение стрелки */
-        background-size: 24px; /* Размер стрелки */
+        background-position: right 10px center;
+        background-size: 24px;
+        outline: 1px solid #2c2b5b;
         transition: outline 0.4s ease-in, box-shadow 0.4s ease-in-out;
 
         &:focus {
-            outline: 1px solid rgb(0, 137, 250);
-            box-shadow: 2px 3px 3px rgb(0, 137, 250);
+            outline: 1px solid #5b57d9;
+            box-shadow: 0 0 20px rgba(123, 47, 190, 0.6);
         }
     }
 }
@@ -75,12 +91,12 @@
     flex-direction: column;
     width: 100%;
     height: 0px;
-    max-width: 1300px;
+    max-width: 1240px;
+    padding: 0px 40px 0px 40px;
     margin: 10px auto;
-    margin-bottom: 30px;
     box-sizing: border-box;
     border-radius: 12px;
-    background-color: black;
+    background-color: #100913;
     interpolate-size: allow-keywords;
     transition: all 0.4s ease-in-out;
     justify-content: center;
@@ -93,33 +109,36 @@
         font-family: var(--main-font-bold);
         font-weight: 700;
         font-size: 1.6rem;
+        margin: 10px auto;
     }
 
     input {
-        display: flex;
-        width: 100%;
-        max-width: 400px;
-        box-sizing: border-box;
-        padding: 15px 20px;
-        border: 1px solid white;
-        background-color: rgb(15, 15, 15);
-        border-radius: 12px;
-        transition: border 0.4s ease, outline 0.3s ease-in-out;
-        margin-bottom: 20px;
-        font-family: var(--main-font);
+        background-color: #2c2b5b;
         font-size: 1rem;
+        padding: 8px 14px;
+        border: 1px solid #2c2b5b;
+        border-radius: 12px;
+        box-shadow: none;
+        transition: border 0.4s ease-in-out, padding 0.3s ease, outline 0.4s ease, box-shadow 0.4s ease-out;
+
+        &:hover {
+            outline: 1px solid #5b57d9;
+            border: 1px solid #5b57d9;
+        }
 
         &:focus {
-            border: 1px solid rgb(0, 137, 250);
-            outline: 1px solid rgb(0, 137, 250);
+            box-shadow: 0 0 0 3px #5b57d9;
         }
+    }
+
+    input::placeholder {
+        color: rgb(122, 122, 122);
     }
 
     button {
         display: flex;
-        color: rgb(0, 0, 0);
-        background-color: rgb(0, 137, 250);
-        padding: 10px 35px;
+        background-color: #5b57d9;
+        padding: 12px 20px;
         font-size: 1.1rem;
         font-weight: 200;
         border-radius: 12px;
@@ -127,41 +146,18 @@
         font-family: var(--main-font-bold);
 
         &:hover {
-            background-color: white;
+            background-color: #4441b1;
         }
     }
 }
 
 .group-form-body.active {
-    border: 0.3px solid rgb(255, 255, 255, 0.2);
-    padding: 24px;
-    min-height: 35%;
+    min-height: 40%;
 }
 
 .active-button {
-  background-color: white !important;
-
-  &:hover {
-    background-color: rgb(0, 137, 250) !important;
-  }
+  background-color: #4441b1 !important;
 }
-
-/* @keyframes heightIn {
-    0% {
-        height: 0;
-        overflow: hidden;
-    }
-
-    50% {
-        padding: 24px;
-    }
-
-    100% {
-        height: 500px;
-        overflow: visible;
-    }
-}
- */
 
 
 .group-cards-body {
@@ -173,36 +169,7 @@
     gap: 20px 20px;
     align-items: start;
     justify-content: center;
-    padding: 0px 40px;
+    padding: 0px 40px 40px 40px;
     box-sizing: border-box;
     margin: 20px auto;
-    border-left: 0.3px solid rgb(255, 255, 255, 0.1);
-    border-right: 0.3px solid rgb(255, 255, 255, 0.1);
-}
-
-
-@keyframes borderAnimated {
-    0% {
-        border: 0px solid rgb(0, 0, 0);
-    }
-
-    10% {
-        border-top: 1px solid white;
-    }
-
-    25% {
-        border-right: 1px solid white;
-    }
-
-    50% {
-        border-bottom: 1px solid white;
-    }
-
-    75% {
-        border-left: 1px solid white;
-    }
-
-    100% {
-        border: 0.3px solid rgb(255, 255, 255, 0.2);
-    }
 }

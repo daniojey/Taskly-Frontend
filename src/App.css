@@ -6,6 +6,8 @@
   box-sizing: border-box;
   flex-direction: column;
   flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
   height: 100vh;
   width: 100vw;
   min-height: 100vh;
@@ -20,7 +22,6 @@
   height: 100%;
   padding: 0px;
   margin: 0px;
-  overflow-y: auto;
 }
 
 .loading-overlay {
@@ -122,7 +123,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 /* Поддержка в Firefox */
 * {
   scrollbar-width: 20px; /* узкий скроллбар */
-  scrollbar-color: rgb(100, 100, 100) rgb(15, 15, 15); /* ползунок и трек */
+  scrollbar-color: #5b57d9 rgb(15, 15, 15); /* ползунок и трек */
 }
 
 
