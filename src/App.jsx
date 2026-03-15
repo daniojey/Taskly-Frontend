@@ -20,6 +20,7 @@ import NotificationPage from './pages/NotificationPage/NotificationPage'
 import GroupLogsPage from './pages/GroupLogsPage/GroupLogsPage'
 import { OneTimerProvider } from './OneTimerContext'
 import ActiveTaskPage from './pages/ActiveTaskPage/ActiveTaskPage'
+import NotifyPopUp from './components/NotifyPopUp/NotifyPopUp'
 
 const queryClient = new QueryClient()
 
@@ -32,6 +33,7 @@ function App() {
           <OneTimerProvider>
           <QueryClientProvider client={queryClient}>
 
+            <NotifyPopUp/>
             <Notification/>
             <Header />
 

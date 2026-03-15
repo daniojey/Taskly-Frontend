@@ -6,6 +6,7 @@ import './GroupPage.css'
 import { useSearchParams } from "react-router"
 import { AuthContext } from "../../AuthContext.jsx"
 import AddMembersModelWindow from "../../components/AddMembersModelWindow/AddMembersModelWindow.tsx"
+import { useNotify } from "../../common/stores/NotifyStore.tsx"
 
 
 interface GroupItem {
@@ -25,6 +26,7 @@ function GroupsPage() {
     const {user} = useContext(AuthContext)
     const [addMembersWindow, setAddMembersWindow] = useState<boolean>(false)
     const [selectValue, setSelectValue] = useState<string | null>(null)
+    const addNotify = useNotify((state) => state.addNotify)
 
 
     const onChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -69,8 +71,8 @@ function GroupsPage() {
             setGroups(groups => [data, ...groups]);
             setGroupName('')
             setCreateForm(false)
-        } catch (error) {
-            console.error(error)
+        } catch (error: any) {
+            addNotify(error?.response?.data?.results, 'error')
         }
     }
 
@@ -135,13 +137,20 @@ function GroupsPage() {
             </div>
 
             <form className={createForm ? "group-form-body active" : "group-form-body"} onSubmit={submitForm}>
-                <h2>Come up with a name for the group</h2>
-                <input type="text" placeholder="..." onChange={(e) => {
-                    const target = e.target as HTMLInputElement
-                    setGroupName(target.value)} 
-                }
-                required/>
-                <button type="submit">Create Group</button>
+                {groups && groups.length > 30 && (
+                    <h2>Group limit reached</h2>
+                ) || (
+                    <>
+                    <h2>Come up with a name for the group</h2>
+                    <input type="text" placeholder="..." onChange={(e) => {
+                        const target = e.target as HTMLInputElement
+                        setGroupName(target.value)} 
+                    }
+                    required/>
+                    <button type="submit">Create Group</button>
+                    </>
+                )}
+                
             </form>
             
             <div className="group-cards-body">
