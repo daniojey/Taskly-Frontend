@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { api } from '../../../api';
 import { getAccessToken } from '../../../tokens_func';
 import DynamicPngIcon from '../UI/icons/DynamicPngIcon';
+import '../../App.css'
 
 interface Members {
     email: string;
@@ -25,7 +26,6 @@ interface AddMembersModelWindowProps {
 }
 
 
-
 function AddMembersModelWindow ({ onClose, onCreateGroup }: AddMembersModelWindowProps) {
     const [close, setClose] = useState(false)
     const [searchingUsers, setSearchingUsers] = useState<Members[]>([])
@@ -43,7 +43,6 @@ function AddMembersModelWindow ({ onClose, onCreateGroup }: AddMembersModelWindo
                 }}
             )
 
-            console.log(response)
             return response.data
         } catch (error: any) {
             if (error instanceof Error) {
@@ -72,7 +71,7 @@ function AddMembersModelWindow ({ onClose, onCreateGroup }: AddMembersModelWindo
     }
 
 
-    const handleSerach = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.value && e.target.value.length > 0 && timers.has('timer')) {
             clearTimeout(timers.get('timer'))
         }
@@ -113,49 +112,59 @@ function AddMembersModelWindow ({ onClose, onCreateGroup }: AddMembersModelWindo
         createPortal(
             <div className={`window-overlay ${close ? 'close' : 'open'}`} onClick={handleCloseOverlay}>
                 <div className='window-body' style={{
-                    maxWidth: '900px'
+                    maxWidth: '800px',
+                    height: '80vh',
+                    maxHeight: '600px',
+                    minHeight: '40vh'
                 }}>
                     <div className='add-members-window__body'>
-                        <div className='add-members-window__user_found'>
-                            <h2>Serach users</h2>
-                            {searchingUsers.length > 0 && searchingUsers.map(user => (
-                                <div className="add-member__user-card" key={user.id}>
-                                    { user.image_profile_url && (
-                                        <img src={user.image_profile_url}/>
-                                    ) || (
-                                        <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} />
-                                    )}
-                                    <p>{user.username}</p>
-
-                                    <button onClick={() => handleClickAddUser(user)}>Add</button>
-                                </div>
-                            ))}
+                        <h3>Add Members</h3>
+                        <div className='add-members-window__button_body'>
+                            <input type="text" className='holy_input' onChange={handleSearch} />
                         </div>
 
-                        <div className='add-members-window__selected_users'>
-                            <h2>Added users</h2>
+                        <div className='add-members-window__content_body'>
+                            <div className='add-members-window__user_found'>
+                                <h2>Serach users</h2>
+                                {searchingUsers.length > 0 && searchingUsers.map(user => (
+                                    <div className="add-member__user-card" key={user.id}>
+                                        <div>
+                                            { user.image_profile_url && (
+                                                <img src={user.image_profile_url}/>
+                                            ) || (
+                                                <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} />
+                                            )}
+                                            <p>{user.username}</p>
+                                        </div>
 
-                            {addMembers.length > 0 && addMembers.map(user => (
-                                <div className='add-member-window__added_user_item' key={user.id}>
-                                    <div>
-                                        { user.image_profile_url && (
-                                            <img src={user.image_profile_url}/>
-                                        ) || (
-                                            <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} />
-                                        )}
-                                        <p>{user.username}</p>
+                                        <button onClick={() => handleClickAddUser(user)}>Add</button>
                                     </div>
-                                    
-                                    <div className='delete-icon-container' onClick={() => setAddMembers(addMembers.filter(item => user.id !== item.id))}>
-                                        <DynamicPngIcon iconName='deleteBucketIcon' />
+                                ))}
+                            </div>
+
+                            <div className='add-members-window__selected_users'>
+                                <h2>Added users</h2>
+                                {addMembers.length > 0 && addMembers.map(user => (
+                                    <div className='add-member-window__added_user_item' key={user.id}>
+                                        <div>
+                                            { user.image_profile_url && (
+                                                <img src={user.image_profile_url}/>
+                                            ) || (
+                                                <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} />
+                                            )}
+                                            <p>{user.username}</p>
+                                        </div>
+                                        
+                                        <div className='delete-icon-container' onClick={() => setAddMembers(addMembers.filter(item => user.id !== item.id))}>
+                                            <DynamicPngIcon iconName='deleteBucketIcon' />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                    <div className='add-members-window__button_body'>
-                        <input type="text" className='neomorphism-input' onChange={handleSerach} />
-                        <button onClick={handleCreate}>Create Group</button>
+                        <div className='add-members-window__create-button'>
+                            <button onClick={handleCreate}>Create Group</button>
+                        </div>
                     </div>
                 </div>
             </div>

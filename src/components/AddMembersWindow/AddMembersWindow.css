@@ -32,29 +32,35 @@
 
 .add-member__user-card {
     display: flex;
-    max-width: 400px;
-    padding: 12px;
-    gap: 20px;
-    box-sizing: border-box;
-    background-color: rgb(41, 41, 41);
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    border-radius: 20px;
+    background-color: #32294a;
+    padding: 6px 10px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    opacity: 0;
+    animation: fadeIn 0.4s ease forwards;
 
-    img {
-        border-radius: 50%;
+    div {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+
+        img {
+            border-radius: 50%;
+        }
     }
 
     button {
         display: flex;
-        padding: 12px;
-        background-color: rgb(0, 137, 250);
+        padding: 8px 12px;
+        background-color: #5b57d9;
         font-family: var(--main-font-bold);
-        transition: color 0.4s ease-out, background-color 0.5s ease-in-out;
+        transition: background-color 0.5s ease-in-out;
 
         &:hover {
-            background-color: white;
-            color: black;
+            background-color: #4441b1;
         }
     }
 }
