@@ -22,16 +22,17 @@
 
     button {
         display: flex;
-        background-color: blue;
+        background-color: #5b57d9;
         padding: 4px 6px;
         box-sizing: border-box;
         font-size: 1.2rem;
+        font-weight: 900;
         border-radius: 12px;
-        transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+        transition: background-color 0.4s ease;
+        font-family: var(--main-font-bold);
 
         &:hover {
-            background-color: white;
-            color: blue;
+            background-color: #4441b1;
         }
     }
 }
