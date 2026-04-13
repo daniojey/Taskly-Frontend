@@ -43,29 +43,10 @@ function GroupPageDetail() {
 
     const user  = useUser((state) => state.user)
 
-
     const { groupId  = ''} = useParams<string>()
 
     const scrollContainerRef = useRef<HTMLDivElement | null>(null)
 
-    const scrollLeft = () => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollBy({
-                left: -400,
-                behavior: 'smooth'
-            });
-        }
-    };
-
-    const scrollRight = () => {
-        if (scrollContainerRef.current) {
-            // положительное значение означает прокрутку вправо
-            scrollContainerRef.current.scrollBy({
-                left: 400, // прокручиваем на 200px вправо
-                behavior: 'smooth' // плавная анимация прокрутки
-            });
-        }
-    };
 
     const getGroup = async () => {
         try {
@@ -169,41 +150,23 @@ function GroupPageDetail() {
                 )}
             </div>
 
-            <div className='group-detail__navigation'>
+            {/* <div className='group-detail__navigation'>
                 <div className='group-detail__projects-body'>
                     <h2>Projects</h2>
                     <button onClick={(e) => setGroupWindow(!groupWindow)}>New project</button>
                 </div>
 
-                <div className='group-detail__navigation-buttons'>
-                    <button
-                        onClick={scrollLeft}
-                        className="scroll-button"
-                        aria-label="Прокрутить влево"
-                    >
-                        <ChevronLeft size={24} />
-                    </button>
-
-                    <button
-                        onClick={scrollRight}
-                        className="scroll-button"
-                        aria-label="Прокрутить вправо"
-                    >
-                        <ChevronRight size={24} />
-                    </button>
-                </div>
 
                 <div className='group-detail__members'>
                     <h2>Members</h2>
                     <button onClick={() => setMembersWindow(true)}>+</button>
                 </div>
-            </div>
+            </div> */}
 
             <div className='group-detail__body'>
-                <div className='group-detail__body-projects' ref={scrollContainerRef}>
+                <div className='group-detail__body-projects'>
                     {projects && projects.map((project, index) => (
                         <ProjectCard props={project} key={index} groupId={groupId} />
-                        // <div className='grs' key={index}>{project.title}</div>
                     )
 
                     )}
@@ -225,7 +188,6 @@ function GroupPageDetail() {
                                     ) : (
                                         <p>{userItem.username}</p>
                                     )}
-                                    <p>{userItem.last_login}</p>
                                 </div>
                             </div>
 
@@ -233,8 +195,6 @@ function GroupPageDetail() {
                                 <div className='delete-icon-container' onClick={() => setSelectedUser(userItem)}>
                                     <DynamicPngIcon iconName='deleteBucketIcon' />
                                 </div>
-
-
                             )}
                         </div>
                     ))}

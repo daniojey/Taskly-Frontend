@@ -1,0 +1,51 @@
+.stratagem-interface-body {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    padding: 16px;
+    border-radius: 0px 12px 12px 0px;
+    position: absolute;
+    left: 0;
+    top: 15px;
+    z-index: 5000;
+    background-color: #323079;
+    animation: slideIn 0.4s ease-in-out forwards;
+}
+
+
+.stratagem-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: start;
+    justify-content: center;
+}
+
+.stratagem-name {
+    display: flex;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: var(--main-font-bold);
+}
+
+.stratagem-coombination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+        display: flex;
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(0%);
+    }
+}

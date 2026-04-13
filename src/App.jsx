@@ -21,6 +21,7 @@ import GroupLogsPage from './pages/GroupLogsPage/GroupLogsPage'
 import { OneTimerProvider } from './OneTimerContext'
 import ActiveTaskPage from './pages/ActiveTaskPage/ActiveTaskPage'
 import NotifyPopUp from './components/NotifyPopUp/NotifyPopUp'
+import StratagemComponent from './components/StratagemComponent/StratagemComponent'
 
 const queryClient = new QueryClient()
 
@@ -36,6 +37,7 @@ function App() {
             <NotifyPopUp/>
             <Notification/>
             <Header />
+            <StratagemComponent />
 
             <Routes>
               <Route path='/' element={<Homepage />} />
