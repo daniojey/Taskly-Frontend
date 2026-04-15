@@ -25,7 +25,6 @@ function ProjectCard({ props, groupId }) {
                 </div>
 
                 <div className="project-card__body">
-                    <label>Tasks</label>
                     {tasks && tasks.length > 0 ? tasks.map((task, index) => (
                         <div className="project-card__task-card" key={index}>
                             <p className="title-task">Title: {task.name}</p>
@@ -34,7 +33,7 @@ function ProjectCard({ props, groupId }) {
                     )): (
                         <div className="project-card__task-not-found">
                             <h2>Not found tasks</h2>
-                            <Link to={`/projects/${id}/`}>Create</Link>
+                            <Link to={`/projects/${id}/group/${groupId}/`}>Create</Link>
                         </div>
                     )}
                 </div>

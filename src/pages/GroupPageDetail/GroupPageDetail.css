@@ -1,13 +1,16 @@
 .group-detail__title {
     display: flex;
-    width: calc(100% - 48px);
+    width: 100%;
+    max-width: 1300px;
     align-items: center;
     justify-content: space-between;
     padding: 0px 16px;
     box-sizing: border-box;
-    margin: 24px;
+    margin: 24px auto;
     background-color: #323079;
     border-radius: 12px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
 
     button {
         display: flex;
@@ -29,26 +32,66 @@
 
 .group-detail__body {
     display: flex;
-    flex: 1; 
-    min-height: 0;
+    max-height: 70%;
     width: 100%;
     max-width: 1300px;
     margin: 0 auto;
     box-sizing: border-box;
-    padding: 24px 24px 30px 24px;
-    box-sizing: border-box;
     border-radius: 0px 0px 12px 12px;
     opacity: 1;
-    gap: 20px;
+    gap: 40px;
+}
+
+.group-detail__wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    min-height: 0;
 }
 
 .group-detail__body-projects {
     min-height: 0;
     overflow-y: auto;
+    padding-bottom: 40px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    width: 70%;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    width: 100%;
     gap: 20px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+    animation-delay: 0.5s;
+}
+
+.group-detail__body_project-title,
+.group-detail__body-members-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #323079;
+    padding: 16px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+
+    h3 {
+        font-size: 1.4rem;
+        margin: 0;
+        font-family: var(--main-font-bold);
+        font-weight: 900;
+    }
+
+    p {
+        font-size: 2rem;
+        margin: 0;
+        cursor: pointer;
+        transition: transform 0.4s ease-out;
+
+        &:hover {
+            transform: scale(1.4);
+        }
+    }
 }
 
 .group-detail__body-members {
@@ -65,10 +108,13 @@
     width: 100%;
     justify-content: space-between;
     align-items: center;
-    background-color: #5b57d9;
+    background-color: #323079;
     border-radius: 12px;
     padding: 0px 10px;
     box-sizing: border-box;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+    animation-delay: 0.5s;
 }
 
 .group-detail__member-body {
@@ -78,5 +124,15 @@
 
     div {
         margin-left: 14px;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }

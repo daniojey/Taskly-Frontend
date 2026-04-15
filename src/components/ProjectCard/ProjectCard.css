@@ -1,139 +1,99 @@
 .project-card {
-    position: relative;
     display: flex;
-    box-sizing: border-box;
-    min-width: 150px;
-    min-height: 425px;
+    position: relative;
     flex-direction: column;
-    padding: 10px 10px 100px 10px;
-    border: 0.2px solid rgb(255, 255, 255, 0.2);
-    transition: border 0.4s ease-in-out;
-    cursor: pointer;
+    min-width: 180px;
+    background: 
+        linear-gradient(to bottom, #1a1a2e, #2e2b78, #1a1a2e) padding-box;
+    padding: 16px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    
+    .created_date {
+        display: flex;
+        width: 100%;
+        justify-content: end;
+        align-items: center;
+        margin: 10px 0;
+        font-family: var(--main-font-bold);
+        font-weight: 900;
+    }
 
     &:hover {
-        border: 0.3px solid rgb(0, 137, 250);
+        background: 
+        linear-gradient(to bottom, #2e2b78, #1a1a2e, #2e2b78 ) padding-box;
     }
 }
 
-
 .project-card__title {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgb(0, 137, 250);
-    padding: 10px 24px;
-    border-radius: 12px;
-
+    
     h2 {
-        margin: 0;
+        margin: 10px 0;
+        font-size: 1.3rem;
         font-family: var(--main-font-bold);
+        font-weight: 900;
     }
 }
 
 .project-card__body {
-    position: relative;
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
-
-    label {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0px 24px;
-        font-family: var(--main-font-bold);
-        font-size: 1.5rem;
-        animation: bottomLine 4s ease-in-out infinite;
-    }
-
+    background-color: inherit;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    gap: 15px;
 }
 
 .project-card__task-card {
     display: flex;
+    background-color: #1a1a2e;
     flex-direction: column;
-    border: 0.3px solid rgb(255, 255, 255, 0.3);
+    font-size: 1.2rem;
     border-radius: 12px;
-    margin-top: 10px;
-    justify-content: center;
-    align-items: start;
+    padding: 8px;
     box-sizing: border-box;
-    padding: 15px;
-    gap: 20px;
-    transition: border 0.3s ease-in-out;
-
-    .title-task {
-        display: flex;
-        background-color: rgb(0, 137, 250);
-        width: 100%;
-        padding: 10px 15px;
-        margin: -15px -15px -15px -15px;
-        font-family: var(--main-font-bold);
-    }
+    gap: 10px;
 
     p {
-        margin: 0;
-        font-family: var(--main-font);
-    }
-
-    &:hover {
-        border: 0.3px solid rgb(0, 137, 250);
+        margin: 0px;
     }
 }
 
 .project-card__task-not-found {
     display: flex;
+    background-color: #1a1a2e;
     flex-direction: column;
+    font-size: 1.2rem;
+    border-radius: 12px;
+    padding: 8px;
+    box-sizing: border-box;
+    gap: 10px;
+    height: 100%;
+    justify-content: center;
     align-items: center;
-    justify-content: space-between;
-    margin-top: 40px;
 
-    h2 {
-        display: flex;
-        font-family: var(--main-font-bold);
-        font-size: 1.7rem;
+   h2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4rem;
+   }
 
-    }
-
-    a {
-        display: flex;
-        box-sizing: border-box;
-        background-color: white;
-        padding: 10px 20px;
-        color: black;
+   a {
+    display: flex;
+        background-color: #5b57d9;
+        padding: 10px 35px;
+        font-size: 1.1rem;
+        font-weight: 900;
         border-radius: 12px;
-        transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out;
+        transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
 
         &:hover {
-            background-color: rgb(0, 137, 250);
-            color: white;
+            background-color: #4441b1;
         }
-    }
-}
-
-
-.created_date {
-    position: absolute;
-    padding: 4px 15px;
-    border: 0.2px solid rgb(255, 255, 255, 0.2);
-    border-radius: 12px;
-    margin-right: 15px;
-    right: 0;
-    bottom: 0;
-}
-
-@keyframes bottomLine {
-    0% {
-        border-bottom: 1px solid white;
-        box-shadow: 0 3px 0 0 white;
-    }
-
-    50% {
-        border-bottom: 1px solid rgb(0, 137, 250);
-        box-shadow: 0px 0px 3px rgb(0, 137, 250);
-    }
-
-    100% {
-        border-bottom: 1px solid white;
-        box-shadow: 0 3px 0 0 white;
-    }
+   }
 }

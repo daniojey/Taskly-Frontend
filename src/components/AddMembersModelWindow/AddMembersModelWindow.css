@@ -76,6 +76,7 @@
     }
 }
 
+.add-member__user-card,
 .add-member-window__added_user_item {
     display: flex;
     justify-content: space-between;
@@ -95,6 +96,9 @@
 
         img {
             border-radius: 50%;
+            height: 40px;
+            width: 40px;
+            object-fit: cover;
         }
     }
 

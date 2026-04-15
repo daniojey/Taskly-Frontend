@@ -10,8 +10,6 @@
   scroll-behavior: smooth;
   height: 100vh;
   width: 100vw;
-  min-height: 100vh;
-  min-width: 100%;
   background-color: #0f0813
 }
 
@@ -19,7 +17,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  height: calc(100% - 78px);
   padding: 0px;
   margin: 0px;
 }

@@ -45,8 +45,6 @@ function GroupPageDetail() {
 
     const { groupId  = ''} = useParams<string>()
 
-    const scrollContainerRef = useRef<HTMLDivElement | null>(null)
-
 
     const getGroup = async () => {
         try {
@@ -79,37 +77,6 @@ function GroupPageDetail() {
     }, [])
 
 
-    useEffect(() => {
-        const container = scrollContainerRef.current;
-
-        // Проверяем, что контейнер существует
-        if (!container) return;
-
-        // Функция-обработчик события wheel (колесико мыши)
-        const handleWheel = (event: WheelEvent) => {
-
-            const canScrollHorizontally = container.scrollWidth > container.clientWidth;
-
-            const sensitivity = 2;
-            const scrollAmount = event.deltaY * sensitivity;
-
-            if (canScrollHorizontally) {
-                event.preventDefault();
-
-                container.scrollBy({
-                    left: scrollAmount,
-                    behavior: 'smooth'
-                });
-            }
-        };
-
-        container.addEventListener('wheel', (handleWheel), { passive: false });
-
-        return () => {
-            container.removeEventListener('wheel', handleWheel);
-        };
-    }, []);
-
     const openGroupLogs = () => {
         navigate(`/group/${groupId}/logs/`)
     }
@@ -137,7 +104,7 @@ function GroupPageDetail() {
             <div className='group-detail__title'>
                 {group ? (
                     <>
-                        <h2>{group.name}</h2>
+                        <h2>Group Name: {group.name}</h2>
 
                         {group.is_owner === true && (
                             <button onClick={() => openGroupLogs()}>Group logs</button>
@@ -164,15 +131,27 @@ function GroupPageDetail() {
             </div> */}
 
             <div className='group-detail__body'>
-                <div className='group-detail__body-projects'>
-                    {projects && projects.map((project, index) => (
-                        <ProjectCard props={project} key={index} groupId={groupId} />
-                    )
+                <div className='group-detail__wrapper'>
+                    <div className='group-detail__body_project-title'>
+                        <h3>Projects</h3>
+                        <p onClick={() => setGroupWindow(true)}>+</p>
+                    </div>
+                    <div className='group-detail__body-projects'>
+                        {projects && projects.map((project, index) => (
+                            <ProjectCard props={project} key={index} groupId={groupId} />
+                        )
 
-                    )}
+                        )}
+                    </div>
                 </div>
+                
 
                 <div className='group-detail__body-members'>
+                    <div className='group-detail__body-members-title'>
+                        <h3>Group Members</h3>
+                        <p onClick={() => setMembersWindow(true)}>+</p>
+                    </div>
+
                     {members && members.map((userItem, index) => (
                         <div className='group-detail__member-container' key={index}>
 
