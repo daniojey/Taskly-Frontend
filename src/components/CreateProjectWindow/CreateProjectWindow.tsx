@@ -9,6 +9,7 @@ import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
 import { AuthContext } from '../../AuthContext'
 import { useModalClose } from '../../common/hooks/closeOverlay'
+import '../../common/Styles/ModelWindow.css'
 
 interface CreateProjectWindowProps {
     groupId: string;
@@ -17,14 +18,13 @@ interface CreateProjectWindowProps {
 }
 
 
-
 function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindowProps) {
     const { user } = useContext(AuthContext)
     const { 
         handleCloseWindow,
         closeWindow, 
         isClosing 
-    } = useModalClose({ onClose: onClose, delay: 400, className: "create-task-overlay"})
+    } = useModalClose({ onClose: onClose, delay: 400, className: "window-overlay"})
 
     const schema = yup.object({
         title: yup.string().min(4),
@@ -50,10 +50,6 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
             description: ''
         }
     })
-
-    // const formSubmit
-
-    console.log('ID группы', groupId)
 
 
     const handleForm: SubmitHandler<ProjectData> = async (data) => {
@@ -89,21 +85,25 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
             }
         }
 
-
         createProject(apiData)
     }
 
     return (
         createPortal(
-            <div className={`create-task-overlay ${isClosing ? "close" : 'open'}`} onClick={handleCloseWindow}>
-                <div className='create-task__body'>
-                    <div className='create-task__title'>
+            <div className={`window-overlay ${isClosing ? "close" : 'open'}`} onClick={handleCloseWindow}>
+                <div className='window-body' style={{
+                    maxWidth: '400px',
+                    maxHeight: '350px',
+                    minHeight: '350px',
+                }}>
+                    <div className='create-project-title'>
                         <h2>Create Project</h2>
-                        <label onClick={closeWindow}>x</label>
+                        <label onClick={closeWindow}>+</label>
                     </div>
-                    <form className='create-task__form' onSubmit={handleSubmit(handleForm)}>
+                    <form id='createProjectForm' className='create-project-form' onSubmit={handleSubmit(handleForm)}>
                         <input 
-                        className='neomorphism-input'
+                        className='holy_input'
+                        style={{ maxWidth: '100%'}}
                         type="text" 
                         id='title' 
                         placeholder='title'
@@ -111,14 +111,15 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
                         />
 
                         <textarea 
-                        className='neomorphism-input'
+                        className='holy_input'
+                        style={{ maxWidth: '100%', maxHeight: '100px', height: '100px'}}
                         id="description" 
                         placeholder='description'
                         {...register('description')}
                         ></textarea>
 
-                        <button type='submit'>Create</button>
                     </form>
+                    <button type='submit' form='createProjectForm' className='create-project-button'>Create</button>
                 </div>
             </div>,
             document.body

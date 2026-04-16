@@ -6,6 +6,7 @@ import { api } from '../../../api';
 import { getAccessToken } from '../../../tokens_func';
 import DynamicPngIcon from '../UI/icons/DynamicPngIcon';
 import '../../App.css'
+import { useModalClose } from '../../common/hooks/closeOverlay';
 
 interface Members {
     email: string;
@@ -27,9 +28,13 @@ interface AddMembersModelWindowProps {
 
 
 function AddMembersModelWindow ({ onClose, onCreateGroup }: AddMembersModelWindowProps) {
-    const [close, setClose] = useState(false)
     const [searchingUsers, setSearchingUsers] = useState<Members[]>([])
     const [addMembers, setAddMembers] = useState<Members[]>([])
+    const {
+        handleCloseWindow,
+        closeWindow, 
+        isClosing,
+    } = useModalClose({ onClose: onClose, delay: 400, className: 'window-overlay'})
 
     const timers = new Map()
 
@@ -49,24 +54,6 @@ function AddMembersModelWindow ({ onClose, onCreateGroup }: AddMembersModelWindo
                 throw new Error(error?.message)
             }
             return null
-        }
-    }
-
-
-    const closeWindow = () => {
-        setClose(true)
-
-        setTimeout(() => {
-            onClose()
-        }, 500)
-    }
-
-
-    const handleCloseOverlay = (e: React.MouseEvent) => {
-        const target = e.target as HTMLElement
-
-        if (target.className.includes('window-overlay')) {
-            closeWindow()
         }
     }
 
@@ -105,12 +92,12 @@ function AddMembersModelWindow ({ onClose, onCreateGroup }: AddMembersModelWindo
     const handleCreate = () => {
         const selectedUsers = addMembers.map(item => ( item.id))
         onCreateGroup(selectedUsers)
-        onClose()
+        closeWindow()
     }
 
     return (
         createPortal(
-            <div className={`window-overlay ${close ? 'close' : 'open'}`} onClick={handleCloseOverlay}>
+            <div className={`window-overlay ${isClosing ? 'close' : 'open'}`} onClick={handleCloseWindow}>
                 <div className='window-body' style={{
                     maxWidth: '800px',
                     height: '80vh',
