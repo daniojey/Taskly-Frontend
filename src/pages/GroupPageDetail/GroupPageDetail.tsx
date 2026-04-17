@@ -6,7 +6,6 @@ import { getAccessToken } from '../../../tokens_func.js'
 import ProjectCard from '../../components/ProjectCard/ProjectCard.jsx'
 import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.js'
 
-import { ChevronLeft, ChevronRight, UserIcon } from 'lucide-react';
 import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon.jsx'
 import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.js'
 import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.js'
@@ -29,6 +28,8 @@ interface GroupItem<T>{
 
 }
 
+type updateTypes = 'projects' | 'all'
+
 
 function GroupPageDetail() {
     const [group, setGroup] = useState<GroupItem<UserItem> | null>(null)
@@ -46,24 +47,44 @@ function GroupPageDetail() {
     const { groupId  = ''} = useParams<string>()
 
 
-    const getGroup = async () => {
-        try {
-            const response = await api.get(
-                `api/v1/groups/${groupId}/`,
-                {
-                    headers: {
-                        Authorization: getAccessToken()
-                    }
+    const getGroup = async (typed: updateTypes = 'all') => {
+        switch (typed) {
+            case 'all':
+                try {
+                    const response = await api.get(
+                        `api/v1/groups/${groupId}/`,
+                        {
+                            headers: {
+                                Authorization: getAccessToken()
+                            }
+                        }
+                    )
+
+
+                    console.log(response.data)
+                    setGroup(response.data.results)
+                    setProjects(response.data.results?.projects)
+                    setMembers(response.data.results?.members)
+                } catch (error) {
+                    console.error(error)
                 }
-            )
+            case 'projects':
+                try {
+                    const response = await api.get(
+                        `api/v1/groups-projects/${groupId}/get_group_projects`,
+                        {
+                            headers: {
+                                Authorization: getAccessToken()
+                            }
+                        }
+                    )
 
 
-            console.log(response.data)
-            setGroup(response.data.results)
-            setProjects(response.data.results?.projects)
-            setMembers(response.data.results?.members)
-        } catch (error) {
-            console.error(error)
+                    console.log('RESPONSE', response)
+                    setProjects(response?.data?.results)
+                } catch (error) {
+                    console.error(error)
+                }
         }
     }
 
@@ -72,8 +93,8 @@ function GroupPageDetail() {
         getGroup()
     }, [])
 
-    const handleUpdate = useCallback(() => {
-        getGroup()
+    const handleUpdate = useCallback((typed: updateTypes) => {
+        getGroup(typed)
     }, [])
 
 
@@ -84,7 +105,7 @@ function GroupPageDetail() {
     return (
         <div className='base-container'>
             {groupWindow && (
-                <CreateProjectWindow groupId={groupId} onClose={() => setGroupWindow(false)} onUpdate={() => handleUpdate()} />
+                <CreateProjectWindow groupId={groupId} onClose={() => setGroupWindow(false)} onUpdate={() => handleUpdate('projects')} />
             )}
 
             {membersWindow && (
@@ -97,7 +118,7 @@ function GroupPageDetail() {
                     userId={selectedUser.id}
                     username={selectedUser.username}
                     onClose={() => setSelectedUser(null)}
-                    onUpdate={() => handleUpdate()}
+                    onUpdate={() => handleUpdate('all')}
                 />
             )}
 

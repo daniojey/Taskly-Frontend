@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { api } from "../../../api";
 import { getAccessToken } from "../../../tokens_func";
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon";
+import { useModalClose } from "../../common/hooks/closeOverlay";
 
 const searchUsers = async(input: string, groupId: string) => {
     try {
@@ -60,44 +61,30 @@ interface User {
 
 function AddMemberWindow({ onClose, groupId }: AddMemberWindowProps) {
     const [searchText, setSearchText] = useState<string| null>(null)
-    const [closeWindow, setCloseWindow] = useState<boolean>(false)
     const [users, setUsers] = useState<User[]>([])
+
+    const {
+        isClosing,
+        handleCloseWindow
+    } = useModalClose({ onClose: onClose, delay: 400, className: 'window-overlay'})
 
     const timers = new Map()
 
-    const onCloseWindow = () => {
-        setCloseWindow(true)
-
-        setTimeout(() => {
-            onClose()
-        }, 500)
-    }
-
-    const handleClickOverlay = (e : React.MouseEvent<HTMLElement>) => {
-        const target = e.target as HTMLElement
-
-        if (target.className.includes('window-overlay')) {
-            onCloseWindow()
-        }
-    }
 
     const handleChangeInput = (e: React.ChangeEvent) => {
         const target = e.target as HTMLInputElement
+        
+        if (timers.has('timer')) {
+            clearTimeout(timers.get('timer'))
+        }
 
         const timer = setTimeout(async () => {
             setSearchText(target.value)
-            console.log(target.value)
             const  result = await searchUsers(target.value, groupId)
-            console.log(result)
-            console.log('RESULTS', result.results)
             setUsers(result.results)
         
         }, 2000)
 
-
-        if (timers.has('timer')) {
-            clearTimeout(timers.get('timer'))
-        }
 
         timers.set('timer', timer) 
     }
@@ -120,36 +107,43 @@ function AddMemberWindow({ onClose, groupId }: AddMemberWindowProps) {
     return (
         createPortal(
             <div 
-            className={`window-overlay ${closeWindow ? 'close' : 'open'}`} 
-            onClick={handleClickOverlay}
+            className={`window-overlay ${isClosing ? 'close' : 'open'}`} 
+            onClick={handleCloseWindow}
             >
-                <div className="window-body">
+                <div className="window-body"
+                style={{ maxWidth: '700px'}}>
+                    <div className="add-members-content-body">
+                        <div className="add-members-title-body">
+                            <h1>Search members</h1>
+                        </div>
 
-                    <div className="add-members-title-body">
-                        <h1>Search members</h1>
-                    </div>
+                        <div className="add-members-form-body">
+                            <input 
+                            className="holy_input" 
+                            type="text" 
+                            onChange={handleChangeInput}
+                            placeholder="Enter username..."
+                             />
+                        </div>
 
-                    <div className="add-members-form-body">
-                        <form>
-                            <input className="neomorphism-input add-members" type="text" onChange={handleChangeInput} />
-                        </form>
-                    </div>
-
-                    <div className="add-members-results">
-                        {users.length > 0 && users.map((item, index) => (
-                            <div className="add-member__user-card">
-                                { item.image_profile_url && (
-                                    <img src={item.image_profile_url}/>
-                                ) || (
-                                    <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} />
-                                )}
-                                <p key={item.id}>{item.username}</p>
-
-                                { !item.in_group && !item.is_invite_send && (
-                                    <button onClick={() => handleClickInviteButton(item.id)}>send invite</button>
-                                ) }
-                            </div>
-                        ))}
+                        <div className="add-members-results">
+                            {users.length > 0 && users.map((item, index) => (
+                                <div className="add-member__user-card">
+                                    <div className="add-member__user-card-body">
+                                        { item.image_profile_url && (
+                                            <img src={item.image_profile_url}/>
+                                        ) || (
+                                            <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} />
+                                        )}
+                                        <p key={item.id}>{item.username}</p>
+                                    </div>
+                                    
+                                    { !item.in_group && !item.is_invite_send && (
+                                        <button onClick={() => handleClickInviteButton(item.id)}>send invite</button>
+                                    ) }
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>,
