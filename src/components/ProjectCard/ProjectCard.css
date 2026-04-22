@@ -3,12 +3,12 @@
     position: relative;
     flex-direction: column;
     min-width: 180px;
-    background: 
+    background:
         linear-gradient(to bottom, #1a1a2e, #2e2b78, #1a1a2e) padding-box;
     padding: 16px;
     box-sizing: border-box;
     border-radius: 12px;
-    
+
     .created_date {
         display: flex;
         width: 100%;
@@ -20,14 +20,14 @@
     }
 
     &:hover {
-        background: 
-        linear-gradient(to bottom, #2e2b78, #1a1a2e, #2e2b78 ) padding-box;
+        background:
+            linear-gradient(to bottom, #2e2b78, #1a1a2e, #2e2b78) padding-box;
     }
 }
 
 .project-card__title {
     display: flex;
-    
+
     h2 {
         margin: 10px 0;
         font-size: 1.3rem;
@@ -75,15 +75,16 @@
     justify-content: center;
     align-items: center;
 
-   h2 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.4rem;
-   }
+    h2 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.4rem;
+    }
 
-   a {
-    display: flex;
+    a {
+        display: flex;
+        color: white;
         background-color: #5b57d9;
         padding: 10px 35px;
         font-size: 1.1rem;
@@ -95,5 +96,5 @@
         &:hover {
             background-color: #4441b1;
         }
-   }
+    }
 }

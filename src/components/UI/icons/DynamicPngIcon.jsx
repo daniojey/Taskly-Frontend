@@ -12,6 +12,7 @@ import settingsIcon from '../../../assets/settings_icon.png'
 import statisticIcon from "../../../assets/statistic_icon.png"
 import kidStarHollow from '../../../assets/kid_star_hollow.png'
 import kidStar from '../../../assets/kid_star.png'
+import menuIcon from '../../../assets/menu_icon.png'
 
 // Stratagems Icons
 import stratagemArrowDown from '../../../assets/arrow_dow.png'
@@ -43,6 +44,7 @@ const iconMap = {
     statisticIcon: statisticIcon,
     kidStarHollow: kidStarHollow,
     kidStar: kidStar,
+    menuIcon: menuIcon,
     stratagemArrow_down: stratagemArrowDown,
     stratagemArrow_up: stratagemArrowUp,
     stratagemArrow_left: stratagemArrowLeft,

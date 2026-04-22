@@ -68,6 +68,7 @@ function GroupPageDetail() {
                 } catch (error) {
                     console.error(error)
                 }
+                break
             case 'projects':
                 try {
                     const response = await api.get(
@@ -85,6 +86,7 @@ function GroupPageDetail() {
                 } catch (error) {
                     console.error(error)
                 }
+                break
         }
     }
 

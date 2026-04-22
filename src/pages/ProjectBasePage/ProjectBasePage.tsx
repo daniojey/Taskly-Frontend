@@ -43,7 +43,8 @@ import CreateTaskWindow from '../../components/CreateTaskWindow/CreateTaskWindow
 import DetailTaskWindow from '../../components/DetailTaskWindow/DetailTaskWindow'
 import DeleteWindow from '../../components/DeleteWindow/DeleteWindow'
 import DeleteWindowProject from '../../components/DeleteWindowProject/DeleteWindowProject'
-import { createPortal } from 'react-dom'
+import SidePaneProjectBasePage from '../../components/SidePanelProjectBasePage/SidePanelProjectBasePage'
+import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon'
 
 
 interface Item {
@@ -54,7 +55,6 @@ interface Item {
   title: string;
   status: "BS" | "US" | "NS" | string;
 }
-
 
 interface Container {
   id: string;
@@ -75,10 +75,11 @@ function ItemOverlay({ children } : { children: React. ReactNode}) {
 
 export default function MultipleContainers() {
   const { projectId, groupId } = useParams<string>()
-  const [moreWindow, setMoreWindow] = useState(false)
-  const [openCreateTask, setOpenCreateTask] = useState(false)
-  const [tasks, setTasks] = useState<Item[]>([])
-  const [deleteWindow, setDeleteWindow] = useState(false)
+  const [sideWindow, setSideWindow] = useState<boolean>(false)
+  const [closeSideWindow, setCloseSideWindow] = useState<boolean>(false)
+  const [moreWindow, setMoreWindow] = useState<boolean>(false)
+  const [openCreateTask, setOpenCreateTask] = useState<boolean>(false)
+  const [deleteWindow, setDeleteWindow] = useState<boolean>(false)
   const [containers, setContainers] = useState<Container[]>([
     {
       id: 'base-status',
@@ -105,7 +106,6 @@ export default function MultipleContainers() {
             Authorization: getAccessToken()
           }}
         )
-        console.log(response.data.result)
 
         const allTasks = response.data.result.tasks
 
@@ -114,7 +114,6 @@ export default function MultipleContainers() {
         const urgentTasks = allTasks.filter((task: Item) => task.status === "US") 
         const noStatusTasks = allTasks.filter((task: Item) => task.status === "NS")
         
-        setTasks(allTasks)
         setContainers([
           {
             id: 'base-status',
@@ -195,9 +194,6 @@ export default function MultipleContainers() {
     const activeContainerId = findContainerId(activeId)
     const overContainerId = findContainerId(overId)
 
-    console.log('activecontainer', activeContainerId, 'overContainer', overContainerId)
-    console.log('activeId', active.id, 'overId', over.id)
-
     if (activeContainerId === overContainerId &&
       activeId !== overId) {
         return
@@ -206,7 +202,6 @@ export default function MultipleContainers() {
     if (activeContainerId === overContainerId) return
 
     setContainers((prev) => {
-      console.log('PREV',prev)
       const activeContainer = prev.find((c) => c.id === activeContainerId)
 
       if (!activeContainer) return prev
@@ -214,13 +209,11 @@ export default function MultipleContainers() {
       const activeItem = activeContainer.items.find(
         (item) => item.id === activeId,        
       )
-      console.log(activeItem)
       if (!activeItem) return prev
 
       const newContainers = prev.map((container) => {
         // Если контейнер изменён то удалям перетаскеваемые елемент со старого
         if (container.id === activeContainerId) {
-          console.log('CONTAINER ID == ACTIVECONTAINERID')
           return {
             ...container,
             items: container.items.filter((item) =>
@@ -229,7 +222,6 @@ export default function MultipleContainers() {
         }
 
         if (container.id === overContainerId) {
-          console.log('CONTAINER ID == OVERCONTAINERID')
           
           // В зависимости от условий добавляем елемент либо в конец либо в нужную позицию в новом контейнере
           if (overId === overContainerId) {
@@ -243,8 +235,6 @@ export default function MultipleContainers() {
           findIndex(
             (item) => item.id === overId,
           )
-
-          console.log("OVERITEM", overItemIndex)
 
           if (overItemIndex !== -1) {
             return {
@@ -268,7 +258,6 @@ export default function MultipleContainers() {
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
-    console.log('ACTIVE', active, 'OVER', over)
 
     if (!over) {
       setActiveId(null)
@@ -278,10 +267,6 @@ export default function MultipleContainers() {
     const activeContainerId = findContainerId(active.id)
     const overContainerId = findContainerId(over.id)
 
-    console.log('activecontainer', activeContainerId, 'overContainer', overContainerId)
-    console.log('activeId', active.id, 'overId', over.id)
-    console.log('ACTIVE ELEMENT', active)
-
     if (!activeContainerId || !overContainerId) {
       setActiveId(null)
       return
@@ -289,7 +274,6 @@ export default function MultipleContainers() {
 
     if (activeContainerId === overContainerId &&
       active.id !== over.id) {
-        console.log('LOLLLLLLLLLLLLLLL')
         const containerIndex = containers.findIndex(
           (c) => c.id === activeContainerId,
         )
@@ -330,12 +314,9 @@ export default function MultipleContainers() {
           )
         ).filter(array => array.length != 0)[0][0]
 
-         console.log('TASK FINDED', tasks)
-
         const result = await updateTask(projectId, active, overContainerId, tasks.status)
 
         if (result) {
-          console.log('SUCCESS!')
           await getTasks()
         }
       }
@@ -373,30 +354,31 @@ export default function MultipleContainers() {
         if (!e.target.className.includes('task-base__title-more-info') && moreWindow) {
           setMoreWindow(false);
         }
+
+        if (!e.target.className.includes('project-page__side-panel') && sideWindow) {
+          setCloseSideWindow(true)
+          setTimeout(() => {
+            setSideWindow(false)
+            setCloseSideWindow(false)
+          }, 400)
+        }
     }
   }
 
   return (
     <div className="project-base-container__body" onClick={bodyClick}>
-      <div className={`delete-window__overlay ${deleteWindow ? 'show': ''}`}></div>
 
       {deleteWindow && (
         <DeleteWindowProject projectId={projectId} onClose={() => setDeleteWindow(false)}/>
       )}
 
-
-
       <div className='task-base__title-body'>
-        <button id='createTask' onClick={createTaskWindow}>Create task</button>
-        <button onClick={() => setMoreWindow(!moreWindow)}>⋮</button>
-
-        <div className={`task-base__title-more-info ${moreWindow ? 'show' : ''}`} >
-          <p id='settings'>Settings</p>
-          <p id='info'>Info</p>
-          <p id='delete' onClick={() => setDeleteWindow(true)}>Delete Project</p>
-        </div>
-
+        <DynamicPngIcon iconName={'menuIcon'} onClick={() => setSideWindow(true)}/>
       </div>
+
+      { sideWindow && (
+        <SidePaneProjectBasePage onCreate={createTaskWindow} onDelete={() => setDeleteWindow(true)} isClose={closeSideWindow}/>
+      )}
 
       { openCreateTask && (
         <CreateTaskWindow onClose={() => setOpenCreateTask(false)} onUpdate={() => handleTaskCreate()} projectId={projectId}/>
@@ -412,11 +394,11 @@ export default function MultipleContainers() {
         onDragEnd={handleDragEnd}
       >
         <div className="task-base__container-body">
-          <div className='task-base__container-info-table'>
+          {/* <div className='task-base__container-info-table'>
             <h2>Info Table</h2>
             <p>count tasks: {Object.entries(tasks).length}</p>
             <p>urgent tasks: {tasks.filter(task => task.status === "US").length}</p>
-          </div>
+          </div> */}
 
             {containers.map((container) => (
               <DroppableContainer

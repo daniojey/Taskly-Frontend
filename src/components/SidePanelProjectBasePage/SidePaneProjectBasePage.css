@@ -1,0 +1,59 @@
+.project-page__side-panel {
+    display: flex;
+    background-color: #323079;
+    height: 100%;
+    gap: 15px;
+    flex-direction: column;
+    position: absolute;
+    padding: 16px;
+    box-sizing: border-box;
+    border-radius: 0 12px 12px 0;
+    z-index: 2000;
+
+    button {
+        background-color: #323079;
+        font-family: var(--main-font-bold);
+        transition: background-color 0.4s ease-out;
+
+    }
+
+    #createTask {
+        &:hover {
+            background-color: #10906a;
+        }
+    }
+
+    #delete {
+        &:hover {
+            background-color: rgb(172, 51, 51);
+        }
+    }
+}
+
+.project-page__side-panel.open {
+    animation: slideIn 0.5s ease-in-out forwards;
+}
+
+.project-page__side-panel.close {
+    animation: slideOut 0.5s ease-in-out forwards;
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translate(-100%);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translate(0);
+    }
+
+    100% {
+        transform: translate(-100%);
+    }
+}

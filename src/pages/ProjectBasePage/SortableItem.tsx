@@ -46,7 +46,6 @@ export function SortableItem({
   // }
 
   const style = {
-    border: "1px solid white",
     transform: CSS.Transform.toString(transform),
     transition,
   }

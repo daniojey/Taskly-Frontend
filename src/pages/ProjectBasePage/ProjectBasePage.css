@@ -1,12 +1,9 @@
 .task-base__container-body {
-    position: relative;
-    display: grid;
-    width: 100%;
-    justify-content: center;
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
+    display: flex;
+    max-width: 1300px;
+    height: 100%;
+    gap: 20px;
     padding: 24px;
-    gap: 40px;
     box-sizing: border-box;
 }
 
@@ -30,49 +27,29 @@
 .task-base__title-body {
     position: relative;
     display: flex;
-    width: 96%;
-    margin: 20px auto;
-    box-sizing: border-box;
-    padding: 24px;
-    border: 0.3px solid rgb(255, 255, 255, 0.3);
-    background-color: rgb(15, 15, 15);
-    border-radius: 12px;
+    width: calc(100% - 48px);
+    margin: 0 auto;
     justify-content: space-between;
     align-items: center;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    background-color: #1a1428;
 
-
-    #createTask {
+    img {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        color: rgb(0, 0, 0);
-        background-color: rgb(0, 137, 250);
-        padding: 10px 35px;
+        background-color: #5b57d9;
+        padding: 10px 20px;
         font-size: 1.1rem;
-        font-weight: 200;
+        font-weight: 900;
         border-radius: 12px;
         transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
 
         &:hover {
-            background-color: white;
+            background-color: #4441b1;
         }
     }
-
-    button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #ffff;
-        font-size: 1.3rem;
-        padding: 10px 12px;
-        border: 0.3px solid rgb(255, 255, 255, 0.3);
-        transition: border 0.4s ease-in-out;
-
-        &:hover {
-            border: 0.3px solid rgb(255, 255, 255, 0.8);
-        }
-    }
-    
 }
 
 
@@ -87,6 +64,7 @@
     padding: 24px;
     box-sizing: border-box;
     border-radius: 12px;
+    transform: translateX(-10%);
 
     #delete {
         font-family: var(--main-font-bold);

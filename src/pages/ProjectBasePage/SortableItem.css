@@ -1,17 +1,21 @@
 .draggble-item {
     display: flex;
+    background-color: #5b57d9;
+    border: 2px solid #4441b1;
+    font-family: var(--main-font-bold);
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 16px;
+    box-sizing: border-box;
+    border-radius: 12px;
     width: 100%;
-    max-width: 300px;
-    padding: 24px;
-    color: white;
-    border: 0.3px solid rgb(255, 255, 255, 0.2) !important;
-    border-right: 0.4px solid rgb(255, 255, 255, 0.5) !important;
-    border-bottom: 0.4px solid rgb(255, 255, 255, 0.5) !important;
-    border-radius: 4px;
-    transition: color 0.2s ease-in-out;
+    max-width: 350px;
+    transition: background-color 0.5s ease;
+    transform: scale(0);
+    animation: scaleIn 0.4s ease-out forwards;
 
     &:hover {
-        color: rgb(0, 137, 250);
+        background-color: #4441b1;
     }
 }
 
@@ -28,6 +32,7 @@
 .draggble-item.overlay {
     display: flex;
     width: 100%;
+    transform: scale(1);
     font-family: var(--main-font-bold);
     justify-content: space-between;
     animation: fadeIn 0.5s ease-in-out forwards;
@@ -35,7 +40,7 @@
 }
 
 .draggble-item.unactive {
-    color: rgb(0, 137, 250);
+    color: rgba(255, 255, 255, 0.366)
 }
 
 
@@ -46,5 +51,15 @@
 
     100% {
         opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
     }
 }

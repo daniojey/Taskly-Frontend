@@ -2,6 +2,7 @@
 
 .project-base-container__body {
     display: flex;
+    position: relative;
     flex-direction: column;
     overflow-y: auto;
     height: 100%;
@@ -11,9 +12,8 @@
     display: flex;
     width: 100%;
     flex-direction: column;
-    border: 0.3px solid rgb(255, 255, 255, 0.3);
     border-radius: 12px;
-    background-color: rgb(15, 15, 15);
+    background-color: #1a1428;
     padding: 24px;
     box-sizing: border-box;
     animation: fadeIn 0.5s ease-in-out forwards;
@@ -25,6 +25,12 @@
         justify-content: center;
         font-family: var(--main-font-bold);
         font-size: 1.5rem;
+    }
+
+    h3 {
+        margin: 0 0 20px 0;
+        font-family: var(--main-font-bold);
+        font-size: 1.3rem;
     }
 }
 
