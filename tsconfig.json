@@ -10,6 +10,7 @@
     "noImplicitAny": false,
     "noEmit": true,
     "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
   },
   "include": ["src"]
 }

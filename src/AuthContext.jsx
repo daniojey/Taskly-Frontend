@@ -3,47 +3,64 @@ import { api } from "../api";
 import Cookies from "js-cookie";
 import { getAccessToken, verifyToken } from "../tokens_func";
 import { useUser } from "./common/stores/AuthStore";
+import { useStratagemStore } from "./common/stores/StratagemStore";
 
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const removeUser = useUser((state) => state.removeUser)
-    const {user, setUser} = useUser()
+    const { user, setUser } = useUser()
     const [notifications, setNotifications] = useState(null)
     const [loading, setLoading] = useState(false)
     const [isLogin, setIsLogin] = useState(false)
     const [error, setError] = useState(null)
     const [showLoading, setShowLoading] = useState(true)
-    console.log('🔄 AuthProvider создается/перерендеривается') 
+    const setStratagemsStore = useStratagemStore((state) => state.setStratagemsStore)
+    console.log('🔄 AuthProvider создается/перерендеривается')
 
     const updateNotify = useCallback(async () => {
-            try {
-                const response = await api.get(
-                    'api/v1/notifications/',
-                    {headers: {
+        try {
+            const response = await api.get(
+                'api/v1/notifications/',
+                {
+                    headers: {
                         Authorization: getAccessToken()
-                    }}
-                )
+                    }
+                }
+            )
 
-                console.log(response)
-                setNotifications(response.data.results)
-            } catch (error) {
-                console.error(error)
-            }
+            console.log(response)
+            setNotifications(response.data.results)
+        } catch (error) {
+            console.error(error)
+        }
     }, [])
 
     useEffect(() => {
         console.log('🚀 Инициализация сессии запущена')
 
-         const getNotifications = async () => {
-            console.log('🚀 Инициализация уведомлений')
+        const getStratagems = async () => {
+            try {
+                const response = await api.get('api/v1/stratagems/', {
+                    headers: { Authorization: getAccessToken() }
+                })
+                
+                setStratagemsStore(response.data.results)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        const getNotifications = async () => {
             try {
                 const response = await api.get(
                     'api/v1/notifications/',
-                    {headers: {
-                        Authorization: getAccessToken()
-                    }}
+                    {
+                        headers: {
+                            Authorization: getAccessToken()
+                        }
+                    }
                 )
 
                 console.log(response)
@@ -77,8 +94,7 @@ export const AuthProvider = ({ children }) => {
                         setUser(response?.user);
                         localStorage.setItem('user', JSON.stringify(response?.user))
                         const resultNotify = await getNotifications()
-
-
+                        const resultStratagems = await getStratagems()
                     } else {
                         removeUser()
                         localStorage.removeItem('user')
@@ -140,7 +156,7 @@ export const AuthProvider = ({ children }) => {
 
 
     const logout = useCallback(async () => {
-        
+
         try {
             localStorage.removeItem('accessToken')
             const response = await api.post(
@@ -151,7 +167,7 @@ export const AuthProvider = ({ children }) => {
 
             if (response.status === 200) {
                 console.log('SUCCESS!')
-            } 
+            }
 
 
         } catch (error) {
@@ -163,7 +179,7 @@ export const AuthProvider = ({ children }) => {
         console.log('ВСЁ удалено')
     }, [])
 
-    const contextValue =  useMemo(() => ({
+    const contextValue = useMemo(() => ({
         user,
         login,
         logout,
@@ -178,7 +194,7 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={contextValue}>
             {children}
-            
+
             {showLoading && (
                 <div className={`loading-overlay ${!loading ? 'fade-out' : ''}`}>
                     <div className="Loading-container">

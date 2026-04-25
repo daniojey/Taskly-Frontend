@@ -22,6 +22,7 @@ import { OneTimerProvider } from './OneTimerContext'
 import ActiveTaskPage from './pages/ActiveTaskPage/ActiveTaskPage'
 import NotifyPopUp from './components/NotifyPopUp/NotifyPopUp'
 import StratagemComponent from './components/StratagemComponent/StratagemComponent'
+import StratagemPage from './pages/StratagemPage/StratagemPage'
 
 const queryClient = new QueryClient()
 
@@ -75,6 +76,10 @@ function App() {
 
               <Route path='/active-tasks/' element={
                 <ActiveTaskPage />
+              }/>
+
+              <Route path='/stratagems/' element={
+                <StratagemPage />
               }/>
               
             </Routes>

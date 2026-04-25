@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import './StratagemComponent.css'
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon";
 import { useStratagem } from "../../common/hooks/stratagemHook";
+import { useStratagemStore } from "../../common/stores/StratagemStore";
 
 const userInputMap = {
     "w": 1,
@@ -13,41 +14,33 @@ const userInputMap = {
 
 interface StratagemItem {
     name: string,
-    coombination: number[],
-    is_match: boolean
+    url: string,
+    combination: number[],
+    is_match: boolean,
+    is_base?: boolean
 }
 
 function calculateMatches (short: number[], strategies: StratagemItem[]) {
-    let resultData: StratagemItem[] = []
-    console.log(short)
-
-    for (let item of strategies) {
-        const is_match = short.every((value, index) => {
-            console.log(value)
-            console.log(item.coombination[index])
-            return value === item.coombination[index]
-        })
-        console.log(is_match)
-        let new_item = item
-        
-        new_item.is_match = is_match
-        console.log(new_item)
-        resultData = [...resultData, new_item]
-    }
-
-    return resultData
+    return strategies.map(item => {
+        const is_match = short.every((value, index) => value === item.combination[index])
+        return {...item, is_match}
+    })
 }
 
 function isArrayKey(key: string): key is keyof typeof userInputMap {
     return key in userInputMap
 }
 
+const baseStrategies = [
+    {name: 'groups', url: '/groups/',  combination: [1, 1, 2, 4], is_match: false, is_base: true},
+    {name: 'active tasks', url: '/active-tasks/', combination: [2, 2, 2, 3, 2, 2, 4], is_match: false, is_base: true},
+    {name: 'need motivation', url: 'https://www.youtube.com/shorts/DCALrMgWNUE',combination: [3, 4, 4, 3], is_match: false}
+]
+
 function StratagemComponent() {
-    const [strategies, setStrategies] = useState<StratagemItem[]>([
-        {name: 'groups', coombination: [1, 1, 2, 4], is_match: false},
-        {name: 'active tasks', coombination: [2, 2, 2, 3, 2, 2, 4], is_match: false},
-        {name: 'need motivation', coombination: [3, 4, 4, 3], is_match: false}
-    ])
+    const stratagems = useStratagemStore((state) => state.stratagems)
+    const [strategies, setStrategies] = useState<StratagemItem[]>([...baseStrategies, ...stratagems])
+    const strategiesRef = useRef<StratagemItem[]>(strategies)
 
     const [openWindow, setOpenWindow] = useState<boolean>(false)
     const [userInput, setUserInput] = useState<number[]>([])
@@ -60,6 +53,16 @@ function StratagemComponent() {
         [4, 'right'],
     ])
 
+    console.log('STRATAGEM', strategies)
+
+    useEffect(() => {
+        setStrategies([...baseStrategies, ...stratagems])
+    }, [stratagems])
+
+    useEffect(() => {
+        strategiesRef.current = strategies
+    }, [strategies])
+
 
     useEffect(() => {
         const handleKeydownEvent = (e: KeyboardEvent) => {
@@ -71,20 +74,24 @@ function StratagemComponent() {
             }
 
             if (e.shiftKey && isArrayKey(inputKey)) {
+                const currentStrategies = strategiesRef.current
                 const input = [...userInput, userInputMap[inputKey]]
-                for (let strategy of strategies) {
-                    console.log(input, strategy.coombination)
 
-                    if (JSON.stringify(input) == JSON.stringify(strategy.coombination)) {
-                        executeCommand(strategy.name)
+                for (let strategy of currentStrategies) {
+                    console.log(input, strategy.combination)
+
+                    if (JSON.stringify(input) == JSON.stringify(strategy.combination)) {
+                        executeCommand(strategy?.is_base, strategy.url)
+                        setUserInput([])
+                        setOpenWindow(false)
+                        setStrategies(strategies.map(item => {return {...item, is_match: false}}))
                     }
                 }
 
                 setUserInput(input)
                 const result = calculateMatches(input, strategies)
-                console.log(result)
+                setStrategies(result)
                 const matchesResults = result.filter(item => item.is_match == true)
-                console.log(matchesResults)
 
                 if (matchesResults.length === 0) {
                     setUserInput([])
@@ -97,8 +104,8 @@ function StratagemComponent() {
             if (e.key.toLowerCase() === 'shift') {
                 e.preventDefault()
                 setOpenWindow(false)
+                setStrategies(strategiesRef.current.map(item => {return {...item, is_match: false}}))
                 setUserInput([])
-                setStrategies(strategies.map(item => {return {...item, is_match: false}}))
             }
         }
 
@@ -108,7 +115,7 @@ function StratagemComponent() {
             window.removeEventListener('keydown', handleKeydownEvent)
             window.removeEventListener('keyup', handleKeyupEvent)
         } 
-    }, [userInput])
+    }, [userInput, strategies])
 
     if (openWindow) {
         return (
@@ -121,7 +128,7 @@ function StratagemComponent() {
                             </div>
 
                             <div className="stratagem-coombination">
-                                {item.coombination.length > 0 && item.coombination.map((value, index) => {
+                                {item.combination.length > 0 && item.combination.map((value, index) => {
                                     if (!item.is_match && userInput.length > 0) {
                                         return <DynamicPngIcon iconName={`deactiveStratagemArrow_${arrowMap.get(value)}`}/>
                                     } else if (value === userInput[index]) {

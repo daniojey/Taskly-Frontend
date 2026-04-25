@@ -83,3 +83,57 @@ button {
 .holy_input::placeholder {
   color: rgb(122, 122, 122);
 }
+
+.holy_select {
+  height: 45px;
+  width: 100%;
+  max-width: 300px;
+  padding: 10px 40px 10px 10px;
+  color: #FFF;
+  font-family: Roboto;
+  font-size: 18px;
+  font-style: var(--main-font-bold);
+  font-weight: 400;
+  line-height: 146%;
+  background: #2c2b5b;
+  border: 1px solid #2c2b5b;
+  border-radius: 12px;
+  appearance: none;
+  background-image: url('https://teststepbucket.s3.amazonaws.com/icons/create_test_arrow.svg');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 24px;
+  outline: 1px solid #2c2b5b;
+  transition: outline 0.4s ease-in, box-shadow 0.4s ease-in-out;
+
+  &:focus {
+    outline: 1px solid #5b57d9;
+    box-shadow: 0 0 20px rgba(123, 47, 190, 0.6);
+  }
+}
+
+.holy_select:focus+label,
+.holy_select.has-value+label {
+  top: -15px;
+  transform: translateY(0);
+  font-size: 0.8rem;
+}
+
+.holy_label {
+  position: absolute;
+  display: flex;
+  box-sizing: border-box;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  font-size: 1rem;
+  background-color: transparent;
+  padding: 5px;
+  margin-right: 10px;
+  font-family: var(--main-font-bold);
+  font-weight: 900;
+
+  pointer-events: none;
+  transition: top 0.3s ease, transform 0.3s ease, font-size 0.3s ease, background-color 0.6s ease;
+}
