@@ -20,6 +20,7 @@
 
 .stratagem-page__user-content {
     gap: 20px;
+    overflow-y: auto;
 }
 
 .stratagem-page__card {
@@ -29,10 +30,96 @@
     max-width: 300px;
     flex-direction: column;
     gap: 10px;
-    padding: 16px;
+    padding: 16px 16px 40px 16px    ;
     box-sizing: border-box;
-    background-color: #5b57d9;
+    background-color: #2c2b5b;
     border-radius: 12px;
+}
+
+.stratagem-page__card-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    gap: 10px;
+
+    button {
+        display: flex;
+        background-color: #5b57d9;
+        padding: 8px 12px;
+        font-size: 1rem;
+        font-weight: 900;
+        border-radius: 12px;
+        transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
+
+        &:hover {
+            background-color: #4441b1;
+        }
+    }
+
+    input[type=checkbox] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 36px;
+        height: 36px;
+        border: 2px solid #c0bec8;
+        /* замени на свой border-color */
+        border-radius: 8px;
+        background: #fff;
+        /* замени на свой background */
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    input[type=checkbox]:before,
+    input[type=checkbox]:after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 2.5px;
+        background: transparent;
+        border-radius: 2px;
+        top: 50%;
+        left: 50%;
+        transition: background 0.15s;
+    }
+
+    input[type=checkbox]:before {
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    input[type=checkbox]:after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+    input[type=checkbox]:checked {
+        background: #5b57d9;
+        border-color: #5b57d9;
+    }
+
+    input[type=checkbox]:checked:before,
+    input[type=checkbox]:checked:after {
+        background: #fff;
+    }
+
+    input[type=checkbox]:hover:not(:checked) {
+        border-color: #AFA9EC;
+    }
+
+    input[type=checkbox]:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px #EEEDFE;
+    }
+
+    input[type=checkbox]:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
 }
 
 .stratagem-page__hint-content {
@@ -55,11 +142,43 @@
 
 .stratagem-page__form {
     display: flex;
+    width: 100%;
+    align-items: center;
     flex-direction: column;
+    gap: 10px;
+
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 300px;
+        background-color: #5b57d9;
+        padding: 12px 18px;
+        font-size: 1rem;
+        font-weight: 900;
+        border-radius: 12px;
+        transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
+
+        &:hover {
+            background-color: #4441b1;
+        }
+    }
+
 }
 
 .stratagem-page__form-column {
     display: flex;
+    align-items: center;
+    width: 100%;
     position: relative;
     flex-direction: column;
+
+    label {
+        display: flex;
+        max-width: 300px;
+        width: 100%;
+        justify-content: start;
+    }
 }

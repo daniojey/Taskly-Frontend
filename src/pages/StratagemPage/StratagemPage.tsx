@@ -8,6 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup"
 import DynamicPngIcon from "../../components/UI/icons/DynamicPngIcon"
 import "../../index.css"
 import "./StratagemPage.css"
+import { useStratagemStore } from "../../common/stores/StratagemStore"
 
 interface StratagemCreateSchema {
     name: string;
@@ -26,6 +27,8 @@ interface StratagemItem {
     name: string;
     url: string;
     combination: number[];
+    is_match: boolean;
+    active: boolean;
     data: {
         group_id?: number;
         project_id?: number;
@@ -57,9 +60,49 @@ function StratagemPage () {
         resolver: yupResolver(stratagemFormSchema),
         mode: "onSubmit",
     })
+    const removeStratagemStore = useStratagemStore((state) => state.removeStratagemStore)
+    const updateStratagemsStore = useStratagemStore((state) => state.updateStratagemsStore)
 
+    const deleteStratagem = async (item: StratagemItem) => {
+        try {
+            const response = await api.delete(
+                `api/v1/stratagems/${item.id}/`,
+                {headers: {Authorization: getAccessToken()}}
+            )
 
+            console.log(response)
+            
+            removeStratagemStore(item)
+            setUserStratagems(userStratagems.filter(value => value.id !== item.id))
+        } catch (error) {
+            console.error(error)
+        }
+    }
     
+    const setActiveStratagem = async (item: StratagemItem) => {
+        console.log(item)
+        try {
+            const response = await api.patch(
+                `api/v1/stratagems/${item.id}/`,
+                {active: !item.active},
+                {headers: {Authorization: getAccessToken()}}
+            )
+
+            const newActivityStratagem: StratagemItem = response.data.results
+
+            setUserStratagems(userStratagems.map(item => {
+                if (item.id === newActivityStratagem.id) {
+                    return {...item, active: newActivityStratagem.active}
+                } else {
+                    return item
+                }
+            }))
+            updateStratagemsStore(newActivityStratagem)
+        } catch (error) {
+            console.log(error)
+        }
+    } 
+
     const action = watch('action')
 
     const submitForm = async (data: StratagemCreateSchema) => {
@@ -130,6 +173,14 @@ function StratagemPage () {
                                 <DynamicPngIcon iconName={`stratagemArrow_${arrowMap.get(item)}`}/>
                             ))}
                         </div>
+                        <div className="stratagem-page__card-info">
+                            <input 
+                            type="checkbox"
+                            onClick={() => setActiveStratagem(item)} 
+                            checked={item.active ? true : false} 
+                            />
+                            <button onClick={() => deleteStratagem(item)}>delete</button>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -161,7 +212,7 @@ function StratagemPage () {
                         <label htmlFor="action">Action</label>
                         <select id="action" className={`holy_select ${action ? 'has_value': ''}`} {...register('action')}>
                             {!action ? (
-                                <option value=""></option>
+                                <option value="">Select action...</option>
                             ) : (
                                 <></>
                             )}
@@ -188,7 +239,7 @@ function StratagemPage () {
                             <input type="url" id="url" className="holy_input" {...register('url')}/>
                         </div>
                     )}
-                    <button type="submit">Add</button>
+                    <button type="submit">Create</button>
                 </form>
             </div>
         </div>

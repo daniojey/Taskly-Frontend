@@ -4,6 +4,7 @@ import './StratagemComponent.css'
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon";
 import { useStratagem } from "../../common/hooks/stratagemHook";
 import { useStratagemStore } from "../../common/stores/StratagemStore";
+import { useLocation } from "react-router";
 
 const userInputMap = {
     "w": 1,
@@ -34,7 +35,8 @@ function isArrayKey(key: string): key is keyof typeof userInputMap {
 const baseStrategies = [
     {name: 'groups', url: '/groups/',  combination: [1, 1, 2, 4], is_match: false, is_base: true},
     {name: 'active tasks', url: '/active-tasks/', combination: [2, 2, 2, 3, 2, 2, 4], is_match: false, is_base: true},
-    {name: 'need motivation', url: 'https://www.youtube.com/shorts/DCALrMgWNUE',combination: [3, 4, 4, 3], is_match: false}
+    {name: 'need motivation', url: 'https://www.youtube.com/shorts/DCALrMgWNUE',combination: [3, 4, 4, 3], is_match: false},
+    {name: 'stratasetings', url: '/stratagems/', combination: [1, 2, 2, 1, 2], is_match: false, is_base: true}
 ]
 
 function StratagemComponent() {
@@ -53,10 +55,13 @@ function StratagemComponent() {
         [4, 'right'],
     ])
 
-    console.log('STRATAGEM', strategies)
+    useEffect(() => {
+        setUserInput([])
+        setStrategies(strategies.map(item => {return {...item, is_match: false}}))
+    }, [openWindow])
 
     useEffect(() => {
-        setStrategies([...baseStrategies, ...stratagems])
+        setStrategies([...baseStrategies, ...stratagems.filter(item => item.active)])
     }, [stratagems])
 
     useEffect(() => {

@@ -6,7 +6,6 @@ export const useStratagem = () => {
     const navigate = useNavigate()
 
     const executeCommand = (is_base: boolean = false , url: string) => {
-        console.log(is_base, url)
         switch (is_base) {
             case true:
                 navigate(url)
