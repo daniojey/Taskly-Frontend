@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
     const [error, setError] = useState(null)
     const [showLoading, setShowLoading] = useState(true)
     const setStratagemsStore = useStratagemStore((state) => state.setStratagemsStore)
-    console.log('🔄 AuthProvider создается/перерендеривается')
+    const removeStratagemsStore = useStratagemStore((state) => state.removeStratagemsStore)
 
     const updateNotify = useCallback(async () => {
         try {
@@ -37,42 +37,42 @@ export const AuthProvider = ({ children }) => {
         }
     }, [])
 
-    useEffect(() => {
-        console.log('🚀 Инициализация сессии запущена')
-
-        const getStratagems = async () => {
-            try {
-                const response = await api.get('api/v1/stratagems/', {
-                    headers: { Authorization: getAccessToken() }
-                })
-                
-                setStratagemsStore(response.data.results)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        const getNotifications = async () => {
-            try {
-                const response = await api.get(
-                    'api/v1/notifications/',
-                    {
-                        headers: {
-                            Authorization: getAccessToken()
-                        }
+    const getNotifications = async () => {
+        try {
+            const response = await api.get(
+                'api/v1/notifications/',
+                {
+                    headers: {
+                        Authorization: getAccessToken()
                     }
-                )
+                }
+            )
 
-                console.log(response)
-                setNotifications(response.data.results)
+            console.log(response)
+            setNotifications(response.data.results)
 
-                return true
-            } catch (error) {
-                console.error(error)
-                return false
-            }
+            return true
+        } catch (error) {
+            console.error(error)
+            return false
         }
+    }
 
+    const getStratagems = async () => {
+        try {
+            const response = await api.get('api/v1/stratagems/', {
+                headers: { Authorization: getAccessToken() }
+            })
+
+            setStratagemsStore(response.data.results)
+            return true
+        } catch (error) {
+            console.log(error)
+            return false
+        }
+    }
+
+    useEffect(() => {
         const inicializeSession = async () => {
             setLoading(true)
             try {
@@ -115,6 +115,10 @@ export const AuthProvider = ({ children }) => {
 
         inicializeSession()
 
+        return () => {
+            inicializeSession = () => {}
+        } 
+
     }, [])
 
     const login = useCallback(async (username, password) => {
@@ -143,7 +147,10 @@ export const AuthProvider = ({ children }) => {
 
             setUser(userResponse.data.user);
             setError(null)
-            console.log(userResponse.user)
+
+            await getNotifications()
+            await getStratagems()
+
             return true
         } catch (error) {
             console.error('Ошибка входа:', err);
@@ -167,6 +174,8 @@ export const AuthProvider = ({ children }) => {
 
             if (response.status === 200) {
                 console.log('SUCCESS!')
+                await removeStratagemsStore()
+                setNotifications([])
             }
 
 

@@ -19,6 +19,7 @@ interface Actions {
     setStratagemsStore: (stratagems: StratagemItem[]) => void;
     updateStratagemsStore: (stratagem: StratagemItem) => void;
     removeStratagemStore: (stratagem: StratagemItem) => void;
+    removeStratagemsStore: () => void;
 }
 
 export const useStratagemStore = create<State & Actions>((set, get) => ({
@@ -33,5 +34,6 @@ export const useStratagemStore = create<State & Actions>((set, get) => ({
     })})),
     removeStratagemStore: ((stratagem: StratagemItem) => set({ stratagems: get().stratagems.filter(
         item => item.id !== stratagem.id
-    )}))
+    )})),
+    removeStratagemsStore: (() => set({ stratagems: []}))
 }))

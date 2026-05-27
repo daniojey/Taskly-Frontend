@@ -7,7 +7,7 @@ import { useSearchParams } from "react-router"
 import { buildUrl } from "./common/build_url"
 import { getVisiblePages } from "./common/getVisiblePages"
 
-type NotifyType = 'task' | 'project' | 'invite';
+type NotifyType = 'task' | 'project' | 'invite' | 'other';
 
 interface NotificationItem {
     id: number;
@@ -148,7 +148,8 @@ function NotificationPage() {
     const notifiType: Record<NotifyType, string> = {
         task: 'task',
         project: 'project',
-        invite: 'invite'
+        invite: 'invite',
+        other: 'other' 
     }
 
     const handleInviteButtons = async (notify: NotificationItem, type: string) => {

@@ -99,7 +99,7 @@ button {
   border: 1px solid #2c2b5b;
   border-radius: 12px;
   appearance: none;
-  background-image: url('https://teststepbucket.s3.amazonaws.com/icons/create_test_arrow.svg');
+  background-image: url('./assets/arrow_select.png');
   background-repeat: no-repeat;
   background-position: right 10px center;
   background-size: 24px;

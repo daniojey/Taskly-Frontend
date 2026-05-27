@@ -73,12 +73,12 @@ function StratagemComponent() {
         const handleKeydownEvent = (e: KeyboardEvent) => {
             const inputKey = e.key.toLowerCase()
 
-            if (e.shiftKey) {
+            if (e.altKey) {
                 e.preventDefault()
                 setOpenWindow(true)
             }
 
-            if (e.shiftKey && isArrayKey(inputKey)) {
+            if (e.altKey && isArrayKey(inputKey)) {
                 const currentStrategies = strategiesRef.current
                 const input = [...userInput, userInputMap[inputKey]]
 
@@ -106,7 +106,7 @@ function StratagemComponent() {
         }
 
         const handleKeyupEvent = (e: KeyboardEvent) => {
-            if (e.key.toLowerCase() === 'shift') {
+            if (e.key.toLowerCase() === 'alt') {
                 e.preventDefault()
                 setOpenWindow(false)
                 setStrategies(strategiesRef.current.map(item => {return {...item, is_match: false}}))
