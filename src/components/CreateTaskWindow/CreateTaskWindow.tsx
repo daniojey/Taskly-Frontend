@@ -1,12 +1,14 @@
 import './CreateTaskWindow.css'
+import '../../common/Styles/ModelWindow.css'
+import '../../index.css'
 import { Resolver, SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup';
 import {yupResolver} from '@hookform/resolvers/yup'
-import { useContext, useState } from 'react';
+import { useContext} from 'react';
 import { AuthContext} from '../../AuthContext'
-import { api } from '../../../api';
-import { getAccessToken } from '../../../tokens_func';
 import { useModalClose } from '../../common/hooks/closeOverlay';
+import { createTask } from './common/create_task';
+import { useNotify } from '../../common/stores/NotifyStore';
 
 interface CreateTaskWindowProps {
     onClose: () => void;
@@ -31,7 +33,8 @@ interface FormData extends YupFormData {
 
 function CreateTaskWindow({ onClose, onUpdate, projectId }: CreateTaskWindowProps) {
     const { user } = useContext(AuthContext)
-    const { isClosing, handleCloseWindow, closeWindow} = useModalClose({ onClose: onClose, delay: 400, className: 'create-task-overlay'})
+    const { addNotify } = useNotify()
+    const { isClosing, handleCloseWindow, closeWindow} = useModalClose({ onClose: onClose, delay: 400, className: 'window-overlay'})
 
     const schema = yup.object({
         name: yup.string().min(3).max(30).required(),
@@ -56,78 +59,70 @@ function CreateTaskWindow({ onClose, onUpdate, projectId }: CreateTaskWindowProp
 
 
     const submitForm: SubmitHandler<YupFormData> = async (data) => {
-        // e.preventDefault()
-        console.log(user)
-        console.log('form NOt fetch', data)
         const formData: FormData = {
             ...data,
             project_id: projectId,
             created_by: user.id
         }
-
-        console.log('UPDATED data', data)
         
-        const createTask = async (formData: FormData) => {
-            try {
-                const response = await api.post(
-                    `api/v1/projects/${projectId}/tasks/`,
-                    {...data},
-                    {headers: {
-                        Authorization: getAccessToken()
-                    }}
-                )
+        const result = await createTask(formData, projectId, { closeWindow: closeWindow, onUpdate: onUpdate})
 
-                console.log("RESPONSE",response)
-                closeWindow()
-                onUpdate()
-            } catch (error) {
-                console.error(error)
-            }
+        if (result instanceof Error) {
+            addNotify(result.message, 'error')
         }
-
-
-        createTask(formData)
     }
 
 
 
     return (
-        <div className={`create-task-overlay ${isClosing ? "close" : 'open'}`} onClick={handleCloseWindow}>
-            <div className='create-task__body'>
+        <div 
+            className={`window-overlay ${isClosing ? "close" : 'open'}`} 
+            onClick={handleCloseWindow}
+        >
+            <div className='window-body'
+                style={{ maxHeight: '450px', minHeight: '250px'}}>
                 <div className='create-task__title'>
                     <h2>Create Task</h2>
-                    <label onClick={closeWindow}>x</label>
+                    <label onClick={closeWindow}>+</label>
                 </div>
                 <form onSubmit={handleSubmit(submitForm)} className='create-task__form'>
-                    <input 
-                    className='neomorphism-input' 
-                    type="text" 
-                    id="name" 
-                    placeholder='task name' 
-                    {...register('name')}
-                    />
+                    <div className='create-task__form-first'>
+                        <label htmlFor="name">Task Name</label>
+                        <input 
+                        className='holy_input' 
+                        type="text" 
+                        id="name" 
+                        placeholder='task name' 
+                        {...register('name')}
+                        />
 
-                    <textarea 
-                    id='description'
-                    className='neomorphism-input'  
-                    placeholder='description' 
-                    {...register('description')}
-                    ></textarea>
+                        <label htmlFor="description">Task Description</label>
+                        <textarea 
+                        style={{ resize: 'none'}}
+                        id='description'
+                        className='holy_input'  
+                        placeholder='description' 
+                        {...register('description')}
+                        ></textarea>
+                    </div>
                     
-                    <label htmlFor="status">Status</label>
-                    <select className='neomorphism-input' defaultValue="NS" id="status" {...register('status')}>
-                        <option value="NS">No status</option>
-                        <option value="BS">Base status</option>
-                        <option value="US">Urgent status</option>
-                    </select>
+                    <div className='create-task__form-second'>
+                        <label htmlFor="status">Status</label>
+                        <select className='holy_select' defaultValue="NS" id="status" {...register('status')}>
+                            <option value="NS">No status</option>
+                            <option value="BS">Base status</option>
+                            <option value="US">Urgent status</option>
+                        </select>
 
-                    <label htmlFor="deadline">Deadline</label>
-                    <input
-                    className='neomorphism-input'  
-                    type="datetime-local" 
-                    onFocus={(e) => e.target.showPicker()} 
-                    id='deadline' 
-                    {...register('deadline')}/>
+                        <label htmlFor="deadline">Deadline</label>
+                        <input
+                        className='holy_select'  
+                        type="datetime-local" 
+                        onFocus={(e) => e.target.showPicker()} 
+                        id='deadline' 
+                        {...register('deadline')}/>
+                    </div>
+                    
                     <button type='submit'>Create Task</button>
                 </form>
             </div>
