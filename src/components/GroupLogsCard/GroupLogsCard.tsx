@@ -36,13 +36,13 @@ function GroupLogsCard ({ data, showContext }: GroupLogsCardProps) {
     }, [showContext])
 
     return (
-        <div className='group-logs-card-body'>
+        <div className={`group-logs-card-body ${context ? 'active' : ''}`}>
             <div className='group-logs-card-title'>
                 <h3>{event_type}</h3>
                 <DynamicPngIcon 
                 iconName='arrowDownWhite'
                 height={16}
-                width={16} 
+                width={24} 
                 onClick={() => setContext(!context)}/>
             </div>
 

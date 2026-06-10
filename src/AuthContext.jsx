@@ -115,10 +115,6 @@ export const AuthProvider = ({ children }) => {
 
         inicializeSession()
 
-        return () => {
-            inicializeSession = () => {}
-        } 
-
     }, [])
 
     const login = useCallback(async (username, password) => {

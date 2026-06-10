@@ -8,6 +8,14 @@ import * as yup from 'yup'
 import { Resolver, SubmitHandler, useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import GroupLogsCard from "../../components/GroupLogsCard/GroupLogsCard"
+import { getVisiblePages } from "../NotificationPage/common/getVisiblePages"
+
+interface LogsData {
+    next: string;
+    previous: string;
+    count: number;
+    item_per_page: number;
+}
 
 interface LogItem {
     id: number;
@@ -22,7 +30,7 @@ interface LogItem {
 interface UrlParams {
     page: string;
     dateStart: string | null;
-    dateOut: string | null; 
+    dateOut: string | null;
     username: string | null;
     groupName: string | null;
     eventType: string | null;
@@ -36,11 +44,16 @@ interface YupFormData {
     'event-type': string;
 }
 
-function GroupLogsPage () {
+function GroupLogsPage() {
     const [logs, setLogs] = useState<LogItem[]>([])
+    const [logsPaginator, setLogsPaginator] = useState<LogsData>()
     const [openFilters, setOpenFilters] = useState(false)
     const [searchParams, setSearchParams] = useSearchParams()
     const [showContextLogs, setShowContextLogs] = useState(false)
+    const [countPages, setCountPages] = useState<number[]>([])
+
+    console.log(logs, 'DATA')
+    console.log(logsPaginator, 'DATA')
 
     const schema = yup.object({
         'date-start': yup.string(),
@@ -68,7 +81,7 @@ function GroupLogsPage () {
     const groupName = searchParams.get('group-name') || null
     const eventType = searchParams.get('event-type') || null
 
-    const buildUrl = ({page, dateStart, dateOut, username, groupName, eventType} : UrlParams) => {
+    const buildUrl = ({ page, dateStart, dateOut, username, groupName, eventType }: UrlParams) => {
         const url = `api/v1/group/${groupId}/logs`
         const params = new URLSearchParams()
 
@@ -80,8 +93,6 @@ function GroupLogsPage () {
         if (eventType) params.set('event-type', eventType)
         const queryParam = params.toString()
 
-        console.log(queryParam)
-
         return queryParam ? `${url}?${queryParam}` : url
     }
 
@@ -90,20 +101,30 @@ function GroupLogsPage () {
             try {
                 const response = await api.get(
                     buildUrl({
-                        page: page, 
-                        dateStart: dateStart, 
-                        dateOut: dateOut, 
-                        username: username, 
-                        groupName: groupName, 
+                        page: page,
+                        dateStart: dateStart,
+                        dateOut: dateOut,
+                        username: username,
+                        groupName: groupName,
                         eventType: eventType
                     }),
-                    {headers: {
-                        Authorization: getAccessToken()
-                    }}
+                    {
+                        headers: {
+                            Authorization: getAccessToken()
+                        }
+                    }
                 )
-                
+
                 console.log(response)
-                setLogs(response.data.results)
+                const {results, ...cleanedData} = response.data
+                setLogsPaginator(cleanedData)
+                setLogs(results)
+
+                const countPages = Math.ceil(cleanedData.count / cleanedData.items_per_page)
+                console.log(countPages)
+                const allPages = Array.from({ 'length': countPages }, (_, i) => i + 1)
+                console.log(allPages)
+                setCountPages(allPages)
             } catch (error) {
                 console.error(error)
             }
@@ -123,12 +144,11 @@ function GroupLogsPage () {
 
 
     const submitFilters = async (data: YupFormData) => {
-        console.log(data)
         const params = new URLSearchParams
 
         for (let item in data) {
-                 const key = item as keyof YupFormData
-                 const value = data[key]
+            const key = item as keyof YupFormData
+            const value = data[key]
             if (value && typeof value === 'string') {
                 params.set(key, value)
             }
@@ -137,73 +157,106 @@ function GroupLogsPage () {
         setSearchParams(params)
     }
 
+    const handleNextPage = () => {
+        if (logsPaginator) {
+            const nextPage = new URL(logsPaginator?.next).searchParams.get('page') || "1";
+            console.log(searchParams)
+            const newParams = {...searchParams, page: nextPage}
+            const params = new URLSearchParams(newParams)
+
+            setSearchParams(params)
+        }
+    }
+
+    const handleSetPage = (e) => {
+        const item = e.target as HTMLButtonElement
+
+        if (item.value) {
+            const newParams = {...searchParams, page: item.value}
+            const params = new URLSearchParams(newParams)
+
+            setSearchParams(params)
+        }
+    }
+
+    const handlePreviousPage = () => {
+        if (logsPaginator) {
+            const previousPage = new URL(logsPaginator?.previous).searchParams.get('page') || '1'
+            const newParams = {...searchParams, page: previousPage}
+            const params = new URLSearchParams(newParams)
+
+            setSearchParams(params)
+        }
+    }
+
     return (
         <>
             <div className={`logs__filters-base-container ${openFilters ? 'active' : ''}`}>
                 <div className="logs__filters-title-container">
                     <h2>Filters</h2>
-                    <button onClick={() => setOpenFilters(false)}>X</button>
+                    <button onClick={() => setOpenFilters(false)}>×</button>
                 </div>
 
                 <form onSubmit={handleSubmit(submitFilters)} id="filter-form" className="logs__filters-body">
                     <div className="logs__filters-body-row">
                         <label htmlFor="date-start">Date start</label>
                         <input
-                        {...register('date-start')} 
-                        onClick={(e) => {
-                            const target = e.target as HTMLInputElement
-                            target.showPicker()
-                        }} 
-                        className="datetime-base-style"
-                        type="datetime-local" 
-                        name="date-start" 
-                        id="date-start" 
+                            {...register('date-start')}
+                            onClick={(e) => {
+                                const target = e.target as HTMLInputElement
+                                target.showPicker()
+                            }}
+                            className="holy_select thin"
+                            type="datetime-local"
+                            name="date-start"
+                            id="date-start"
                         />
                     </div>
-                    
+
                     <div className="logs__filters-body-row">
                         <label htmlFor="date-out">Date out</label>
                         <input
-                        {...register('date-out')}
-                        className="datetime-base-style"  
-                        onClick={(e) => {
-                            const target = e.target as HTMLInputElement
-                            target.showPicker()
-                        }}  
-                        type="datetime-local" 
-                        name="date-out" 
-                        id="date-out"
+                            {...register('date-out')}
+                            className="holy_select thin"
+                            onClick={(e) => {
+                                const target = e.target as HTMLInputElement
+                                target.showPicker()
+                            }}
+                            type="datetime-local"
+                            name="date-out"
+                            id="date-out"
                         />
                     </div>
 
                     <div className="logs__filters-body-row">
                         <label htmlFor="username">Username</label>
                         <input
-                        {...register('username')} 
-                        type="text"
-                        className='neomorphism-input' 
-                        name="username" 
-                        id="username" 
+                            {...register('username')}
+                            type="text"
+                            className='holy_input thin'
+                            name="username"
+                            id="username"
                         />
                     </div>
 
                     <div className="logs__filters-body-row">
                         <label htmlFor="group-name">Group name</label>
                         <input
-                        {...register('group-name')} 
-                        type="text"
-                        className='neomorphism-input'
-                        name="group-name" 
-                        id="group-name"
+                            {...register('group-name')}
+                            type="text"
+                            className='holy_input thin'
+                            name="group-name"
+                            id="group-name"
                         />
                     </div>
 
                     <div className="logs__filters-body-row">
                         <label htmlFor="event-type">Event type</label>
                         <select
-                        {...register('event-type')} 
-                        name="event-type" 
-                        id="event-type"
+                            {...register('event-type')}
+                            className="holy_select"
+                            name="event-type"
+                            id="event-type"
                         >
                             <option value="">select..</option>
                             <option value="Add member">add member</option>
@@ -221,19 +274,64 @@ function GroupLogsPage () {
             </div>
 
             <div className="logs__filters-button-title">
-                <DynamicPngIcon iconName='filtersIcon' height={32} width={32} onClick={() => setOpenFilters(!openFilters)}/>
-                
-                <div>
-                    <label>Show context</label>
-                    <input type="checkbox" checked={showContextLogs} onChange={(e) => setShowContextLogs(e.target.checked)}/>
+                <DynamicPngIcon iconName='filtersIcon' height={32} width={32} onClick={() => setOpenFilters(!openFilters)} />
+
+                <div className={`holy_checkbox ${showContextLogs ? 'active' : ''}`} >
+                    <span>Show context</span>
+                    <input
+                        id="cb-1"
+                        type="checkbox"
+                        checked={showContextLogs}
+                        onChange={() => { }}
+                    />
+                    <label htmlFor="cb-1"
+                        onClick={() => setShowContextLogs(!showContextLogs)}
+                    ></label>
                 </div>
             </div>
 
             <div className="logs-base-container" onClick={checkOpenFilters}>
-                {logs.length > 0 && logs.map((item) => (
-                    <GroupLogsCard data={item} key={item.id} showContext={showContextLogs}/>
+                {logs.length > 0 && logs.map((item, index) => (
+                    <GroupLogsCard data={item} key={index} showContext={showContextLogs} />
                 ))}
             </div>
+
+            {countPages.length > 1 && (
+                <div className="pagination">
+                    <button
+                        className="pagination-button"
+                        disabled={logsPaginator ?!logsPaginator.previous : false}
+                        onClick={() => handlePreviousPage()}
+                    >
+                        Назад
+                    </button>
+
+                    {getVisiblePages(parseInt(page), countPages.length).map((item, index) => (
+                        item === '...' ? (
+                            <span key={`ellipsis-${index}`} className="pagination-ellipsis">...</span>
+                        ) : (
+                            <button
+                                key={item}
+                                value={item}
+                                onClick={(e) => handleSetPage(e)}
+                                // className={`pagination-button ${state.currentPage === item ? 'active': ''}`}
+                                className={`pagination-button`}
+                                disabled={parseInt(page) === item}
+                            >
+                                {item}
+                            </button>
+                        )
+                    ))}
+
+                    <button
+                        onClick={() => handleNextPage()}
+                        disabled={logsPaginator ?!logsPaginator.next : false}
+                        className="pagination-button"
+                    >
+                        Вперед
+                    </button>
+                </div>
+            )}
         </>
     )
 }

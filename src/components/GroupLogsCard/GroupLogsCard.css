@@ -1,39 +1,55 @@
 .group-logs-card-body {
+    position: relative;
     display: flex;
-    width: 400px;
-    flex-direction: column;
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    width: 100%;
+    max-width: 350px;
     border-radius: 12px;
-    padding: 16px;
+    background-color: black;
+    color: rgb(255, 255, 255);
+    background: 
+        linear-gradient(to bottom right, #1a1a2e,#1a1a2e, #5b57d9) padding-box;
+    padding: 26px 24px 24px 24px;
+    border: 1px solid #21213b;
     box-sizing: border-box;
-    box-shadow: 2px 2px 1px 1px rgba(255, 255, 255, 0.6);
+    flex-direction: column;
+    transition: all 0.3s ease-out;
+    transform: scale(0);
+    animation: scaleIn 0.5s ease forwards;
+    cursor: pointer;
 
-
-    h3 {
-        display: flex;
-        margin: 0;
-        font-size: 1.4rem;
-        font-family: var(--main-font-bold);
-    }
-
-    p {
-        margin: 0;
+    &:hover {
+        border-color: #ffff;
+        box-shadow: 1px 2px 2px #ffff;
+        background: 
+            linear-gradient(to bottom right, #1a1a2e,#5b57d9, #1a1a2e) padding-box;
     }
 
     #created_date {
-        display: flex;
-        width: 100%;
-        justify-content: end;
-        align-items: center;
-        font-family: var(--main-font-bold);
+        position: absolute;
+        right: 16px;
+        bottom: 0px;
     }
 }
+
+.group-logs-card-body.active {
+    border-color: #ffff;
+    box-shadow: 1px 2px 2px #ffff;
+    background: 
+        linear-gradient(to bottom right, #1a1a2e,#5b57d9, #1a1a2e) padding-box;
+}
+
 
 .group-logs-card-title {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 20px;
+
+    h3 {
+        display: flex;
+        margin: 0;
+        font-size: 1.3rem;
+    }
 }
 
 
