@@ -2,7 +2,8 @@ import { useContext, useState } from "react"
 import { AuthContext } from "../../AuthContext"
 import { useNavigate } from "react-router"
 import './LoginPage.css'
-import DynamicPngIcon from "../../components/UI/icons/DynamicPngIcon.jsx"
+
+const welcomeText = ['W', 'e', 'l', 'c', 'o', 'm', 'e', '', 'b', 'a', 'c', 'k']
 
 function LoginPage() {
     const [username, setUsername] = useState<string | null>(null)
@@ -24,9 +25,14 @@ function LoginPage() {
     return (
         <div className="login-page__background">
             <div className="login-page__body">
-                <div className="login-page__image-container">
-                    <DynamicPngIcon iconName="backGroundIcon"/>
-                    <h2>Welcome Back</h2>
+                <div className="login-page__title-container">
+                    {welcomeText.length > 0 && welcomeText.map((item, index) => (
+                        item !== '' ? (
+                            <h2 style={{ animationDelay: `${0.1 * index}s` }}>{item}</h2>
+                        ) : (
+                            <span></span>
+                        )
+                    ))}
                 </div>
 
                 <form onSubmit={onSubmit} className="login-form">
@@ -34,38 +40,51 @@ function LoginPage() {
 
                     <div className="login-from-field">
                         <label htmlFor="username">Username</label>
-                        <input  className="neomorphism-input" type="text" name="username" id='username' onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        <input className="holy_input" type="text" name="username" id='username' onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             setUsername(e.target.value)
-                        }}/>
+                        }} />
                     </div>
-                    
+
 
                     <div className="login-from-field">
                         <label htmlFor="password">password</label>
-                        <input  
-                        className="neomorphism-input" 
-                        type={showPassword ? 'text' : 'password'}
-                        name="password" 
-                        id='password' 
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            setPassword(e.target.value)
-                        }}/>
+                        <input
+                            className="holy_input"
+                            type={showPassword ? 'text' : 'password'}
+                            name="password"
+                            id='password'
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                setPassword(e.target.value)
+                            }} />
 
-                        <div className="login-form-show-password">
-                            <input type="checkbox" onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                if (e.target.checked) { setShowPassword(true) } else { setShowPassword(false) }
-                            }}/>
-                            <p>show password</p>
-                        </div>
+
+                    </div>
+
+                    <div
+                        className={`holy_checkbox ${showPassword ? 'active' : ''}`}
+                    >
+                        <span onClick={() => setShowPassword(!showPassword)}>show password</span>
+                        <input
+                            id="lb-1"
+                            type="checkbox"
+                            checked={showPassword}
+                            onChange={() => setShowPassword(!showPassword)}
+                            />
+                        <label
+                            htmlFor="lb-1"
+                        >
+                        </label>
                     </div>
 
                     <div id="register-div" onClick={() => navigate('/register/')}>
-                        not account ? register
+                        don`t have an account ? register
                     </div>
-
-                    <button type="submit">SUBMIT</button>
+                    
+                    <div className="login-from-field-button">
+                        <button type="submit">SUBMIT</button>
+                    </div>
                 </form>
-                
+
             </div>
         </div>
     )

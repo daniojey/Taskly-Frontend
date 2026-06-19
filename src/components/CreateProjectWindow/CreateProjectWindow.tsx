@@ -112,7 +112,7 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
 
                         <textarea 
                         className='holy_input'
-                        style={{ maxWidth: '100%', maxHeight: '100px', height: '100px'}}
+                        style={{ maxWidth: '100%', maxHeight: '100px', height: '100px', resize: "none"}}
                         id="description" 
                         placeholder='description'
                         {...register('description')}
