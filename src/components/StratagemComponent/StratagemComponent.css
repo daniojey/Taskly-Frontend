@@ -12,6 +12,10 @@
     animation: slideIn 0.4s ease-in-out forwards;
 }
 
+.stratagem-interface-body.close {
+    animation: slideOut 0.4s ease-in-out forwards;
+}
+
 
 .stratagem-item {
     display: flex;
@@ -47,5 +51,15 @@
 
     100% {
         transform: translateX(0%);
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        transform: translateX(0%);
+    }
+
+    100% {
+        transform: translateX(-100%);
     }
 }

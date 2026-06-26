@@ -4,13 +4,12 @@ import './StratagemComponent.css'
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon";
 import { useStratagem } from "../../common/hooks/stratagemHook";
 import { useStratagemStore } from "../../common/stores/StratagemStore";
-import { useLocation } from "react-router";
 
 const userInputMap = {
-    "w": 1,
-    's': 2,
-    'a': 3,
-    'd': 4,
+    "KeyW": 1,
+    'KeyS': 2,
+    'KeyA': 3,
+    'KeyD': 4,
 }
 
 interface StratagemItem {
@@ -43,10 +42,13 @@ function StratagemComponent() {
     const stratagems = useStratagemStore((state) => state.stratagems)
     const [strategies, setStrategies] = useState<StratagemItem[]>([...baseStrategies, ...stratagems])
     const strategiesRef = useRef<StratagemItem[]>(strategies)
+    const [closeWindow, setCloseWindow] = useState<boolean>(false)
 
     const [openWindow, setOpenWindow] = useState<boolean>(false)
     const [userInput, setUserInput] = useState<number[]>([])
     const {executeCommand} = useStratagem()
+
+    const mapTimers = useRef(new Map())
 
     const arrowMap = new Map([
         [1, 'up'],
@@ -71,7 +73,7 @@ function StratagemComponent() {
 
     useEffect(() => {
         const handleKeydownEvent = (e: KeyboardEvent) => {
-            const inputKey = e.key.toLowerCase()
+            const inputKey = e.code
 
             if (e.altKey) {
                 e.preventDefault()
@@ -88,6 +90,7 @@ function StratagemComponent() {
                     if (JSON.stringify(input) == JSON.stringify(strategy.combination)) {
                         executeCommand(strategy?.is_base, strategy.url)
                         setUserInput([])
+                        setCloseWindow(false)
                         setOpenWindow(false)
                         setStrategies(strategies.map(item => {return {...item, is_match: false}}))
                     }
@@ -107,10 +110,21 @@ function StratagemComponent() {
 
         const handleKeyupEvent = (e: KeyboardEvent) => {
             if (e.key.toLowerCase() === 'alt') {
+                if (mapTimers.current.has('sTimer')) {
+                    return 
+                }
                 e.preventDefault()
-                setOpenWindow(false)
                 setStrategies(strategiesRef.current.map(item => {return {...item, is_match: false}}))
                 setUserInput([])
+
+                setCloseWindow(true)
+                const timer = setTimeout(() => {
+                    setCloseWindow(false)
+                    setOpenWindow(false)
+                    mapTimers.current.clear()
+                }, 400)
+
+                mapTimers.current.set('sTimer', timer)
             }
         }
 
@@ -125,7 +139,7 @@ function StratagemComponent() {
     if (openWindow) {
         return (
             createPortal(
-                <div className="stratagem-interface-body">
+                <div className={`stratagem-interface-body ${closeWindow ? 'close' : ''}`}>
                     {strategies.length > 0 && strategies.map(item => (
                         <div className="stratagem-item">
                             <div className="stratagem-name">
