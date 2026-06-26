@@ -85,8 +85,6 @@ function StratagemComponent() {
                 const input = [...userInput, userInputMap[inputKey]]
 
                 for (let strategy of currentStrategies) {
-                    console.log(input, strategy.combination)
-
                     if (JSON.stringify(input) == JSON.stringify(strategy.combination)) {
                         executeCommand(strategy?.is_base, strategy.url)
                         setUserInput([])
@@ -140,8 +138,8 @@ function StratagemComponent() {
         return (
             createPortal(
                 <div className={`stratagem-interface-body ${closeWindow ? 'close' : ''}`}>
-                    {strategies.length > 0 && strategies.map(item => (
-                        <div className="stratagem-item">
+                    {strategies.length > 0 && strategies.map((item, index) => (
+                        <div className="stratagem-item" key={index}>
                             <div className="stratagem-name">
                                 {item.name}
                             </div>
@@ -149,11 +147,11 @@ function StratagemComponent() {
                             <div className="stratagem-coombination">
                                 {item.combination.length > 0 && item.combination.map((value, index) => {
                                     if (!item.is_match && userInput.length > 0) {
-                                        return <DynamicPngIcon iconName={`deactiveStratagemArrow_${arrowMap.get(value)}`}/>
+                                        return <DynamicPngIcon iconName={`deactiveStratagemArrow_${arrowMap.get(value)}`} key={index}/>
                                     } else if (value === userInput[index]) {
-                                        return <DynamicPngIcon iconName={`activeStratagemArrow_${arrowMap.get(value)}`}/>
+                                        return <DynamicPngIcon iconName={`activeStratagemArrow_${arrowMap.get(value)}`} key={index}/>
                                     } else {
-                                        return <DynamicPngIcon iconName={`stratagemArrow_${arrowMap.get(value)}`}/>
+                                        return <DynamicPngIcon iconName={`stratagemArrow_${arrowMap.get(value)}`} key={index}/>
                                     }
                                         
                                 })}
