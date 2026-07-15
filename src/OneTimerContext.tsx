@@ -2,6 +2,7 @@ import { createContext, useEffect, useRef, useState } from "react";
 import { api } from "../api";
 import { getAccessToken } from "../tokens_func";
 import { useTaskTimer } from "./common/stores/TaskStore";
+import { useNotify } from "./common/stores/NotifyStore";
 
 const startSession = async ( taskId: number) => {
     try {
@@ -39,11 +40,12 @@ const endSession = async ( sessionId: number | null, time: number) => {
     try {
         const response = await api.post(
             `api/v1/task-sessions/${sessionId}/end_session/`,
-            {},
+            {time},
             {headers: {Authorization: getAccessToken()}}
         )
+        return true
     } catch (error) {
-        throw error
+        return false
     }
 }
 
@@ -76,6 +78,7 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
     const originalTitleRef = useRef<string>(document.title)
     const sessionIdRef = useRef<number | null>(null)
     const { setTaskId, removeTaskId, setActiveTimer, removeActiveTimer } = useTaskTimer()
+    const addNotification = useNotify((state) => state.addNotify)
 
     useEffect(() => {
         intervalRef.current = setInterval(() => {
@@ -147,7 +150,9 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
         removeTaskId()
         removeActiveTimer()
         const time = pauseTimeRef.current + (Date.now() - startTime)
-        await endSession(sessionIdRef.current, time)
+        const result = await endSession(sessionIdRef.current, time)
+
+        result ? addNotification("Session saved", 'success') : addNotification("Error from save session", "error")
     }
 
 

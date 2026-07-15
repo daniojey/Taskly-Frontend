@@ -1,3 +1,7 @@
+.notify-popup__wrapper {
+    z-index: 99999;
+}
+
 
 .notify-popup__message {
     display: flex;
@@ -6,7 +10,7 @@
     right: 20px;
     bottom: 0;
     gap: 20px;
-    z-index: 5000;
+    z-index: 9000;
     background-color: #5b57d9;
     border-radius: 12px;
     padding: 6px 14px;

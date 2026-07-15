@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom"
 import { useState, useEffect, useCallback, useReducer } from "react"
-import { useRef } from "react"
+import { useRef, useLayoutEffect } from "react"
 import './TaskChat.css'
 import DynamicSvgIcon from "../UI/icons/DynamicSvgIcon"
 import { api } from "../../../api"
@@ -12,13 +12,23 @@ import TaskSettingsComponent from "../TaskSettingsComponent/TaskSettingsComponen
 import TaskTimerComponent from "../TaskTimerComponent/TaskTimerComponent"
 import TaskStatisticModelWindow from "../TaskStatisticModelWindow/TaskStatisticModelWindow"
 import { useUser } from "../../common/stores/AuthStore"
+import { truncateString } from "../../common/truncate"
 
 
-async function loadMoreMessages(nextUrl) {
+function calculateMessages({payload, messages, count, type}) {
+    if (type === "old") {
+        const newMessages = messages.slice(0, -15)
+        return [...payload, ...newMessages]
+    } else if (type === "new") {
+
+    }
+}
+
+async function loadMoreMessages(url) {
 
     try {
         const response = await api.get(
-            nextUrl.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
+            url.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
             {
                 headers: {
                     Authorization: getAccessToken()
@@ -37,6 +47,7 @@ async function loadMoreMessages(nextUrl) {
 
 const initialState = {
     messages: [],
+    previousPage: null,
     nextPage: null,
     loading: true,
     isHistoryLoading: false,
@@ -76,10 +87,27 @@ function messageReduce(state, action) {
             message.images_urls = fix_images
             return { ...state, messages: [...state.messages, message] }
 
-        case "LOAD_MORE_MESSAGES":
+        case "LOAD_OLD_MESSAGES":
+            const countMessages = Array.from(action.payload.results).length + Array.from(state.messages).length
+            const newMessages = countMessages > 30 
+            ? calculateMessages({
+                payload: action.payload.results.reverse(), 
+                messages: state.messages, 
+                count: countMessages, 
+                type:"old"}) 
+            : [...action.payload.results.reverse() , ...state.messages]
+
             return {
                 ...state,
                 messages: [...action.payload.results.reverse() , ...state.messages],
+                nextPage: action.payload.next,
+                loading: false,
+                isHistoryLoading: true
+            }
+
+        case "LOAD_NEW_MESSAGES":
+            return {...state,
+                messages: [...state.messages, ...action.payload.results.reverse()],
                 nextPage: action.payload.next,
                 loading: false,
                 isHistoryLoading: true
@@ -112,6 +140,9 @@ function messageReduce(state, action) {
         case 'SET_TASK_STATISTIC_WINDOW':
             return {...state, openTaskStatistic: action.payload}
 
+        case "REMOVE_OLD_MESSAGES":
+            return {...state, messages: []}
+
         default:
             return {...state}
     }
@@ -120,7 +151,7 @@ function messageReduce(state, action) {
 function TaskChat({ data, onClose, groupId, projectId }) {
     const user = useUser((state) => state.user)
     const [close, setClose] = useState(false)
-    const [taskData, setTaskData] = useState(data);
+    const [taskData, _] = useState(data);
     const [messageText, setMessageText] = useState(null)
     const [state, dispatch] = useReducer(messageReduce, initialState)
     const [activeImageWindow, setActiveImageWindow] = useState(false)
@@ -135,33 +166,33 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     const textInputRef = useRef(null)
     const loadingRef = useRef(false)
     const nextPageRef = useRef(null)
+    const previousPageRef = useRef(null)
     const scrollPositionRef = useRef(0)
     const inputFilesRef = useRef(null)
     const activeImageRef = useRef(null)
 
     const token = localStorage.getItem('accessToken')
 
-    const saveScrollPosition = () => {
+    const saveScrollAnchor = () => {
         if (messagesContainerRef.current) {
-            scrollPositionRef.current = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.scrollTop + 30;
+            scrollPositionRef.current = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.scrollTop
         }
     }
 
-    const restoreScrollPosition = () => {
-        if (messagesContainerRef.current && scrollPositionRef.current > 0) {
-            const newScrollTop = messagesContainerRef.current.scrollHeight - scrollPositionRef.current;
-            messagesContainerRef.current.scrollTop = newScrollTop;
-        }
+    const restoreScrollAnchor = () => {
+        const container = messagesContainerRef.current
+        if (container && scrollPositionRef.current > 0) {
+        // Восстанавливаем скролл: новая высота минус сохраненное расстояние от низа
+        container.scrollTop = container.scrollHeight - scrollPositionRef.current;
+        
+        // Сбрасываем ref
+        scrollPositionRef.current = 0;
     }
-
-    useEffect(() => {
-       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [state.messages])
+    }
  
-
-    useEffect(() => {
+    useLayoutEffect(() => {
         if (state.isHistoryLoading) {
-            restoreScrollPosition();
+            restoreScrollAnchor();
             dispatch({ type: 'RESET_HISTORY_LOADING_FLAG' });
         }
     }, [state.messages, state.isHistoryLoading]); 
@@ -207,37 +238,54 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         }, 400)
     }, [])
 
+    const ObserverConfig = {
+        startObserve: {
+            getUrl: () => nextPageRef.current,
+            actionType: "LOAD_OLD_MESSAGES",
+            updateRef: (result) => {nextPageRef.current = result?.next} 
+        },
 
+        endObserve: {
+            getUrl: () => previousPageRef.current,
+            actionType: "LOAD_NEW_MESSAGES",
+            updateRef: (result) => {previousPageRef.current = result?.previous}
+        }
+    }
 
-    const callbackFunc = useCallback(async (entries) => {
+    const IntersectionCallback = useCallback(async (entries) => {
         const [entry] = entries
 
         const container = messagesContainerRef.current
         const hasScroll = container && container.scrollHeight > container.clientHeight
+        const entryId = entry.target.id
+        const config = ObserverConfig[entryId]
+        console.log(config)
 
+        if (!config || loadingRef.current || !hasScroll || !entry.isIntersecting || !config.getUrl()) return 
 
-        if (loadingRef.current === false && hasScroll && nextPageRef.current && entry.isIntersecting) {
-            loadingRef.current = true
-
-            saveScrollPosition();
-
-            const result = await loadMoreMessages(nextPageRef.current)
+        loadingRef.current = true
+        saveScrollAnchor()
+  
+        try {
+            const result = await loadMoreMessages(config.getUrl())
             
             if (result) {
-                dispatch({ type: 'LOAD_MORE_MESSAGES', payload: result })
-                nextPageRef.current = result?.next
-                loadingRef.current = false
+
+                dispatch({ type: config.actionType, payload: result})
+                config.updateRef(result)
             } else {
                 console.error(result)
-                loadingRef.current = false
             }
+        } finally {
+            loadingRef.current = false
         }
+        
 
     }, [])
 
 
     useEffect(() => {
-        const observer = new IntersectionObserver(callbackFunc, {
+        const observer = new IntersectionObserver(IntersectionCallback, {
             root: messagesContainerRef.current,
             rootMargin: '100px 0px 0px 0px',
             threshold: 0,
@@ -247,12 +295,17 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             observer.observe(messagesStartRef.current);
         }
 
+        if (messagesEndRef.current) {
+            observer.observe(messagesEndRef.current)
+        }
+
         return () => {
             if (messagesStartRef.current) {
-                observer.unobserve(messagesStartRef.current);
+                // observer.unobserve(messagesStartRef.current);
+                observer.disconnect()
             }
         };
-    }, [callbackFunc]);
+    }, [IntersectionCallback]);
 
     useEffect(
         () => {
@@ -309,7 +362,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             dispatch({ type: 'SET_CONTEXT_MENU_DATA', payload: null})
         }
 
-        if (e.target.className.includes('create-task-overlay ')) {
+        if (e.target.className.includes('window-overlay ')) {
             CloseWindow()
         } else if (e.target.className.includes('task-detail__opacity-filter') && deleteWindow) {
             setDeleteWindow()
@@ -426,7 +479,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
     return (
         createPortal(
-            <div className={`create-task-overlay ${close ? "close" : 'open'}`} onClick={closeOverlay}>
+            <div className={`window-overlay ${close ? "close" : 'open'}`} onClick={closeOverlay}>
 
                 {activeImageWindow && (
                     <FullscreenImage imageData={activeImageRef.current} onClose={() => setActiveImageWindow(false)}/>
@@ -453,7 +506,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                 )}
 
 
-                <div className='chat-task__body'>
+                <div className='window-body'>
                     <div className='task-chat__title'>
                         <h2>{taskData?.name}</h2>
                         <div className="task-chat__admin-icons">
@@ -465,7 +518,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                     </div>
 
                     <div className="task-chat__field" ref={messagesContainerRef} onContextMenu={handleContextMenu}>
-                        <div ref={messagesStartRef}></div>
+                        <div id="startObserve" ref={messagesStartRef}></div>
                         {state.messages.length > 0 && state.messages.map(item => (
                             <div className={`task-chat__message-body ${item?.user?.id === user.id ? 'user' : ''}`} key={item.id}>
 
@@ -481,7 +534,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                                 {item?.message && (
                                     <div className={`task-chat__message-content ${item?.user?.id == user.id ? 'user' : ''}`}>
                                         {Object.keys(item.answer_to).length > 0 && (
-                                            <p className="task-chat__answer" key={item.answer_to.id}>{item.answer_to.text}</p>
+                                            <p className="task-chat__answer" key={item.answer_to.id}>{truncateString(item.answer_to.text, 50)}</p>
                                         )}
                                         
                                         
@@ -491,7 +544,11 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                                 
                             </div>
                         ))}
-                        <div ref={messagesEndRef}/>
+
+                        {state.messages.length === 0 && (
+                            <div className="task-chet_message-none">Not found messages</div>
+                        )}
+                        <div id="endObserve" ref={messagesEndRef}/>
                     </div>
                     
                     { state.inputFiles && (
@@ -516,7 +573,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
                     <form className="task-chat__form" onSubmit={change} >
                         <input ref={inputFilesRef} type="file" accept="image/*" onChange={changeSelectFiles} multiple/>
-                        <input ref={textInputRef} className="task-chat__input" type="text" onChange={(e) => setMessageText(e.target.value)} />
+                        <input ref={textInputRef} className="holy_input" style={{maxWidth: '100%'}} type="text" onChange={(e) => setMessageText(e.target.value)} />
                         {/* <button type="submit">send</button> */}
                         <DynamicPngIcon iconName='clipsFile' height={24} width={24} className="clips-file-icon" onClick={() => inputFilesRef.current.click()}/>
                         <DynamicSvgIcon 
