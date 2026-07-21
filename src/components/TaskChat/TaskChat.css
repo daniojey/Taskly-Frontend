@@ -59,7 +59,7 @@
     flex: 1;
 }
 
-.task-chat__message-content {
+/* .task-chat__message-content {
     display: flex;
     flex-direction: column;
     justify-content: start;
@@ -92,9 +92,9 @@
         background-color: rgb(32, 32, 32)
     }
     
-}
+} */
 
-.task-chat__answer {
+/* .task-chat__answer {
     display: flex;
     padding: 3px 7px;
     border-radius: 8px;
@@ -152,7 +152,7 @@
     width: 100%;
     font-weight: 900;
     font-size: 2rem;
-}
+} */
 
 .task-chat__files-preview-body {
     display: flex;

@@ -13,9 +13,12 @@ import TaskTimerComponent from "../TaskTimerComponent/TaskTimerComponent"
 import TaskStatisticModelWindow from "../TaskStatisticModelWindow/TaskStatisticModelWindow"
 import { useUser } from "../../common/stores/AuthStore"
 import { truncateString } from "../../common/truncate"
+import { Virtuoso } from "react-virtuoso"
+import MessageComponent from "../MessageComponent/MessageComponent"
 
+const START_INDEX = 10000;
 
-function calculateMessages({payload, messages, count, type}) {
+function calculateMessages({ payload, messages, count, type }) {
     if (type === "old") {
         const newMessages = messages.slice(0, -15)
         return [...payload, ...newMessages]
@@ -24,26 +27,7 @@ function calculateMessages({payload, messages, count, type}) {
     }
 }
 
-async function loadMoreMessages(url) {
 
-    try {
-        const response = await api.get(
-            url.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
-            {
-                headers: {
-                    Authorization: getAccessToken()
-                }
-            }
-        )
-
-        console.log(response.data)
-        return response.data 
-    } catch (error) {
-        console.error('Error loading more messages:', error)
-        return null
-    }
-
-}
 
 const initialState = {
     messages: [],
@@ -79,9 +63,10 @@ function messageReduce(state, action) {
 
             let fix_images = action.payload?.images_urls.map(item => {
                 return {
-                ...item,
-                "url": `${import.meta.env.VITE_REACT_APP_API_BASE_URL_IMAGES}${item.url}`
-            }})
+                    ...item,
+                    "url": `${import.meta.env.VITE_REACT_APP_API_BASE_URL_IMAGES}${item.url}`
+                }
+            })
             console.log(fix_images)
             let message = action.payload
             message.images_urls = fix_images
@@ -89,62 +74,64 @@ function messageReduce(state, action) {
 
         case "LOAD_OLD_MESSAGES":
             const countMessages = Array.from(action.payload.results).length + Array.from(state.messages).length
-            const newMessages = countMessages > 30 
-            ? calculateMessages({
-                payload: action.payload.results.reverse(), 
-                messages: state.messages, 
-                count: countMessages, 
-                type:"old"}) 
-            : [...action.payload.results.reverse() , ...state.messages]
+            const newMessages = countMessages > 30
+                ? calculateMessages({
+                    payload: action.payload.results.reverse(),
+                    messages: state.messages,
+                    count: countMessages,
+                    type: "old"
+                })
+                : [...action.payload.results.reverse(), ...state.messages]
 
             return {
                 ...state,
-                messages: [...action.payload.results.reverse() , ...state.messages],
+                messages: [...action.payload.results.reverse(), ...state.messages],
                 nextPage: action.payload.next,
                 loading: false,
                 isHistoryLoading: true
             }
 
         case "LOAD_NEW_MESSAGES":
-            return {...state,
+            return {
+                ...state,
                 messages: [...state.messages, ...action.payload.results.reverse()],
                 nextPage: action.payload.next,
                 loading: false,
                 isHistoryLoading: true
             }
 
-         case "RESET_HISTORY_LOADING_FLAG":
+        case "RESET_HISTORY_LOADING_FLAG":
             return {
                 ...state,
                 isHistoryLoading: false
             }
-        
+
         case 'SET_INPUT_FILES':
-            return {...state, inputFiles: action.payload}
+            return { ...state, inputFiles: action.payload }
 
         case 'DELETE_INPUT_FILE':
-            return {...state, inputFiles: state.inputFiles.filter(value => value.index !== action.payload)}
+            return { ...state, inputFiles: state.inputFiles.filter(value => value.index !== action.payload) }
 
         case 'CLEAR_INPUT_FILES':
-            return {...state, inputFiles: []}
+            return { ...state, inputFiles: [] }
 
         case "SET_CONTEXT_MENU_DATA":
-            return {...state, contextMenuData: action.payload}
+            return { ...state, contextMenuData: action.payload }
 
         case 'SET_ANSWER_MESSAGE':
-            return {...state, answerMessage: action.payload}
+            return { ...state, answerMessage: action.payload }
 
         case "SET_TASK_SETTINGS_WINDOW":
-            return {...state, openTaskSettings: action.payload}
+            return { ...state, openTaskSettings: action.payload }
 
         case 'SET_TASK_STATISTIC_WINDOW':
-            return {...state, openTaskStatistic: action.payload}
+            return { ...state, openTaskStatistic: action.payload }
 
         case "REMOVE_OLD_MESSAGES":
-            return {...state, messages: []}
+            return { ...state, messages: [] }
 
         default:
-            return {...state}
+            return { ...state }
     }
 }
 
@@ -156,6 +143,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     const [state, dispatch] = useReducer(messageReduce, initialState)
     const [activeImageWindow, setActiveImageWindow] = useState(false)
     const [isActiveTask, setIsActiveTask] = useState(false)
+    const [firstItemIndex, setFirstItemIndex] = useState(START_INDEX);
 
     const webSocketRef = useRef(null)
 
@@ -163,8 +151,8 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     const messagesStartRef = useRef(null)
     const messagesContainerRef = useRef(null)
 
-    const textInputRef = useRef(null)
     const loadingRef = useRef(false)
+    const textInputRef = useRef(null)
     const nextPageRef = useRef(null)
     const previousPageRef = useRef(null)
     const scrollPositionRef = useRef(0)
@@ -173,29 +161,58 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
     const token = localStorage.getItem('accessToken')
 
-    const saveScrollAnchor = () => {
-        if (messagesContainerRef.current) {
-            scrollPositionRef.current = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.scrollTop
+    async function loadMoreMessages() {
+        console.log("Визов функции", state.nextPage)
+        if (state.nextPage === null) return null
+        if (loadingRef.current) null
+        loadingRef.current = true
+
+
+        try {
+            const response = await api.get(
+                state.nextPage.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
+                {
+                    headers: {
+                        Authorization: getAccessToken()
+                    }
+                }
+            )
+
+            console.log(response.data)
+            dispatch({ type: "LOAD_OLD_MESSAGES", payload: response.data })
+            setFirstItemIndex((prev) => prev - response.data.results.length)
+            loadingRef.current = false
+            return response.data.results
+        } catch (error) {
+            console.error('Error loading more messages:', error)
+            return null
         }
+
     }
 
-    const restoreScrollAnchor = () => {
-        const container = messagesContainerRef.current
-        if (container && scrollPositionRef.current > 0) {
-        // Восстанавливаем скролл: новая высота минус сохраненное расстояние от низа
-        container.scrollTop = container.scrollHeight - scrollPositionRef.current;
-        
-        // Сбрасываем ref
-        scrollPositionRef.current = 0;
-    }
-    }
- 
-    useLayoutEffect(() => {
-        if (state.isHistoryLoading) {
-            restoreScrollAnchor();
-            dispatch({ type: 'RESET_HISTORY_LOADING_FLAG' });
-        }
-    }, [state.messages, state.isHistoryLoading]); 
+    // const saveScrollAnchor = () => {
+    //     if (messagesContainerRef.current) {
+    //         scrollPositionRef.current = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.scrollTop
+    //     }
+    // }
+
+    // const restoreScrollAnchor = () => {
+    //     const container = messagesContainerRef.current
+    //     if (container && scrollPositionRef.current > 0) {
+    //         // Восстанавливаем скролл: новая высота минус сохраненное расстояние от низа
+    //         container.scrollTop = container.scrollHeight - scrollPositionRef.current;
+
+    //         // Сбрасываем ref
+    //         scrollPositionRef.current = 0;
+    //     }
+    // }
+
+    // useLayoutEffect(() => {
+    //     if (state.isHistoryLoading) {
+    //         restoreScrollAnchor();
+    //         dispatch({ type: 'RESET_HISTORY_LOADING_FLAG' });
+    //     }
+    // }, [state.messages, state.isHistoryLoading]);
 
     useEffect(() => {
         dispatch({ type: 'START_LOADING' })
@@ -216,7 +233,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             try {
                 const response = await api.get(
                     `api/v1/tasks/${taskData.id}/get_is_active_task/`,
-                    {headers: {Authorization: getAccessToken()}}
+                    { headers: { Authorization: getAccessToken() } }
                 )
 
                 console.log(response)
@@ -238,74 +255,74 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         }, 400)
     }, [])
 
-    const ObserverConfig = {
-        startObserve: {
-            getUrl: () => nextPageRef.current,
-            actionType: "LOAD_OLD_MESSAGES",
-            updateRef: (result) => {nextPageRef.current = result?.next} 
-        },
+    // const ObserverConfig = {
+    //     startObserve: {
+    //         getUrl: () => nextPageRef.current,
+    //         actionType: "LOAD_OLD_MESSAGES",
+    //         updateRef: (result) => { nextPageRef.current = result?.next }
+    //     },
 
-        endObserve: {
-            getUrl: () => previousPageRef.current,
-            actionType: "LOAD_NEW_MESSAGES",
-            updateRef: (result) => {previousPageRef.current = result?.previous}
-        }
-    }
+    //     endObserve: {
+    //         getUrl: () => previousPageRef.current,
+    //         actionType: "LOAD_NEW_MESSAGES",
+    //         updateRef: (result) => { previousPageRef.current = result?.previous }
+    //     }
+    // }
 
-    const IntersectionCallback = useCallback(async (entries) => {
-        const [entry] = entries
+    // const IntersectionCallback = useCallback(async (entries) => {
+    //     const [entry] = entries
 
-        const container = messagesContainerRef.current
-        const hasScroll = container && container.scrollHeight > container.clientHeight
-        const entryId = entry.target.id
-        const config = ObserverConfig[entryId]
-        console.log(config)
+    //     const container = messagesContainerRef.current
+    //     const hasScroll = container && container.scrollHeight > container.clientHeight
+    //     const entryId = entry.target.id
+    //     const config = ObserverConfig[entryId]
+    //     console.log(config)
 
-        if (!config || loadingRef.current || !hasScroll || !entry.isIntersecting || !config.getUrl()) return 
+    //     if (!config || loadingRef.current || !hasScroll || !entry.isIntersecting || !config.getUrl()) return
 
-        loadingRef.current = true
-        saveScrollAnchor()
-  
-        try {
-            const result = await loadMoreMessages(config.getUrl())
-            
-            if (result) {
+    //     loadingRef.current = true
+    //     saveScrollAnchor()
 
-                dispatch({ type: config.actionType, payload: result})
-                config.updateRef(result)
-            } else {
-                console.error(result)
-            }
-        } finally {
-            loadingRef.current = false
-        }
-        
+    //     try {
+    //         const result = await loadMoreMessages(config.getUrl())
 
-    }, [])
+    //         if (result) {
+
+    //             dispatch({ type: config.actionType, payload: result })
+    //             config.updateRef(result)
+    //         } else {
+    //             console.error(result)
+    //         }
+    //     } finally {
+    //         loadingRef.current = false
+    //     }
 
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(IntersectionCallback, {
-            root: messagesContainerRef.current,
-            rootMargin: '100px 0px 0px 0px',
-            threshold: 0,
-        });
+    // }, [])
 
-        if (messagesStartRef.current) {
-            observer.observe(messagesStartRef.current);
-        }
 
-        if (messagesEndRef.current) {
-            observer.observe(messagesEndRef.current)
-        }
+    // useEffect(() => {
+    //     const observer = new IntersectionObserver(IntersectionCallback, {
+    //         root: messagesContainerRef.current,
+    //         rootMargin: '100px 0px 0px 0px',
+    //         threshold: 0,
+    //     });
 
-        return () => {
-            if (messagesStartRef.current) {
-                // observer.unobserve(messagesStartRef.current);
-                observer.disconnect()
-            }
-        };
-    }, [IntersectionCallback]);
+    //     if (messagesStartRef.current) {
+    //         observer.observe(messagesStartRef.current);
+    //     }
+
+    //     if (messagesEndRef.current) {
+    //         observer.observe(messagesEndRef.current)
+    //     }
+
+    //     return () => {
+    //         if (messagesStartRef.current) {
+    //             // observer.unobserve(messagesStartRef.current);
+    //             observer.disconnect()
+    //         }
+    //     };
+    // }, [IntersectionCallback]);
 
     useEffect(
         () => {
@@ -359,7 +376,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
     const closeOverlay = (e) => {
         if (state.answerMessage && !e.target.className.includes('context-right-menu')) {
-            dispatch({ type: 'SET_CONTEXT_MENU_DATA', payload: null})
+            dispatch({ type: 'SET_CONTEXT_MENU_DATA', payload: null })
         }
 
         if (e.target.className.includes('window-overlay ')) {
@@ -373,23 +390,25 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         e.preventDefault()
 
         if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
-            
+
             let metadata = {
-                    type: 'message_metadata',
-                    message: messageText,
-                    taskId: taskData.id,
-                    filesCount: state.inputFiles.length,
-                    messageId: Date.now()
-                }
-            
+                type: 'message_metadata',
+                message: messageText,
+                taskId: taskData.id,
+                filesCount: state.inputFiles.length,
+                messageId: Date.now()
+            }
+
             if (state.answerMessage.size > 0) {
                 console.log(state.answerMessage)
-                metadata = {...metadata, answerToMessage: {
-                    'id': state.answerMessage.get('id'),
-                    'text': state.answerMessage.get('text')
-                }}
+                metadata = {
+                    ...metadata, answerToMessage: {
+                        'id': state.answerMessage.get('id'),
+                        'text': state.answerMessage.get('text')
+                    }
+                }
             }
-            
+
 
             webSocketRef.current.send(JSON.stringify(metadata));
 
@@ -408,7 +427,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                 }
 
                 webSocketRef.current.send(JSON.stringify(fileMetadata))
-                
+
                 const arrayBuffer = await file.file.arrayBuffer();
                 webSocketRef.current.send(arrayBuffer)
             }
@@ -420,7 +439,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
             textInputRef.current.value = '';
             dispatch({ type: 'CLEAR_INPUT_FILES' })
-            dispatch({ type: 'SET_ANSWER_MESSAGE', payload: new Map()})
+            dispatch({ type: 'SET_ANSWER_MESSAGE', payload: new Map() })
             setMessageText(null)
         }
     }
@@ -435,30 +454,31 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             return null
         }
 
-        const filesWithPreview = filesArray.map((file, index) => { 
+        const filesWithPreview = filesArray.map((file, index) => {
 
             return {
                 index: index,
                 file: file,
                 preview: URL.createObjectURL(file), // создаём временный URL
                 name: file.name
-        }});
+            }
+        });
 
-        dispatch({ type: 'SET_INPUT_FILES', payload: filesWithPreview})
+        dispatch({ type: 'SET_INPUT_FILES', payload: filesWithPreview })
     }
 
     const deleteFile = (fileIndex) => {
-        dispatch({ type: 'DELETE_INPUT_FILE', payload: fileIndex})
-    } 
+        dispatch({ type: 'DELETE_INPUT_FILE', payload: fileIndex })
+    }
 
     const setAnswerMessage = (message_data) => {
-        dispatch({ type: 'SET_ANSWER_MESSAGE', payload: message_data})
+        dispatch({ type: 'SET_ANSWER_MESSAGE', payload: message_data })
     }
 
     const handleContextMenu = (e) => {
         if (e.target.tagName == 'P' && !e.target.className.includes('task-chat__message-username')) {
             e.preventDefault()
-            dispatch({ type: 'SET_CONTEXT_MENU_DATA', payload: e})
+            dispatch({ type: 'SET_CONTEXT_MENU_DATA', payload: e })
         }
     }
 
@@ -467,7 +487,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             const response = await api.post(
                 `api/v1/tasks/${taskData.id}/change_active_task/`,
                 {},
-                {headers: {Authorization: getAccessToken()}}
+                { headers: { Authorization: getAccessToken() } }
             )
 
             console.log(response)
@@ -482,26 +502,26 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             <div className={`window-overlay ${close ? "close" : 'open'}`} onClick={closeOverlay}>
 
                 {activeImageWindow && (
-                    <FullscreenImage imageData={activeImageRef.current} onClose={() => setActiveImageWindow(false)}/>
+                    <FullscreenImage imageData={activeImageRef.current} onClose={() => setActiveImageWindow(false)} />
                 )}
 
                 {state.contextMenuData && (
-                    <RightClickMenuComponent event={state.contextMenuData} setMessage={setAnswerMessage}/>
+                    <RightClickMenuComponent event={state.contextMenuData} setMessage={setAnswerMessage} />
                 )}
 
                 {state.openTaskStatistic && (
-                    <TaskStatisticModelWindow 
-                    taskId={taskData.id}
-                    onClose={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: false})}
+                    <TaskStatisticModelWindow
+                        taskId={taskData.id}
+                        onClose={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: false })}
                     />
                 )}
 
                 {state.openTaskSettings && (
-                    <TaskSettingsComponent 
-                    onClose={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: false})}
-                    taskId={taskData.id}
-                    projectId={projectId}
-                    groupId={groupId}
+                    <TaskSettingsComponent
+                        onClose={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: false })}
+                        taskId={taskData.id}
+                        projectId={projectId}
+                        groupId={groupId}
                     />
                 )}
 
@@ -510,14 +530,27 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                     <div className='task-chat__title'>
                         <h2>{taskData?.name}</h2>
                         <div className="task-chat__admin-icons">
-                            <TaskTimerComponent taskId={taskData.id} taskName={taskData.name}/>
+                            <TaskTimerComponent taskId={taskData.id} taskName={taskData.name} />
                             <DynamicPngIcon iconName={isActiveTask ? 'kidStar' : 'kidStarHollow'} onClick={(e) => changeIsActiveTask(e)} />
-                            <DynamicPngIcon iconName="statisticIcon"onClick={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: true})}/>
-                            <DynamicPngIcon iconName="settingsIcon" onClick={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: true})}/>
+                            <DynamicPngIcon iconName="statisticIcon" onClick={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: true })} />
+                            <DynamicPngIcon iconName="settingsIcon" onClick={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: true })} />
                         </div>
                     </div>
 
-                    <div className="task-chat__field" ref={messagesContainerRef} onContextMenu={handleContextMenu}>
+
+                    <Virtuoso
+                        style={{ height: "100vh" }}
+                        totalCount={100}
+                        data={state.messages}
+                        startReached={loadMoreMessages}
+                        firstItemIndex={firstItemIndex}
+                        computeItemKey={(_, item) => item.id}
+                        initialTopMostItemIndex={state.messages.length - 1}
+                        itemContent={(_, item) => (
+                            <MessageComponent messageData={item} activeImageRef={activeImageRef} setActiveImage={setActiveImageWindow}/>
+                        )}>
+                    </Virtuoso>
+                    {/* <div className="task-chat__field" ref={messagesContainerRef} onContextMenu={handleContextMenu}>
                         <div id="startObserve" ref={messagesStartRef}></div>
                         {state.messages.length > 0 && state.messages.map(item => (
                             <div className={`task-chat__message-body ${item?.user?.id === user.id ? 'user' : ''}`} key={item.id}>
@@ -532,6 +565,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                                 </div>
 
                                 {item?.message && (
+                                    
                                     <div className={`task-chat__message-content ${item?.user?.id == user.id ? 'user' : ''}`}>
                                         {Object.keys(item.answer_to).length > 0 && (
                                             <p className="task-chat__answer" key={item.answer_to.id}>{truncateString(item.answer_to.text, 50)}</p>
@@ -549,38 +583,38 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                             <div className="task-chet_message-none">Not found messages</div>
                         )}
                         <div id="endObserve" ref={messagesEndRef}/>
-                    </div>
-                    
-                    { state.inputFiles && (
-                         <div className={`task-chat__files-preview-body ${state.inputFiles.length > 0 ? 'open' : ''}`}>
+                    </div> */}
+
+                    {state.inputFiles && (
+                        <div className={`task-chat__files-preview-body ${state.inputFiles.length > 0 ? 'open' : ''}`}>
                             {state.inputFiles.map((item, index) => (
                                 <div className="files-preview-container" key={index}>
                                     <span onClick={() => deleteFile(item.index)}>X</span>
-                                    <img src={item.preview} alt="" className="preview-file-image" style={{ animationDelay: `${0.1*index}s`}}/>
+                                    <img src={item.preview} alt="" className="preview-file-image" style={{ animationDelay: `${0.1 * index}s` }} />
                                 </div>
                             ))}
                         </div>
                     )}
-                   
-                    
+
+
                     {state.answerMessage && (
                         <div className="task-chat__answer-body">
-                            <div className={`task-chat__answer-content ${state.answerMessage.get('text') ? 'open': ''}`}>
+                            <div className={`task-chat__answer-content ${state.answerMessage.get('text') ? 'open' : ''}`}>
                                 <div className="task-chat__answer-title">{state.answerMessage.get('text')}</div>
                             </div>
                         </div>
                     )}
 
                     <form className="task-chat__form" onSubmit={change} >
-                        <input ref={inputFilesRef} type="file" accept="image/*" onChange={changeSelectFiles} multiple/>
-                        <input ref={textInputRef} className="holy_input" style={{maxWidth: '100%'}} type="text" onChange={(e) => setMessageText(e.target.value)} />
+                        <input ref={inputFilesRef} type="file" accept="image/*" onChange={changeSelectFiles} multiple />
+                        <input ref={textInputRef} className="holy_input" style={{ maxWidth: '100%' }} type="text" onChange={(e) => setMessageText(e.target.value)} />
                         {/* <button type="submit">send</button> */}
-                        <DynamicPngIcon iconName='clipsFile' height={24} width={24} className="clips-file-icon" onClick={() => inputFilesRef.current.click()}/>
-                        <DynamicSvgIcon 
-                        size={28} 
-                        className={`sendIcon`} 
-                        color="#ffffffff" 
-                        onClick={change}
+                        <DynamicPngIcon iconName='clipsFile' height={24} width={24} className="clips-file-icon" onClick={() => inputFilesRef.current.click()} />
+                        <DynamicSvgIcon
+                            size={28}
+                            className={`sendIcon`}
+                            color="#ffffffff"
+                            onClick={change}
                         >
                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                         </DynamicSvgIcon>
