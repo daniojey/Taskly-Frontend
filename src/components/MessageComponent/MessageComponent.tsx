@@ -51,14 +51,14 @@ interface MessageComponentProps {
 
 
 function MessageComponent({ messageData, activeImageRef, setActiveImage } : MessageComponentProps) {
-    const [messageItem, setMessageItem] = useState<MessageItem>(messageData)
+    const [messageItem, _] = useState<MessageItem>(messageData)
     const user = useUser((state) => state.user)
-
+    
     const isOwn = messageItem.user.id === user.id
 
     return (
         <div className="task-chat__message-wrapper">
-            <div className={`task-chat__message-body ${messageItem?.user?.id === user.id ? 'user' : ''}`} key={messageItem.id}>
+            <div className={`task-chat__message-body ${isOwn ? 'user' : ''}`} key={messageItem.id}>
 
                 <div className="task-chat__images-body">
                     {messageItem?.images_urls && messageItem.images_urls.map(item => (
@@ -70,8 +70,7 @@ function MessageComponent({ messageData, activeImageRef, setActiveImage } : Mess
                 </div>
 
                 {messageItem?.message && (
-
-                    <div className={`task-chat__message-content ${messageItem?.user?.id == user.id ? 'user' : ''}`}>
+                    <div className={`task-chat__message-content ${isOwn ? 'user' : ''}`}>
                         {Object.keys(messageItem.answer_to).length > 0 && (
                             <p className="task-chat__answer" key={messageItem.answer_to.id}>{truncateString(messageItem.answer_to.text, 50)}</p>
                         )}

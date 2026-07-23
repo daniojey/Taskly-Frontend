@@ -15,6 +15,7 @@ import { useUser } from "../../common/stores/AuthStore"
 import { truncateString } from "../../common/truncate"
 import { Virtuoso } from "react-virtuoso"
 import MessageComponent from "../MessageComponent/MessageComponent"
+import { useNotify } from "../../common/stores/NotifyStore"
 
 const START_INDEX = 10000;
 
@@ -137,6 +138,7 @@ function messageReduce(state, action) {
 
 function TaskChat({ data, onClose, groupId, projectId }) {
     const user = useUser((state) => state.user)
+    const addNotify = useNotify((state) => state.addNotify)
     const [close, setClose] = useState(false)
     const [taskData, _] = useState(data);
     const [messageText, setMessageText] = useState(null)
@@ -148,14 +150,10 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     const webSocketRef = useRef(null)
 
     const messagesEndRef = useRef(null)
-    const messagesStartRef = useRef(null)
-    const messagesContainerRef = useRef(null)
 
     const loadingRef = useRef(false)
     const textInputRef = useRef(null)
     const nextPageRef = useRef(null)
-    const previousPageRef = useRef(null)
-    const scrollPositionRef = useRef(0)
     const inputFilesRef = useRef(null)
     const activeImageRef = useRef(null)
 
@@ -491,8 +489,10 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             )
 
             console.log(response)
-            setIsActiveTask(response.data.results)
+            setIsActiveTask(response.data.status)
+            addNotify(response.data.results, "success")
         } catch (error) {
+            addNotify('Error in process change task status', "error")
             throw error
         }
     }
