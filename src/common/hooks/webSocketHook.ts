@@ -108,7 +108,7 @@ export const useWebSocket = ({
 
     const send = useCallback((data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
-            wsRef.current.send(data);
+            wsRef.current.send(data as BufferSource);
         } else {
             console.warn('WebSocket не подключен');
         }

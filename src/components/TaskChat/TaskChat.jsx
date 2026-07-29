@@ -24,24 +24,41 @@ function calculateMessages({ payload, messages, count, type }) {
         const newMessages = messages.slice(0, -15)
         return [...payload, ...newMessages]
     } else if (type === "new") {
-
+        const newMessages = messages.slice(15)
+        return [...newMessages, ...payload]
     }
 }
 
+function configurePages({ payload }) {
+    const start = payload.results[0]
+    const end = payload.results.at(-1)
 
+    const config = {
+        mess: payload.results,
+        startId: start.id,
+        endId: end.id,
+        length: payload.results.length,
+        nextPage: payload.next,
+        previousPage: payload.previous
+    }
+
+    console.log(config)
+    return config
+}
 
 const initialState = {
     messages: [],
+    pageMessages: [],
     previousPage: null,
     nextPage: null,
     loading: true,
-    isHistoryLoading: false,
-    error: null,
     inputFiles: [],
     contextMenuData: null,
     answerMessage: new Map(),
     openTaskSettings: false,
     openTaskStatistic: false,
+    resetFirstItemFlag: false,
+    firstItemIndex: 10000
 };
 
 
@@ -50,6 +67,7 @@ function messageReduce(state, action) {
         case "SET_MESSAGE_RESPONSE":
             return {
                 ...state,
+                pageMessages: [configurePages({ payload: action.payload})],
                 messages: action.payload.results.reverse(),
                 nextPage: action.payload.next,
             }
@@ -68,14 +86,14 @@ function messageReduce(state, action) {
                     "url": `${import.meta.env.VITE_REACT_APP_API_BASE_URL_IMAGES}${item.url}`
                 }
             })
-            console.log(fix_images)
             let message = action.payload
             message.images_urls = fix_images
             return { ...state, messages: [...state.messages, message] }
 
         case "LOAD_OLD_MESSAGES":
             const countMessages = Array.from(action.payload.results).length + Array.from(state.messages).length
-            const newMessages = countMessages > 30
+            const evixes = countMessages > 45
+            const newMessages = evixes
                 ? calculateMessages({
                     payload: action.payload.results.reverse(),
                     messages: state.messages,
@@ -83,28 +101,32 @@ function messageReduce(state, action) {
                     type: "old"
                 })
                 : [...action.payload.results.reverse(), ...state.messages]
+            const pagesData = configurePages({ payload: action.payload })
 
             return {
                 ...state,
-                messages: [...action.payload.results.reverse(), ...state.messages],
+                messages: newMessages,
                 nextPage: action.payload.next,
                 loading: false,
-                isHistoryLoading: true
+                pageMessages: [...state.pageMessages, pagesData],
+                firstItemIndex: state.firstItemIndex - action.payload.results.length
             }
 
         case "LOAD_NEW_MESSAGES":
-            return {
-                ...state,
-                messages: [...state.messages, ...action.payload.results.reverse()],
-                nextPage: action.payload.next,
-                loading: false,
-                isHistoryLoading: true
-            }
+            const countMess = Array.from(action.payload.results).length + Array.from(state.messages).length
+            const oldMessages = countMess > 45
+                ? calculateMessages({
+                    payload: action.payload.results.reverse(),
+                    messages: state.messages,
+                    count: countMess,
+                    type: "new"
+                })
+                : [...state.messages ,...action.payload.results.reverse()]
 
-        case "RESET_HISTORY_LOADING_FLAG":
             return {
                 ...state,
-                isHistoryLoading: false
+                messages: oldMessages,
+                loading: false,
             }
 
         case 'SET_INPUT_FILES':
@@ -131,13 +153,17 @@ function messageReduce(state, action) {
         case "REMOVE_OLD_MESSAGES":
             return { ...state, messages: [] }
 
+        case "SET_NULL_PAGEMESSAGES":
+            return {...state, pageMessages: []}
+
         default:
             return { ...state }
     }
 }
 
 function TaskChat({ data, onClose, groupId, projectId }) {
-    const user = useUser((state) => state.user)
+    
+    // const user = useUser((state) => state.user)
     const addNotify = useNotify((state) => state.addNotify)
     const [close, setClose] = useState(false)
     const [taskData, _] = useState(data);
@@ -145,26 +171,35 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     const [state, dispatch] = useReducer(messageReduce, initialState)
     const [activeImageWindow, setActiveImageWindow] = useState(false)
     const [isActiveTask, setIsActiveTask] = useState(false)
-    const [firstItemIndex, setFirstItemIndex] = useState(START_INDEX);
-
+    
     const webSocketRef = useRef(null)
-
+    
     const messagesEndRef = useRef(null)
-
+    
     const loadingRef = useRef(false)
     const textInputRef = useRef(null)
     const nextPageRef = useRef(null)
     const inputFilesRef = useRef(null)
     const activeImageRef = useRef(null)
-
+    
     const token = localStorage.getItem('accessToken')
-
+    console.log(state.pageMessages)
+    
     async function loadMoreMessages() {
-        console.log("Визов функции", state.nextPage)
-        if (state.nextPage === null) return null
-        if (loadingRef.current) null
-        loadingRef.current = true
+        const startMessage = state.messages[0]
+        console.log(startMessage)
 
+        const filterMessages = state.pageMessages.find(item => {
+            if (item.startId == startMessage.id) return item
+        })
+        console.log(filterMessages)
+
+        // if (state.nextPage === null) return null
+        if (loadingRef.current) return null
+        loadingRef.current = true
+        
+        // const loadOldItem = state.pagesData.find(item => item.endId <= )
+        // const useUrl = state.nextPage || filterMessages?.NextPage
 
         try {
             const response = await api.get(
@@ -176,41 +211,51 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                 }
             )
 
-            console.log(response.data)
             dispatch({ type: "LOAD_OLD_MESSAGES", payload: response.data })
-            setFirstItemIndex((prev) => prev - response.data.results.length)
-            loadingRef.current = false
             return response.data.results
         } catch (error) {
             console.error('Error loading more messages:', error)
             return null
+        } finally {
+            loadingRef.current = false
         }
-
     }
 
-    // const saveScrollAnchor = () => {
-    //     if (messagesContainerRef.current) {
-    //         scrollPositionRef.current = messagesContainerRef.current.scrollHeight - messagesContainerRef.current.scrollTop
-    //     }
-    // }
+    async function loadActualMessages() {
+        if (loadingRef.current) return null
+        loadingRef.current = true
+        const endMessage = state.messages.at(-1)
+        console.log(endMessage)
 
-    // const restoreScrollAnchor = () => {
-    //     const container = messagesContainerRef.current
-    //     if (container && scrollPositionRef.current > 0) {
-    //         // Восстанавливаем скролл: новая высота минус сохраненное расстояние от низа
-    //         container.scrollTop = container.scrollHeight - scrollPositionRef.current;
+        const filterMessages = state.pageMessages.find(item => {
+            if (item.endId <= endMessage.id) return item
+        })
+        console.log(filterMessages)
 
-    //         // Сбрасываем ref
-    //         scrollPositionRef.current = 0;
-    //     }
-    // }
+        if (filterMessages === undefined) {
+            return null
+        }
 
-    // useLayoutEffect(() => {
-    //     if (state.isHistoryLoading) {
-    //         restoreScrollAnchor();
-    //         dispatch({ type: 'RESET_HISTORY_LOADING_FLAG' });
-    //     }
-    // }, [state.messages, state.isHistoryLoading]);
+        try {
+            const response = await api.get(
+                filterMessages.previousPage.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
+                {
+                    headers: {
+                        Authorization: getAccessToken()
+                    }
+                }
+            )
+
+            dispatch({ type: "LOAD_NEW_MESSAGES", payload: response.data })
+            return response.data.results
+        } catch (error) {
+            console.error('Error loading more messages:', error)
+            return null
+        } finally {
+            loadingRef.current = false
+        }
+    }
+
 
     useEffect(() => {
         dispatch({ type: 'START_LOADING' })
@@ -540,12 +585,13 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
                     <Virtuoso
                         style={{ height: "100vh" }}
-                        totalCount={100}
                         data={state.messages}
                         startReached={loadMoreMessages}
-                        firstItemIndex={firstItemIndex}
+                        endReached={loadActualMessages}
+                        firstItemIndex={state.firstItemIndex}
                         computeItemKey={(_, item) => item.id}
                         initialTopMostItemIndex={state.messages.length - 1}
+                        increaseViewportBy={{ top: 400, bottom: 400 }}
                         itemContent={(_, item) => (
                             <MessageComponent messageData={item} activeImageRef={activeImageRef} setActiveImage={setActiveImageWindow}/>
                         )}>
