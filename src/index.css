@@ -172,7 +172,7 @@ button {
 }
 
 .holy_checkbox.active {
-  background-color: transparent;
+  background-color: #1f1d1d;
 }
 
 /* label — контейнер для ::before и ::after */

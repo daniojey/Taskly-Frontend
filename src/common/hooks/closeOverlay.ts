@@ -21,6 +21,7 @@ export const useModalClose = ({ onClose, delay = 500, className}: UseModalCloseO
 
   const handleCloseWindow = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement
+    e.stopPropagation()
 
     if (target.className.includes(className)) {
         closeWindow()
