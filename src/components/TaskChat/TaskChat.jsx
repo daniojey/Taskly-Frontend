@@ -1,6 +1,5 @@
 import { createPortal } from "react-dom"
-import { useState, useEffect, useCallback, useReducer } from "react"
-import { useRef, useLayoutEffect } from "react"
+import { useState, useEffect, useRef, useReducer } from "react"
 import './TaskChat.css'
 import DynamicSvgIcon from "../UI/icons/DynamicSvgIcon"
 import { api } from "../../../api"
@@ -11,65 +10,36 @@ import RightClickMenuComponent from "../RightClickMenuComponent/RightClickMenuCo
 import TaskSettingsComponent from "../TaskSettingsComponent/TaskSettingsComponent"
 import TaskTimerComponent from "../TaskTimerComponent/TaskTimerComponent"
 import TaskStatisticModelWindow from "../TaskStatisticModelWindow/TaskStatisticModelWindow"
-import { useUser } from "../../common/stores/AuthStore"
-import { truncateString } from "../../common/truncate"
 import { Virtuoso } from "react-virtuoso"
 import MessageComponent from "../MessageComponent/MessageComponent"
 import { useNotify } from "../../common/stores/NotifyStore"
 
-const START_INDEX = 10000;
-
-function calculateMessages({ payload, messages, count, type }) {
-    if (type === "old") {
-        const newMessages = messages.slice(0, -15)
-        return [...payload, ...newMessages]
-    } else if (type === "new") {
-        const newMessages = messages.slice(15)
-        return [...newMessages, ...payload]
-    }
-}
-
-function configurePages({ payload }) {
-    const start = payload.results[0]
-    const end = payload.results.at(-1)
-
-    const config = {
-        mess: payload.results,
-        startId: start.id,
-        endId: end.id,
-        length: payload.results.length,
-        nextPage: payload.next,
-        previousPage: payload.previous
-    }
-
-    console.log(config)
-    return config
-}
+const MAX_MESSAGES = 45
 
 const initialState = {
     messages: [],
-    pageMessages: [],
-    previousPage: null,
-    nextPage: null,
+    boundaryCursors: [], 
     loading: true,
     inputFiles: [],
     contextMenuData: null,
     answerMessage: new Map(),
     openTaskSettings: false,
     openTaskStatistic: false,
-    resetFirstItemFlag: false,
-    firstItemIndex: 10000
-};
-
+    firstItemIndex: 100000,
+}
 
 function messageReduce(state, action) {
     switch (action.type) {
         case "SET_MESSAGE_RESPONSE":
             return {
                 ...state,
-                pageMessages: [configurePages({ payload: action.payload})],
                 messages: action.payload.results.reverse(),
-                nextPage: action.payload.next,
+                boundaryCursors: [{
+                    olderCursor: action.payload.next,
+                    newerCursor: action.payload.previous,
+                    count: action.payload.results.length,
+                }],
+                loading: false,
             }
 
         case "START_LOADING":
@@ -78,62 +48,62 @@ function messageReduce(state, action) {
         case "END_LOADING":
             return { ...state, loading: false }
 
-        case "UPDATE_MESSAGES":
-
-            let fix_images = action.payload?.images_urls.map(item => {
-                return {
-                    ...item,
-                    "url": `${import.meta.env.VITE_REACT_APP_API_BASE_URL_IMAGES}${item.url}`
-                }
-            })
-            let message = action.payload
-            message.images_urls = fix_images
+        case "UPDATE_MESSAGES": {
+            const fixImages = action.payload?.images_urls.map(item => ({
+                ...item,
+                url: `${import.meta.env.VITE_REACT_APP_API_BASE_URL_IMAGES}${item.url}`
+            }))
+            const message = { ...action.payload, images_urls: fixImages }
             return { ...state, messages: [...state.messages, message] }
+        }
 
-        case "LOAD_OLD_MESSAGES":
-            const countMessages = Array.from(action.payload.results).length + Array.from(state.messages).length
-            const evixes = countMessages > 45
-            const newMessages = evixes
-                ? calculateMessages({
-                    payload: action.payload.results.reverse(),
-                    messages: state.messages,
-                    count: countMessages,
-                    type: "old"
-                })
-                : [...action.payload.results.reverse(), ...state.messages]
-            const pagesData = configurePages({ payload: action.payload })
+        case "LOAD_OLD_MESSAGES": {
+            let messages = [...action.payload.results.reverse(), ...state.messages]
+            let boundaryCursors = [
+                {
+                    olderCursor: action.payload.next,
+                    newerCursor: action.payload.previous,
+                    count: action.payload.results.length,
+                },
+                ...state.boundaryCursors,
+            ]
+            let firstItemIndex = state.firstItemIndex - action.payload.results.length
 
-            return {
-                ...state,
-                messages: newMessages,
-                nextPage: action.payload.next,
-                loading: false,
-                pageMessages: [...state.pageMessages, pagesData],
-                firstItemIndex: state.firstItemIndex - action.payload.results.length
+
+            while (messages.length > MAX_MESSAGES && boundaryCursors.length > 1) {
+                const evicted = boundaryCursors.pop()
+                messages = messages.slice(0, messages.length - evicted.count)
             }
 
-        case "LOAD_NEW_MESSAGES":
-            const countMess = Array.from(action.payload.results).length + Array.from(state.messages).length
-            const oldMessages = countMess > 45
-                ? calculateMessages({
-                    payload: action.payload.results.reverse(),
-                    messages: state.messages,
-                    count: countMess,
-                    type: "new"
-                })
-                : [...state.messages ,...action.payload.results.reverse()]
+            return { ...state, messages, boundaryCursors, firstItemIndex, loading: false }
+        }
 
-            return {
-                ...state,
-                messages: oldMessages,
-                loading: false,
+        case "LOAD_NEW_MESSAGES": {
+            let messages = [...state.messages, ...action.payload.results.reverse()]
+            let boundaryCursors = [
+                ...state.boundaryCursors,
+                {
+                    olderCursor: action.payload.next,
+                    newerCursor: action.payload.previous,
+                    count: action.payload.results.length,
+                },
+            ]
+            let firstItemIndex = state.firstItemIndex
+
+            while (messages.length > MAX_MESSAGES && boundaryCursors.length > 1) {
+                const evicted = boundaryCursors.shift()
+                messages = messages.slice(evicted.count)
+                firstItemIndex += evicted.count
             }
+
+            return { ...state, messages, boundaryCursors, firstItemIndex, loading: false }
+        }
 
         case 'SET_INPUT_FILES':
             return { ...state, inputFiles: action.payload }
 
         case 'DELETE_INPUT_FILE':
-            return { ...state, inputFiles: state.inputFiles.filter(value => value.index !== action.payload) }
+            return { ...state, inputFiles: state.inputFiles.filter(v => v.index !== action.payload) }
 
         case 'CLEAR_INPUT_FILES':
             return { ...state, inputFiles: [] }
@@ -150,112 +120,64 @@ function messageReduce(state, action) {
         case 'SET_TASK_STATISTIC_WINDOW':
             return { ...state, openTaskStatistic: action.payload }
 
-        case "REMOVE_OLD_MESSAGES":
-            return { ...state, messages: [] }
-
-        case "SET_NULL_PAGEMESSAGES":
-            return {...state, pageMessages: []}
-
         default:
-            return { ...state }
+            return state
     }
 }
 
 function TaskChat({ data, onClose, groupId, projectId }) {
-    
-    // const user = useUser((state) => state.user)
     const addNotify = useNotify((state) => state.addNotify)
     const [close, setClose] = useState(false)
-    const [taskData, _] = useState(data);
+    const [taskData] = useState(data)
     const [messageText, setMessageText] = useState(null)
     const [state, dispatch] = useReducer(messageReduce, initialState)
     const [activeImageWindow, setActiveImageWindow] = useState(false)
     const [isActiveTask, setIsActiveTask] = useState(false)
-    
+
     const webSocketRef = useRef(null)
-    
     const messagesEndRef = useRef(null)
-    
     const loadingRef = useRef(false)
     const textInputRef = useRef(null)
-    const nextPageRef = useRef(null)
     const inputFilesRef = useRef(null)
     const activeImageRef = useRef(null)
-    
+
     const token = localStorage.getItem('accessToken')
-    console.log(state.pageMessages)
-    
+
     async function loadMoreMessages() {
-        const startMessage = state.messages[0]
-        console.log(startMessage)
-
-        const filterMessages = state.pageMessages.find(item => {
-            if (item.startId == startMessage.id) return item
-        })
-        console.log(filterMessages)
-
-        // if (state.nextPage === null) return null
-        if (loadingRef.current) return null
+        const cursor = state.boundaryCursors[0]?.olderCursor
+        if (loadingRef.current || !cursor) return null
         loadingRef.current = true
-        
-        // const loadOldItem = state.pagesData.find(item => item.endId <= )
-        // const useUrl = state.nextPage || filterMessages?.NextPage
 
         try {
             const response = await api.get(
-                state.nextPage.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
-                {
-                    headers: {
-                        Authorization: getAccessToken()
-                    }
-                }
+                cursor.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
+                { headers: { Authorization: getAccessToken() } }
             )
-
             dispatch({ type: "LOAD_OLD_MESSAGES", payload: response.data })
-            return response.data.results
         } catch (error) {
-            console.error('Error loading more messages:', error)
-            return null
+            console.error('Error loading old messages:', error)
         } finally {
             loadingRef.current = false
         }
     }
 
     async function loadActualMessages() {
-        if (loadingRef.current) return null
+        const cursor = state.boundaryCursors.at(-1)?.newerCursor
+        if (loadingRef.current || !cursor) return null
         loadingRef.current = true
-        const endMessage = state.messages.at(-1)
-        console.log(endMessage)
-
-        const filterMessages = state.pageMessages.find(item => {
-            if (item.endId <= endMessage.id) return item
-        })
-        console.log(filterMessages)
-
-        if (filterMessages === undefined) {
-            return null
-        }
 
         try {
             const response = await api.get(
-                filterMessages.previousPage.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
-                {
-                    headers: {
-                        Authorization: getAccessToken()
-                    }
-                }
+                cursor.replace(import.meta.env.VITE_REACT_APP_API_BASE_URL, ''),
+                { headers: { Authorization: getAccessToken() } }
             )
-
             dispatch({ type: "LOAD_NEW_MESSAGES", payload: response.data })
-            return response.data.results
         } catch (error) {
-            console.error('Error loading more messages:', error)
-            return null
+            console.error('Error loading new messages:', error)
         } finally {
             loadingRef.current = false
         }
     }
-
 
     useEffect(() => {
         dispatch({ type: 'START_LOADING' })
@@ -264,9 +186,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         const getMessages = async () => {
             try {
                 const response = await api.get(`api/v1/chat-messages/${taskData.id}/`)
-                console.log('RESPONSE ', response)
                 dispatch({ type: "SET_MESSAGE_RESPONSE", payload: response.data })
-                nextPageRef.current = response.data.next
             } catch (error) {
                 console.error(error)
             }
@@ -278,8 +198,6 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                     `api/v1/tasks/${taskData.id}/get_is_active_task/`,
                     { headers: { Authorization: getAccessToken() } }
                 )
-
-                console.log(response)
                 setIsActiveTask(response.data?.results)
             } catch (error) {
                 throw error
@@ -298,124 +216,36 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         }, 400)
     }, [])
 
-    // const ObserverConfig = {
-    //     startObserve: {
-    //         getUrl: () => nextPageRef.current,
-    //         actionType: "LOAD_OLD_MESSAGES",
-    //         updateRef: (result) => { nextPageRef.current = result?.next }
-    //     },
+    useEffect(() => {
+        const webSocketConnection = new WebSocket(
+            'ws://' + 'localhost:8000' + `/ws/chat/${taskData.id}` + `/?token=${token}`
+        )
 
-    //     endObserve: {
-    //         getUrl: () => previousPageRef.current,
-    //         actionType: "LOAD_NEW_MESSAGES",
-    //         updateRef: (result) => { previousPageRef.current = result?.previous }
-    //     }
-    // }
+        const onOpen = () => console.log("Opened")
+        const onError = () => console.log("Error")
+        const onMessage = (e) => {
+            const data = JSON.parse(e.data)
+            dispatch({ type: 'UPDATE_MESSAGES', payload: data?.message })
+        }
 
-    // const IntersectionCallback = useCallback(async (entries) => {
-    //     const [entry] = entries
+        webSocketConnection.addEventListener("open", onOpen)
+        webSocketConnection.addEventListener('message', onMessage)
+        webSocketConnection.addEventListener("error", onError)
 
-    //     const container = messagesContainerRef.current
-    //     const hasScroll = container && container.scrollHeight > container.clientHeight
-    //     const entryId = entry.target.id
-    //     const config = ObserverConfig[entryId]
-    //     console.log(config)
+        webSocketRef.current = webSocketConnection
 
-    //     if (!config || loadingRef.current || !hasScroll || !entry.isIntersecting || !config.getUrl()) return
-
-    //     loadingRef.current = true
-    //     saveScrollAnchor()
-
-    //     try {
-    //         const result = await loadMoreMessages(config.getUrl())
-
-    //         if (result) {
-
-    //             dispatch({ type: config.actionType, payload: result })
-    //             config.updateRef(result)
-    //         } else {
-    //             console.error(result)
-    //         }
-    //     } finally {
-    //         loadingRef.current = false
-    //     }
-
-
-    // }, [])
-
-
-    // useEffect(() => {
-    //     const observer = new IntersectionObserver(IntersectionCallback, {
-    //         root: messagesContainerRef.current,
-    //         rootMargin: '100px 0px 0px 0px',
-    //         threshold: 0,
-    //     });
-
-    //     if (messagesStartRef.current) {
-    //         observer.observe(messagesStartRef.current);
-    //     }
-
-    //     if (messagesEndRef.current) {
-    //         observer.observe(messagesEndRef.current)
-    //     }
-
-    //     return () => {
-    //         if (messagesStartRef.current) {
-    //             // observer.unobserve(messagesStartRef.current);
-    //             observer.disconnect()
-    //         }
-    //     };
-    // }, [IntersectionCallback]);
-
-    useEffect(
-        () => {
-            const webSocketConnection = new WebSocket(
-                'ws://'
-                + 'localhost:8000'
-                + `/ws/chat/${taskData.id}`
-                + `/?token=${token}`
-            )
-
-            const onOpen = () => console.log("Opened");
-            const onError = () => console.log("Error");
-            const onMessage = (e) => {
-                console.log('EDATA', JSON.parse(e.data))
-                const data = JSON.parse(e.data)
-                // setMessages(messages => [...messages, data])
-                dispatch({ type: 'UPDATE_MESSAGES', payload: data?.message })
-            }
-
-            webSocketConnection.addEventListener("open", onOpen);
-            webSocketConnection.addEventListener('message', onMessage)
-            webSocketConnection.addEventListener("error", onError);
-
-            webSocketRef.current = webSocketConnection
-
-            return () => {
-                webSocketConnection.removeEventListener("open", onOpen);
-                webSocketConnection.removeEventListener("error", onError);
-
-                webSocketConnection.close();
-
-                // In case it hasn't been established yet before trying to close
-                webSocketConnection.addEventListener(
-                    "open",
-                    event => event.currentTarget.close()
-                );
-            };
-        },
-        [token, taskData.id]
-    );
-
+        return () => {
+            webSocketConnection.removeEventListener("open", onOpen)
+            webSocketConnection.removeEventListener("error", onError)
+            webSocketConnection.close()
+            webSocketConnection.addEventListener("open", event => event.currentTarget.close())
+        }
+    }, [token, taskData.id])
 
     const CloseWindow = () => {
         setClose(true)
-
-        setTimeout(() => {
-            onClose()
-        }, 400)
+        setTimeout(() => onClose(), 400)
     }
-
 
     const closeOverlay = (e) => {
         if (state.answerMessage && !e.target.className.includes('context-right-menu')) {
@@ -433,7 +263,6 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         e.preventDefault()
 
         if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
-
             let metadata = {
                 type: 'message_metadata',
                 message: messageText,
@@ -443,7 +272,6 @@ function TaskChat({ data, onClose, groupId, projectId }) {
             }
 
             if (state.answerMessage.size > 0) {
-                console.log(state.answerMessage)
                 metadata = {
                     ...metadata, answerToMessage: {
                         'id': state.answerMessage.get('id'),
@@ -452,13 +280,10 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                 }
             }
 
-
-            webSocketRef.current.send(JSON.stringify(metadata));
-
+            webSocketRef.current.send(JSON.stringify(metadata))
 
             for (let i = 0; i < state.inputFiles.length; i++) {
-                const file = state.inputFiles[i];
-
+                const file = state.inputFiles[i]
 
                 const fileMetadata = {
                     type: 'file_metadata',
@@ -471,41 +296,34 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
                 webSocketRef.current.send(JSON.stringify(fileMetadata))
 
-                const arrayBuffer = await file.file.arrayBuffer();
+                const arrayBuffer = await file.file.arrayBuffer()
                 webSocketRef.current.send(arrayBuffer)
             }
 
             webSocketRef.current.send(JSON.stringify({
                 type: 'message_complete',
                 messageId: metadata.messageId
-            }));
+            }))
 
-            textInputRef.current.value = '';
+            textInputRef.current.value = ''
             dispatch({ type: 'CLEAR_INPUT_FILES' })
             dispatch({ type: 'SET_ANSWER_MESSAGE', payload: new Map() })
             setMessageText(null)
         }
     }
 
-
     const changeSelectFiles = (e) => {
-        const filesArray = Array.from(e.target.files);
-        const maxSize = 5 * 1024 * 1024;
-        const maxFiles = 10;
+        const filesArray = Array.from(e.target.files)
+        const maxFiles = 10
 
-        if (filesArray.length > maxFiles) {
-            return null
-        }
+        if (filesArray.length > maxFiles) return null
 
-        const filesWithPreview = filesArray.map((file, index) => {
-
-            return {
-                index: index,
-                file: file,
-                preview: URL.createObjectURL(file), // создаём временный URL
-                name: file.name
-            }
-        });
+        const filesWithPreview = filesArray.map((file, index) => ({
+            index,
+            file,
+            preview: URL.createObjectURL(file),
+            name: file.name
+        }))
 
         dispatch({ type: 'SET_INPUT_FILES', payload: filesWithPreview })
     }
@@ -518,22 +336,13 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         dispatch({ type: 'SET_ANSWER_MESSAGE', payload: message_data })
     }
 
-    const handleContextMenu = (e) => {
-        if (e.target.tagName == 'P' && !e.target.className.includes('task-chat__message-username')) {
-            e.preventDefault()
-            dispatch({ type: 'SET_CONTEXT_MENU_DATA', payload: e })
-        }
-    }
-
-    const changeIsActiveTask = async (e) => {
+    const changeIsActiveTask = async () => {
         try {
             const response = await api.post(
                 `api/v1/tasks/${taskData.id}/change_active_task/`,
                 {},
                 { headers: { Authorization: getAccessToken() } }
             )
-
-            console.log(response)
             setIsActiveTask(response.data.status)
             addNotify(response.data.results, "success")
         } catch (error) {
@@ -542,136 +351,89 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         }
     }
 
-    return (
-        createPortal(
-            <div className={`window-overlay ${close ? "close" : 'open'}`} onClick={closeOverlay}>
 
-                {activeImageWindow && (
-                    <FullscreenImage imageData={activeImageRef.current} onClose={() => setActiveImageWindow(false)} />
-                )}
+    return createPortal(
+        <div className={`window-overlay ${close ? "close" : 'open'}`} onClick={closeOverlay}>
+            {activeImageWindow && (
+                <FullscreenImage imageData={activeImageRef.current} onClose={() => setActiveImageWindow(false)} />
+            )}
 
-                {state.contextMenuData && (
-                    <RightClickMenuComponent event={state.contextMenuData} setMessage={setAnswerMessage} />
-                )}
+            {state.contextMenuData && (
+                <RightClickMenuComponent event={state.contextMenuData} setMessage={setAnswerMessage} />
+            )}
 
-                {state.openTaskStatistic && (
-                    <TaskStatisticModelWindow
-                        taskId={taskData.id}
-                        onClose={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: false })}
-                    />
-                )}
+            {state.openTaskStatistic && (
+                <TaskStatisticModelWindow
+                    taskId={taskData.id}
+                    onClose={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: false })}
+                />
+            )}
 
-                {state.openTaskSettings && (
-                    <TaskSettingsComponent
-                        onClose={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: false })}
-                        taskId={taskData.id}
-                        projectId={projectId}
-                        groupId={groupId}
-                    />
-                )}
+            {state.openTaskSettings && (
+                <TaskSettingsComponent
+                    onClose={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: false })}
+                    taskId={taskData.id}
+                    projectId={projectId}
+                    groupId={groupId}
+                />
+            )}
 
-
-                <div className='window-body'>
-                    <div className='task-chat__title'>
-                        <h2>{taskData?.name}</h2>
-                        <div className="task-chat__admin-icons">
-                            <TaskTimerComponent taskId={taskData.id} taskName={taskData.name} />
-                            <DynamicPngIcon iconName={isActiveTask ? 'kidStar' : 'kidStarHollow'} onClick={(e) => changeIsActiveTask(e)} />
-                            <DynamicPngIcon iconName="statisticIcon" onClick={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: true })} />
-                            <DynamicPngIcon iconName="settingsIcon" onClick={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: true })} />
-                        </div>
+            <div className='window-body'>
+                <div className='task-chat__title'>
+                    <h2>{taskData?.name}</h2>
+                    <div className="task-chat__admin-icons">
+                        <TaskTimerComponent taskId={taskData.id} taskName={taskData.name} />
+                        <DynamicPngIcon iconName={isActiveTask ? 'kidStar' : 'kidStarHollow'} onClick={changeIsActiveTask} />
+                        <DynamicPngIcon iconName="statisticIcon" onClick={() => dispatch({ type: 'SET_TASK_STATISTIC_WINDOW', payload: true })} />
+                        <DynamicPngIcon iconName="settingsIcon" onClick={() => dispatch({ type: 'SET_TASK_SETTINGS_WINDOW', payload: true })} />
                     </div>
+                </div>
 
+                <Virtuoso
+                    style={{ height: "100vh" }}
+                    data={state.messages}
+                    startReached={loadMoreMessages}
+                    endReached={loadActualMessages}
+                    firstItemIndex={state.firstItemIndex}
+                    computeItemKey={(_, item) => item.id}
+                    initialTopMostItemIndex={state.messages.length - 1}
+                    increaseViewportBy={{ top: 400, bottom: 400 }}
+                    itemContent={(_, item) => (
+                        <MessageComponent messageData={item} activeImageRef={activeImageRef} setActiveImage={setActiveImageWindow} />
+                    )}
+                />
 
-                    <Virtuoso
-                        style={{ height: "100vh" }}
-                        data={state.messages}
-                        startReached={loadMoreMessages}
-                        endReached={loadActualMessages}
-                        firstItemIndex={state.firstItemIndex}
-                        computeItemKey={(_, item) => item.id}
-                        initialTopMostItemIndex={state.messages.length - 1}
-                        increaseViewportBy={{ top: 400, bottom: 400 }}
-                        itemContent={(_, item) => (
-                            <MessageComponent messageData={item} activeImageRef={activeImageRef} setActiveImage={setActiveImageWindow}/>
-                        )}>
-                    </Virtuoso>
-                    {/* <div className="task-chat__field" ref={messagesContainerRef} onContextMenu={handleContextMenu}>
-                        <div id="startObserve" ref={messagesStartRef}></div>
-                        {state.messages.length > 0 && state.messages.map(item => (
-                            <div className={`task-chat__message-body ${item?.user?.id === user.id ? 'user' : ''}`} key={item.id}>
-
-                                <div className="task-chat__images-body">
-                                    {item?.images_urls && item.images_urls.map(item => (
-                                        <img src={item.url} key={item.id} onClick={() => {
-                                            activeImageRef.current = item
-                                            setActiveImageWindow(true)
-                                        }}></img>
-                                    ))}
-                                </div>
-
-                                {item?.message && (
-                                    
-                                    <div className={`task-chat__message-content ${item?.user?.id == user.id ? 'user' : ''}`}>
-                                        {Object.keys(item.answer_to).length > 0 && (
-                                            <p className="task-chat__answer" key={item.answer_to.id}>{truncateString(item.answer_to.text, 50)}</p>
-                                        )}
-                                        
-                                        
-                                        <p className={`task-chat__message ${item?.user?.id ? 'user' : ''}`} id={item.id}>{item?.message}</p>
-                                    </div>
-                                )}
-                                
+                {state.inputFiles && (
+                    <div className={`task-chat__files-preview-body ${state.inputFiles.length > 0 ? 'open' : ''}`}>
+                        {state.inputFiles.map((item, index) => (
+                            <div className="files-preview-container" key={index}>
+                                <span onClick={() => deleteFile(item.index)}>X</span>
+                                <img src={item.preview} alt="" className="preview-file-image" style={{ animationDelay: `${0.1 * index}s` }} />
                             </div>
                         ))}
+                    </div>
+                )}
 
-                        {state.messages.length === 0 && (
-                            <div className="task-chet_message-none">Not found messages</div>
-                        )}
-                        <div id="endObserve" ref={messagesEndRef}/>
-                    </div> */}
-
-                    {state.inputFiles && (
-                        <div className={`task-chat__files-preview-body ${state.inputFiles.length > 0 ? 'open' : ''}`}>
-                            {state.inputFiles.map((item, index) => (
-                                <div className="files-preview-container" key={index}>
-                                    <span onClick={() => deleteFile(item.index)}>X</span>
-                                    <img src={item.preview} alt="" className="preview-file-image" style={{ animationDelay: `${0.1 * index}s` }} />
-                                </div>
-                            ))}
+                {state.answerMessage && (
+                    <div className="task-chat__answer-body">
+                        <div className={`task-chat__answer-content ${state.answerMessage.get('text') ? 'open' : ''}`}>
+                            <div className="task-chat__answer-title">{state.answerMessage.get('text')}</div>
                         </div>
-                    )}
+                    </div>
+                )}
 
-
-                    {state.answerMessage && (
-                        <div className="task-chat__answer-body">
-                            <div className={`task-chat__answer-content ${state.answerMessage.get('text') ? 'open' : ''}`}>
-                                <div className="task-chat__answer-title">{state.answerMessage.get('text')}</div>
-                            </div>
-                        </div>
-                    )}
-
-                    <form className="task-chat__form" onSubmit={change} >
-                        <input ref={inputFilesRef} type="file" accept="image/*" onChange={changeSelectFiles} multiple />
-                        <input ref={textInputRef} className="holy_input" style={{ maxWidth: '100%' }} type="text" onChange={(e) => setMessageText(e.target.value)} />
-                        {/* <button type="submit">send</button> */}
-                        <DynamicPngIcon iconName='clipsFile' height={24} width={24} className="clips-file-icon" onClick={() => inputFilesRef.current.click()} />
-                        <DynamicSvgIcon
-                            size={28}
-                            className={`sendIcon`}
-                            color="#ffffffff"
-                            onClick={change}
-                        >
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                        </DynamicSvgIcon>
-                    </form>
-                </div>
-            </div>,
-            document.body
-        )
-
+                <form className="task-chat__form" onSubmit={change}>
+                    <input ref={inputFilesRef} type="file" accept="image/*" onChange={changeSelectFiles} multiple />
+                    <input ref={textInputRef} className="holy_input" style={{ maxWidth: '100%' }} type="text" onChange={(e) => setMessageText(e.target.value)} />
+                    <DynamicPngIcon iconName='clipsFile' height={24} width={24} className="clips-file-icon" onClick={() => inputFilesRef.current.click()} />
+                    <DynamicSvgIcon size={28} className="sendIcon" color="#ffffffff" onClick={change}>
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                    </DynamicSvgIcon>
+                </form>
+            </div>
+        </div>,
+        document.body
     )
 }
-
 
 export default TaskChat
