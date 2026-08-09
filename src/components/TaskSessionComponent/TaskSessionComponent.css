@@ -5,26 +5,47 @@
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 25px 30px;
     overflow-y: auto;
+    padding: 20px 10px;
+    box-sizing: border-box;
 }
 
 .sessions-filters-body {
     display: flex;
-    gap: 5%;
+    gap: 10px;
     width: 100%;
     padding: 16px 0px;
     box-sizing: border-box;
 
-    select {
-        font-family: var(--main-font);
+}
+
+.paggination-delta {
+    display: flex;
+    gap: 10px;
+    margin: 0 auto;
+    align-items: center;
+
+    button {
         display: flex;
-        padding: 6px 12px;
-        padding-right: 12px;
-        background-color: rgba(255, 255, 255, 0.542);
-        color: black;
+        padding: 10px 16px;
+        background-color: #1e1d45;
+        border-radius: 8px;
         transition: background-color 0.4s ease-in-out;
 
-        &:focus {
-            background-color: white;
+        &:hover {
+            background-color: #5b57d9;
         }
+    }
+
+    span {
+        display: flex;
+        padding: 10px 16px;
+        background-color: #1e1d45;
+        border-radius: 8px;
+        filter: brightness(0.6);
+    }
+
+    #current-page-number {
+        background-color: #5b57d9;
+        pointer-events: none;
     }
 }

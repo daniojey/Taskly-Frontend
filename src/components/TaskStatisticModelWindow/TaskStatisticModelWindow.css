@@ -1,37 +1,68 @@
 .task-statistic__button-container {
     display: flex;
-    gap: 20px;
+    gap: 2px;
     justify-content: center;
     align-items: center;
     margin-bottom: 20px;
 }
 
 .statistic-button {
+    position: relative;
     display: flex;
     width: 50%;
     justify-content: end;
-    border: 0.1px solid rgba(255, 255, 255, 0.5);
+    padding: 7px 12px;
+    box-sizing: border-box;
+    background-color: #1e1d45;
+    z-index: 1;
+}
+
+.statistic-button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #1e1d45;
+    transform: skewX(-8deg);
+    z-index: -1;
+    transition: background-color 0.4s ease-in-out;
 }
 
 .statistic-button.active {
-    border: 1px solid rgb(0, 137, 250);
-    color: rgb(0, 137, 250);
+
+    &::after {
+        background: #5b57d9;
+    }
 }
 
 .diagram-button {
+    position: relative;
     display: flex;
     width: 50%;
     justify-content: start;
-    border: 0.1px solid rgba(255, 255, 255, 0.5);
+    padding: 7px 12px;
+    box-sizing: border-box;
+    background-color: #1e1d45;
+    transition: background-color 0.4s ease-in-out;
+    z-index: 1;
+}
+
+.diagram-button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #1e1d45;
+    transform: skewX(-8deg);
+    z-index: -1;
+    transition: background-color 0.4s ease-in-out;
+}
+
+.diagram-button.active {
+    &::after {
+        background: #5b57d9;
+    }
 }
 
 .statistic-button:focus,
 .diagram-button:focus {
     outline: none;
 }
-
-.diagram-button.active {
-    border: 1px solid rgb(150, 27, 27);
-    color: rgb(150, 27, 27);
-}
-
