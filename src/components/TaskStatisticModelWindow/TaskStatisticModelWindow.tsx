@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import { createPortal } from "react-dom"
 import { useModalClose } from "../../common/hooks/closeOverlay";
 import TaskSessionComponent from "../TaskSessionComponent/TaskSessionComponent";

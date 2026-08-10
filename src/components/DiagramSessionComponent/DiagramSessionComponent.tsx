@@ -3,13 +3,15 @@ import {
     CategoryScale,
     LinearScale,
     BarElement,
+    LineElement,
+    PointElement,
     Title,
     Tooltip,
     Legend,
     plugins,
 } from 'chart.js'
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Bar } from 'react-chartjs-2'
+import { useEffect, useMemo, useState } from 'react';
+import { Bar, Line } from 'react-chartjs-2'
 import { api } from '../../../api';
 import { getAccessToken } from '../../../tokens_func';
 import './DiagramSessionComponent.css'
@@ -18,6 +20,8 @@ ChartJS.register(
     CategoryScale,
     LinearScale,
     BarElement,
+    LineElement,
+    PointElement,
     Title,
     Tooltip,
     Legend,
@@ -28,6 +32,9 @@ const options = {
     plugins: {
         legend: {
             position: 'top' as const,
+            labels: {
+                usePointStyle: true,
+            }
         },
         title: {
             display: true,
@@ -36,7 +43,7 @@ const options = {
     }
 }
 
-export const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 interface UserItem {
     id: number;
@@ -85,7 +92,7 @@ function DiagramSessionComponent({ taskId } : { taskId: number}) {
                     {
                         label: 'Users sessions count',
                         data: users_labels.map((username) => statisticData.filter(item => item.user.username === username).length),
-                        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                        backgroundColor: '#5b57d9',
                     }
                 ]
             }
@@ -94,7 +101,7 @@ function DiagramSessionComponent({ taskId } : { taskId: number}) {
                 labels,
                 datasets: [
                     {
-                        label: 'Avarage time session',
+                        label: 'Avarage time session in minutes',
                         data: labels.map(mounthName => {
                             const seconds = statisticData.map(item => { 
                                 if (item.created_at === mounthName) { 
@@ -108,7 +115,7 @@ function DiagramSessionComponent({ taskId } : { taskId: number}) {
 
                             return avg
                         }),
-                        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                        backgroundColor: '#5b57d9',
                     }
                 ]
             }
@@ -121,7 +128,10 @@ function DiagramSessionComponent({ taskId } : { taskId: number}) {
                 {
                     label: 'Sessions Count',
                     data: labels.map((mounthName) => statisticData.filter(item => item.created_at === mounthName).length),
-                    backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                    backgroundColor: '#5b57d9',
+                    borderColor: "#5b57d9",
+                    pointStyle: 'rectRot',
+                    pointRadius: 10,
                 }
             ]
         }
@@ -147,7 +157,11 @@ function DiagramSessionComponent({ taskId } : { taskId: number}) {
                 >user sessions</p>
             </div>
 
-            <Bar options={options} data={data} />
+            {statisticType !== "count" && (
+                <Bar options={options} data={data} />
+            ) || (
+                <Line options={options} data={data}/>
+            )}
         </div>
     ) 
 }
