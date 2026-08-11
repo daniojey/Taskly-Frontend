@@ -1,0 +1,66 @@
+.delete-window {
+    position: fixed; /* Лучше fixed для модальных окон */
+    display: flex;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -100%); /* Исправлено: одна функция с двумя параметрами */
+    flex-direction: column;
+    background-color: black;
+    color: white;
+    z-index: 1000;
+    border: 0.3px solid rgb(255, 255, 255, 0.3);
+    box-shadow: 3px 3px 4px #ffffff;
+    padding: 24px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    animation: windowTransform 0.5s ease forwards;
+}
+
+.delete-window__body {
+    display: flex;
+    margin-top: 25px;
+    justify-content: space-between;
+    align-items: center;
+
+    #delete {
+        border: 0.5px solid red;
+        background-image: url('../../assets/red_lines.jpg');
+        background-repeat: no-repeat;
+        background-position: right;
+        transition: background-position 0.5s ease-in-out;
+
+        &:hover {
+            background-position: center;
+        }
+    }
+
+    #cancel {
+        border: 0.5px solid rgb(0, 137, 250);
+        background-image: url('../../assets/blue_lines.jpg');
+        background-repeat: no-repeat;
+        background-position: right;
+        transition: background-position 0.5s ease-in-out;
+        
+        &:hover {
+            background-position: center;
+        }
+    }
+}
+
+
+@keyframes windowTransform {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -100%);
+    }
+
+
+    75% {
+        transform: translate(-50%, -20%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}

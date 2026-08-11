@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import './DetailTaskWindow.css'
 import { createPortal } from 'react-dom'
-import DeleteWindow from '../DeleteWindow/DeleteWindow'
+import DeleteWindow from '../DeleteTaskWindow/DeleteTaskWindow'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
 
