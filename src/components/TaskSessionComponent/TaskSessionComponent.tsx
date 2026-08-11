@@ -96,6 +96,7 @@ function TaskSessionComponent({ taskId }: { taskId: number }) {
     const [currentPage, setCurrentPage] = useState<number>(1)
     const [performersSessions, setPerformersSessions] = useState<PerformerSessionItem[]>([])
     const [state, dispatch] = useReducer(reducer, initialState)
+    console.log(state.user_filter)
 
     useEffect(() => {
         setCurrentPage(1)
@@ -103,27 +104,20 @@ function TaskSessionComponent({ taskId }: { taskId: number }) {
     },[state.is_active, state.unactive, state.unactive])
 
     const buildUrl = () => {
-        let filterExists = true
         let url = `api/v1/task-sessions/${taskId}/get_task_performers_sessions/?page=${currentPage}`;
 
-        if (state.is_active && filterExists) {
-            url = url + `&is_active=${state.is_active ? 'True' : ''}`
-        } else if (state.is_active && !filterExists) {
-            url = url + `?is_active=${state.is_active ? 'True' : ''}`
+        if (state.is_active) {
+            url += `&is_active=${state.is_active ? 'True' : ''}`
         }
 
-        if (state.unactive && filterExists) {
-            url = url + `&?unactive=${state.unactive ? 'True' : ''}`
-        } else if (state.unactive && !filterExists) {
-            url = url + `?unactive=${state.unactive ? 'True' : ''}`
-            filterExists = true
-        };
-
-        if (state.user_filter && filterExists) {
-            url + `&?user_filter=${state.user_filter}`
-        } else if (state.user_filter && !filterExists) {
-            url + `?user_filter=${state.user_filter}`
+        if (state.unactive) {
+            url += `&?unactive=${state.unactive ? 'True' : ''}`
         }
+
+        if (state.user_filter) {
+            url += `&user_filter=${state.user_filter}`
+        } 
+
         
         return url
     }
@@ -183,6 +177,7 @@ function TaskSessionComponent({ taskId }: { taskId: number }) {
 
                 <input
                     type="text"
+                    onChange={(e) => dispatch({ type: "SET_USER_FILTER", payload: e.target.value})}
                     className='holy_input'
                     style={{
                         maxWidth: "150px"
