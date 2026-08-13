@@ -2,7 +2,7 @@
  
 **Real-time task and team management platform with live notifications, session tracking, and built-in task discussions.**
  
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/Django-DRF-092E20?style=flat&logo=django&logoColor=white)](https://www.django-rest-framework.org/)
 [![React](https://img.shields.io/badge/React-TypeScript-61DAFB?style=flat&logo=react&logoColor=white)](https://react.dev/)
 [![Redis](https://img.shields.io/badge/Redis-Celery-DC382D?style=flat&logo=redis&logoColor=white)](https://redis.io/)
@@ -54,25 +54,53 @@ Taskly is a group-based project management tool built for teams that need to org
 ![Alt text](path/to/screenshot.png)
 -->
  
-**Dashboard**
+**GroupPage**
  
-_screenshot placeholder_
+<div align="center">
+  <img src="screenshots/group_page.png">
+</div>
  
 **Group management**
  
-_screenshot placeholder_
+<div align="center">
+  <img src="screenshots/group_detail.png">
+</div>
  
-**Task view**
+**Tasks view**
  
-_screenshot placeholder_
+<div align="center">
+  <img src="screenshots/tasks_view.png">
+</div>
  
 **Task discussion (chat)**
  
-_screenshot placeholder_
+<div align="center">
+  <img src="screenshots/chat_discussion.png">
+</div>
  
 **Manager statistics**
  
-_screenshot placeholder_
+<div align="center">
+  <img src="screenshots/task_statistic.png">
+</div>
+
+---
+
+<div align="center">
+  <img src="screenshots/diagram_count.png">
+</div>
+
+---
+
+<div align="center">
+  <img src="screenshots/diagram_duration.png">
+</div>
+
+---
+
+<div align="center">
+  <img src="screenshots/diagram_users.png">
+</div>
  
 ## Demo
  
@@ -120,14 +148,7 @@ The app will be available at `http://localhost:<port>` and the API at `http://lo
 - **Django Channels** manages WebSocket connections for live chat and notifications
 - **Celery workers** process background jobs (notification generation, statistics)
 - **Redis** acts as the Channels layer backend and Celery broker
-## Roadmap
- 
-<!-- Optional — fill in or remove -->
-- [ ] ...
-- [ ] ...
-## License
- 
-<!-- MIT / other -->
+
  
 ---
  
