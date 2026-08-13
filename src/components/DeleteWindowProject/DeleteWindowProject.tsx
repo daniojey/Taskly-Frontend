@@ -12,7 +12,6 @@ interface DeleteWindowProjectProps {
 function DeleteWindowProject({ projectId, onClose}: DeleteWindowProjectProps) {
     const navigate = useNavigate()
 
-
     const projectDelete = async (projectId: string | undefined) => {
         try {
             const response = await api.delete(`api/v1/groups-projects/${projectId}/`,

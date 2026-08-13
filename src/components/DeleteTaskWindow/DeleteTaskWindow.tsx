@@ -3,6 +3,7 @@ import { getAccessToken } from '../../../tokens_func'
 import { useQueryClient } from '@tanstack/react-query';
 import './DeleteWindow.css'
 import { createPortal } from 'react-dom';
+import DeleteWindow from '../DeleteWindow/DeleteWindow';
 
 interface DeleteWindowProps {
     data: any;
@@ -30,18 +31,13 @@ function DeleteTaskWindow({ data, onClose, onCloseWindow }: DeleteWindowProps) {
         
     }
 
+    const deleteData = {
+        onClose: () => onClose,
+        onDelete: () => deleteTask
+    }
 
     return (
-        createPortal(
-            <div className='delete-window'>
-                <h2>You realy want to delete ?</h2>
-                <div className='delete-window__body'>
-                    <button id='cancel' onClick={onClose}>Cancel</button>
-                    <button id='delete' onClick={deleteTask}>Delete</button>
-                </div>
-            </div>
-        , document.body)
-        
+        <DeleteWindow data={deleteData}/>
     )
 }
 
