@@ -8,8 +8,10 @@ import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.
 
 import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon.jsx'
 import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.js'
+import DeleteWindow from '../../components/DeleteWindow/DeleteWindow.js'
 import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.js'
 import { useUser } from '../../common/stores/AuthStore.jsx'
+import { deleteGroup } from './common/delete_group.js'
 
 interface UserItem {
     id: number;
@@ -37,6 +39,7 @@ function GroupPageDetail() {
     const [membersWindow, setMembersWindow] = useState(false)
     const [projects, setProjects] = useState([])
     const [members, setMembers] = useState<UserItem[]>([])
+    const [deleteWindow, setDeleteWindow] = useState<boolean>(false)
 
     const navigate = useNavigate()
 
@@ -124,13 +127,23 @@ function GroupPageDetail() {
                 />
             )}
 
+            {deleteWindow && (
+                <DeleteWindow data={{
+                    onClose: () => setDeleteWindow(false),
+                    onDelete: () => deleteGroup(group ? group.id : null)
+                }}/>
+            )}
+
             <div className='group-detail__title'>
                 {group ? (
                     <>
                         <h2>Group Name: {group.name}</h2>
 
                         {group.is_owner === true && (
-                            <button onClick={() => openGroupLogs()}>Group logs</button>
+                            <div className='group-detail__owner-buttons'>
+                                <button onClick={() => openGroupLogs()}>Group logs</button>
+                                <button id='delete' onClick={() => setDeleteWindow(true)}>Delete</button>
+                            </div>
                         )}
                     </>
                 ) : (

@@ -5,6 +5,8 @@ import { api } from '../../../api';
 import { useContext } from 'react';
 import { AuthContext } from '../../AuthContext.jsx'
 import { useNavigate } from "react-router"
+import "./RegistrationPage.css"
+import { Link } from 'react-router';
 
 
 interface YupFormData {
@@ -64,16 +66,37 @@ function RegistrationPage() {
     return (
         <div className='registration-page__background'>
             <div className='registration-page__body'>
-                <form onSubmit={handleSubmit(handleSubmitForm)}>
-                    <div className='registration-form-field'></div>
-                    <input className='neomorphism-input' type="text" id='first_name' {...register('first_name')} />
-                    <input className='neomorphism-input'type="text" id='last_name' {...register('last_name')} />
-                    <input className='neomorphism-input'type="text" id='email' {...register('email')} />
-                    <input className='neomorphism-input'type="text" id='username' {...register('username')} />
-                    <input className='neomorphism-input'type="text" id='password' {...register('password')} />
-                    <input className='neomorphism-input'type="text" id='confirmPassword' {...register('confirmPassword')} />
-                    <button type='submit'>Submit</button>
+                <h3>Create an account</h3>
+                <form onSubmit={handleSubmit(handleSubmitForm)} className='registration-form' id='registration-form'>
+                    <div className='registration-form-field'>
+                        <label htmlFor="first_name">First name</label>
+                        <input className='holy_input' type="text" id='first_name' {...register('first_name')} />
+                    </div>
+                    <div className='registration-form-field'>
+                        <label htmlFor="last_name">Last name</label>
+                        <input className='holy_input'type="text" id='last_name' {...register('last_name')} />
+                    </div>
+                    <div className='registration-form-field'>
+                        <label htmlFor="email">Email</label>
+                        <input className='holy_input'type="text" id='email' {...register('email')} />
+                    </div>
+                    <div className='registration-form-field'>
+                        <label htmlFor="username">Username</label>
+                        <input className='holy_input'type="text" id='username' {...register('username')} />
+                    </div>
+                    <div className='registration-form-field'>
+                        <label htmlFor="password">Password</label>
+                        <input className='holy_input'type="password" id='password' {...register('password')} />
+                    </div>
+                    <div className='registration-form-field'>
+                        <label htmlFor="confirmPassword">Confirm password</label>
+                        <input className='holy_input'type="password" id='confirmPassword' {...register('confirmPassword')} />
+                    </div>
                 </form>
+                <p>If you have account <Link to="/login">back to login</Link></p>
+                <div className='registration-button-container'>
+                    <button type='submit' form='registration-form'>Submit</button>
+                </div>
             </div>
         </div>
     )

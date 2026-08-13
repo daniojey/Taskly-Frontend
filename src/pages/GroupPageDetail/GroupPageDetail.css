@@ -26,6 +26,19 @@
             background-color: #4441b1;
         }
     }
+
+    #delete {
+        background-color: #f21313;
+
+        &:hover {
+            background-color: #b50f0f;
+        }
+    }
+}
+
+.group-detail__owner-buttons {
+    display: flex;
+    gap: 20px;
 }
 
 

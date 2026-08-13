@@ -1,45 +1,41 @@
-import { api } from '../../../api'
-import { getAccessToken } from '../../../tokens_func'
-import { useQueryClient } from '@tanstack/react-query';
-import './DeleteWindow.css'
+import { createPortal } from "react-dom"
+import "../../common/Styles/ModelWindow.css"
+import "./DeleteWindow.css"
+
+type Status = "task" | "project" | "group"
 
 interface DeleteWindowProps {
-    data: any;
-    onClose: () => void;
-    onCloseWindow: () => void;
+    data: {
+        onClose: () => void;
+        onDelete: () => void;
+    }
 }
 
-function DeleteWindow({ data, onClose, onCloseWindow }: DeleteWindowProps) {
-    const queryClient = useQueryClient();
+function DeleteWindow({ data } : DeleteWindowProps) {
+    const {
+        onClose, 
+        onDelete,
+    } = data
 
-    const deleteTask = async () => {
-        try{
-            const response = await api.delete(`api/v1/tasks/${data.id}/`,
-                {headers: {
-                    Authorization: getAccessToken()
-                }}
-            )
-
-            console.log('TASK DELETE', response)
-            console.log(await queryClient.invalidateQueries({ queryKey: ['updateTasks'] }));
-            onClose()
-            onCloseWindow()
-        } catch (error) {
-            console.error(error)
-        }
-        
-    }
-
-
-    return (
-        <div className='delete-window'>
-            <h2>You realy want to delete ?</h2>
-            <div className='delete-window__body'>
-                <button id='cancel' onClick={onClose}>Cancel</button>
-                <button id='delete' onClick={deleteTask}>Delete</button>
+    return (createPortal(
+       <div className='window-overlay open' onClick={() => onClose()}>
+            <div className='window-body'
+            style={{
+                maxWidth: "400px",
+                maxHeight: "200px",
+                minHeight: "200px"
+                }}>
+                <div className="delete-window__body-container">
+                    <h2>You realy want to delete ?</h2>
+                    <div className="delete-window__buttons">
+                        <button id='cancel' onClick={() => onClose()}>Cancel</button>
+                        <button id='delete' onClick={() => onDelete()}>Delete</button>
+                    </div>
+                </div>
             </div>
         </div>
-    )
+    , document.body))
 }
+
 
 export default DeleteWindow

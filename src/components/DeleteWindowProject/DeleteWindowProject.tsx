@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router'
 import './DeleteWindowProject.css'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
+import DeleteWindow from '../DeleteWindow/DeleteWindow'
 
 interface DeleteWindowProjectProps {
     projectId: string | undefined;
@@ -26,14 +27,13 @@ function DeleteWindowProject({ projectId, onClose}: DeleteWindowProjectProps) {
         }
     }
 
+    const data = {
+        onClose: () => onClose(),
+        onDelete: () => projectDelete(projectId)
+    }
+
     return (
-        <div className='delete-window'>
-            <h2>You realy want to delete ?</h2>
-            <div className='delete-window__body'>
-                <button id='cancel' onClick={onClose}>Cancel</button>
-                <button id='delete' onClick={() => projectDelete(projectId)}>Delete</button>
-            </div>
-        </div>
+        <DeleteWindow data={data}/>
     )   
 }
 
