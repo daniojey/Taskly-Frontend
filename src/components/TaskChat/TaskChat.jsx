@@ -216,7 +216,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         }, 400)
     }, [])
 
-    const protocol = window.location.protocol === "https" ? 'wss://' : 'ws://'
+    const protocol = window.location.protocol === "https:" ? 'wss://' : 'ws://'
     console.log(protocol)
     useEffect(() => {
         const webSocketConnection = new WebSocket(
