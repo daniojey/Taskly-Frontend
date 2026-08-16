@@ -1,4 +1,4 @@
-import './HomePge.css'
+import './HomePage.css'
 import myImage from '../../assets/home_image.png';
 import { Link } from 'react-router';
 
