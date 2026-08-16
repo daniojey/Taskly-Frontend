@@ -217,7 +217,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     }, [])
 
     const protocol = window.location.protocol === "https" ? 'wss://' : 'ws://'
-
+    console.log(protocol)
     useEffect(() => {
         const webSocketConnection = new WebSocket(
             protocol + import.meta.env.VITE_WEB_SOCKET + `/ws/chat/${taskData.id}` + `/?token=${token}`
