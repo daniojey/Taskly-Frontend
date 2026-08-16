@@ -16,10 +16,13 @@
     display: flex;
     width: 100%;
     justify-content: start;
+    align-items: start;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .task-chat__message-body.user {
-    justify-content: end;
+    align-items: end;
 }
 
 .task-chat__message-content {

@@ -264,54 +264,56 @@ function TaskChat({ data, onClose, groupId, projectId }) {
     const change = async (e) => {
         e.preventDefault()
 
-        if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
-            let metadata = {
-                type: 'message_metadata',
-                message: messageText,
-                taskId: taskData.id,
-                filesCount: state.inputFiles.length,
-                messageId: Date.now()
-            }
+        if (state.inputFiles.length > 0) {
+            try {
+                const filesArray = new FormData()
 
-            if (state.answerMessage.size > 0) {
-                metadata = {
-                    ...metadata, answerToMessage: {
-                        'id': state.answerMessage.get('id'),
-                        'text': state.answerMessage.get('text')
+                Array.from(state.inputFiles).forEach(item => {
+                    console.log(item)
+                    filesArray.append('images', item.file)
+                })
+
+                const response = await api.post("api/v1/upload-chat-images/",
+                    filesArray,
+                    {headers: { 
+                        Authorization: getAccessToken(),
+                        "Content-Type": 'multipart/form-data'
+                    }}
+                )
+
+                if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
+                    console.log('WEB SOCK START')
+                    let metadata = {
+                        message: messageText || '',
+                        taskId: taskData.id,
+                        messageId: Date.now(),
+                        images: response.data.results.map(item => item.id)
                     }
+
+                    webSocketRef.current.send(JSON.stringify(metadata))
+
                 }
+            } catch (e) {
+                console.error(e)
             }
+        } else {
+            if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
 
-            webSocketRef.current.send(JSON.stringify(metadata))
-
-            for (let i = 0; i < state.inputFiles.length; i++) {
-                const file = state.inputFiles[i]
-
-                const fileMetadata = {
-                    type: 'file_metadata',
-                    messageId: metadata.messageId,
-                    fileName: file.name,
-                    fileType: file.type,
-                    fileSize: file.size,
-                    fileIndex: i
+                let metadata = {
+                    message: messageText,
+                    taskId: taskData.id,
+                    messageId: Date.now()
                 }
 
-                webSocketRef.current.send(JSON.stringify(fileMetadata))
+                webSocketRef.current.send(JSON.stringify(metadata))
 
-                const arrayBuffer = await file.file.arrayBuffer()
-                webSocketRef.current.send(arrayBuffer)
             }
-
-            webSocketRef.current.send(JSON.stringify({
-                type: 'message_complete',
-                messageId: metadata.messageId
-            }))
-
-            textInputRef.current.value = ''
-            dispatch({ type: 'CLEAR_INPUT_FILES' })
-            dispatch({ type: 'SET_ANSWER_MESSAGE', payload: new Map() })
-            setMessageText(null)
         }
+
+        textInputRef.current.value = ''
+        dispatch({ type: 'CLEAR_INPUT_FILES' })
+        dispatch({ type: 'SET_ANSWER_MESSAGE', payload: new Map() })
+        setMessageText(null)
     }
 
     const changeSelectFiles = (e) => {
