@@ -218,7 +218,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
     useEffect(() => {
         const webSocketConnection = new WebSocket(
-            'ws://' + 'localhost:8000' + `/ws/chat/${taskData.id}` + `/?token=${token}`
+            'ws://' + import.meta.env.VITE_WEB_SOCKET + `/ws/chat/${taskData.id}` + `/?token=${token}`
         )
 
         const onOpen = () => console.log("Opened")

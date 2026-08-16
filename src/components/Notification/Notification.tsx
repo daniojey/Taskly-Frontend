@@ -19,7 +19,7 @@ function Notification() {
 
     const { isConnected } = useWebSocket({
         url: 'ws://'
-                + 'localhost:8000'
+                + import.meta.env.VITE_WEB_SOCKET
                 + '/ws/notifi'
                 + `/?token=${token}`,
 
