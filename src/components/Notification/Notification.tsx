@@ -16,9 +16,11 @@ function Notification() {
     const [hideNotify, setHideNotify] = useState(false)
     const {updateNotify} = useContext(AuthContext)
 
+    const protocol = window.location.protocol === "https" ? 'wss://' : 'ws://'
+
 
     const { isConnected } = useWebSocket({
-        url: 'ws://'
+        url: protocol
                 + import.meta.env.VITE_WEB_SOCKET
                 + '/ws/notifi'
                 + `/?token=${token}`,

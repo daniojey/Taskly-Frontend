@@ -216,9 +216,11 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         }, 400)
     }, [])
 
+    const protocol = window.location.protocol === "https" ? 'wss://' : 'ws://'
+
     useEffect(() => {
         const webSocketConnection = new WebSocket(
-            'ws://' + import.meta.env.VITE_WEB_SOCKET + `/ws/chat/${taskData.id}` + `/?token=${token}`
+            protocol + import.meta.env.VITE_WEB_SOCKET + `/ws/chat/${taskData.id}` + `/?token=${token}`
         )
 
         const onOpen = () => console.log("Opened")
