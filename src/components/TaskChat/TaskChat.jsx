@@ -26,6 +26,7 @@ const initialState = {
     openTaskSettings: false,
     openTaskStatistic: false,
     firstItemIndex: 100000,
+    isUploadMessage: false
 }
 
 function messageReduce(state, action) {
@@ -119,6 +120,9 @@ function messageReduce(state, action) {
 
         case 'SET_TASK_STATISTIC_WINDOW':
             return { ...state, openTaskStatistic: action.payload }
+
+        case 'SET_IS_UPLOAD_MESSAGE':
+            return {...state, isUploadMessage: action.payload}
 
         default:
             return state
@@ -263,9 +267,12 @@ function TaskChat({ data, onClose, groupId, projectId }) {
 
     const change = async (e) => {
         e.preventDefault()
+        console.log(state.isUploadMessage)
+        if (state.isUploadMessage) return null
 
         if (state.inputFiles.length > 0) {
             try {
+                dispatch({ type: "SET_IS_UPLOAD_MESSAGE", payload: true})
                 const filesArray = new FormData()
 
                 Array.from(state.inputFiles).forEach(item => {
@@ -297,6 +304,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
                 console.error(e)
             }
         } else {
+            dispatch({ type: "SET_IS_UPLOAD_MESSAGE", payload: true})
             if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
 
                 let metadata = {
@@ -314,6 +322,7 @@ function TaskChat({ data, onClose, groupId, projectId }) {
         dispatch({ type: 'CLEAR_INPUT_FILES' })
         dispatch({ type: 'SET_ANSWER_MESSAGE', payload: new Map() })
         setMessageText(null)
+        dispatch({ type: "SET_IS_UPLOAD_MESSAGE", payload: false})
     }
 
     const changeSelectFiles = (e) => {
