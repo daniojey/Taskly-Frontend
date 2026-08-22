@@ -37,7 +37,7 @@ interface StratagemItem {
 }
 
 const stratagemFormSchema = yup.object({
-    name: yup.string().max(100).min(10).required('This field is required'),
+    name: yup.string().max(100).min(5).required('This field is required'),
     combination: yup.string().required().matches(
       /^[1-4](,\s*[1-4]){0,5}$/,
       'Only 1-4 numbers'
@@ -60,6 +60,8 @@ function StratagemPage () {
         resolver: yupResolver(stratagemFormSchema),
         mode: "onSubmit",
     })
+
+    const setStratagemsStore = useStratagemStore((state) => state.setStratagemsStore)
     const removeStratagemStore = useStratagemStore((state) => state.removeStratagemStore)
     const updateStratagemsStore = useStratagemStore((state) => state.updateStratagemsStore)
 
@@ -74,6 +76,7 @@ function StratagemPage () {
             
             removeStratagemStore(item)
             setUserStratagems(userStratagems.filter(value => value.id !== item.id))
+            setNotify('Stratagem remove', 'success')
         } catch (error) {
             console.error(error)
         }
@@ -98,6 +101,7 @@ function StratagemPage () {
                 }
             }))
             updateStratagemsStore(newActivityStratagem)
+            setNotify('Set active stratagem', 'success')
         } catch (error) {
             console.log(error)
         }
@@ -131,8 +135,9 @@ function StratagemPage () {
             )
 
             const newStratagem = response.data.results
-            console.log(response)
-            setUserStratagems([newStratagem, ...userStratagems])
+            setStratagemsStore([newStratagem, ...userStratagems])
+            setUserStratagems([...userStratagems, newStratagem])
+            setNotify('Stratagem created', 'success')
         } catch (error) {
             console.log(error)
         }
@@ -166,11 +171,11 @@ function StratagemPage () {
             <div className="stratagem-page__user-content">
                 <h3>My stratagems</h3>
                 { userStratagems.length > 0 && userStratagems.map(item => (
-                    <div className="stratagem-page__card">
+                    <div className="stratagem-page__card" key={item.id}>
                         {item.name}
                         <div>
-                            {item.combination && item.combination.map(item => (
-                                <DynamicPngIcon iconName={`stratagemArrow_${arrowMap.get(item)}`}/>
+                            {item.combination && item.combination.map((item, index) => (
+                                <DynamicPngIcon key={index} iconName={`stratagemArrow_${arrowMap.get(item)}`}/>
                             ))}
                         </div>
                         <div className="stratagem-page__card-info">

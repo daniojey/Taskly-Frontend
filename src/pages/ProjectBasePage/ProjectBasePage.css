@@ -1,6 +1,6 @@
 .task-base__container-body {
     display: flex;
-    max-width: 1300px;
+    width: 100%;
     height: 100%;
     gap: 20px;
     padding: 24px;
