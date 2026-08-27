@@ -9,6 +9,11 @@ interface StratagemItem {
     is_match: boolean,
     is_base?: boolean,
     active: boolean,
+    data: {
+        group_id?: number;
+        project_id?: number;
+        task_id?: number;
+    }
 }
 
 interface State {

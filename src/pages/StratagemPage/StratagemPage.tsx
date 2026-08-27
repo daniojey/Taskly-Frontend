@@ -55,15 +55,18 @@ const stratagemFormSchema = yup.object({
 
 function StratagemPage () {
     const setNotify = useNotify((state) => state.addNotify)
-    const [userStratagems, setUserStratagems] = useState<StratagemItem[]>([])
     const { register, watch, handleSubmit, formState: { errors}} = useForm({
         resolver: yupResolver(stratagemFormSchema),
         mode: "onSubmit",
     })
-
+    
+    const stratagems = useStratagemStore<StratagemItem[]>((state) => state.stratagems)
     const setStratagemsStore = useStratagemStore((state) => state.setStratagemsStore)
     const removeStratagemStore = useStratagemStore((state) => state.removeStratagemStore)
     const updateStratagemsStore = useStratagemStore((state) => state.updateStratagemsStore)
+
+    const action = watch('action')
+
 
     const deleteStratagem = async (item: StratagemItem) => {
         try {
@@ -71,11 +74,8 @@ function StratagemPage () {
                 `api/v1/stratagems/${item.id}/`,
                 {headers: {Authorization: getAccessToken()}}
             )
-
-            console.log(response)
             
             removeStratagemStore(item)
-            setUserStratagems(userStratagems.filter(value => value.id !== item.id))
             setNotify('Stratagem remove', 'success')
         } catch (error) {
             console.error(error)
@@ -83,7 +83,6 @@ function StratagemPage () {
     }
     
     const setActiveStratagem = async (item: StratagemItem) => {
-        console.log(item)
         try {
             const response = await api.patch(
                 `api/v1/stratagems/${item.id}/`,
@@ -93,13 +92,6 @@ function StratagemPage () {
 
             const newActivityStratagem: StratagemItem = response.data.results
 
-            setUserStratagems(userStratagems.map(item => {
-                if (item.id === newActivityStratagem.id) {
-                    return {...item, active: newActivityStratagem.active}
-                } else {
-                    return item
-                }
-            }))
             updateStratagemsStore(newActivityStratagem)
             setNotify('Set active stratagem', 'success')
         } catch (error) {
@@ -107,7 +99,6 @@ function StratagemPage () {
         }
     } 
 
-    const action = watch('action')
 
     const submitForm = async (data: StratagemCreateSchema) => {
         let formData = data
@@ -135,29 +126,12 @@ function StratagemPage () {
             )
 
             const newStratagem = response.data.results
-            setStratagemsStore([newStratagem, ...userStratagems])
-            setUserStratagems([...userStratagems, newStratagem])
+            setStratagemsStore([newStratagem, ...stratagems])
             setNotify('Stratagem created', 'success')
         } catch (error) {
             console.log(error)
         }
     }
-
-    useEffect(() => {
-        const getStratagems = async () => {
-            try {
-                const response = await api.get('api/v1/stratagems/', {
-                    headers: {Authorization: getAccessToken()}
-                })
-
-                setUserStratagems(response.data?.results)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        getStratagems()
-    }, [])
 
     const arrowMap = new Map([
         [1, 'up'],
@@ -170,7 +144,7 @@ function StratagemPage () {
         <div className="stratagem-base-page">
             <div className="stratagem-page__user-content">
                 <h3>My stratagems</h3>
-                { userStratagems.length > 0 && userStratagems.map(item => (
+                { stratagems.length > 0 && stratagems.map(item => (
                     <div className="stratagem-page__card" key={item.id}>
                         {item.name}
                         <div>
