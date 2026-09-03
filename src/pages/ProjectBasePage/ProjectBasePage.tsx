@@ -45,6 +45,7 @@ import DeleteTaskWindow from '../../components/DeleteTaskWindow/DeleteTaskWindow
 import DeleteWindowProject from '../../components/DeleteWindowProject/DeleteWindowProject'
 import SidePaneProjectBasePage from '../../components/SidePanelProjectBasePage/SidePanelProjectBasePage'
 import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon'
+import AICreatorTask from '../../components/AICreatorTask/AICreatorTask'
 
 
 interface Item {
@@ -80,6 +81,7 @@ export default function MultipleContainers() {
   const [moreWindow, setMoreWindow] = useState<boolean>(false)
   const [openCreateTask, setOpenCreateTask] = useState<boolean>(false)
   const [deleteWindow, setDeleteWindow] = useState<boolean>(false)
+  const [aiHelperWindow, setAiHelperWindow] = useState<boolean>(false)
   const [containers, setContainers] = useState<Container[]>([
     {
       id: 'base-status',
@@ -377,13 +379,16 @@ export default function MultipleContainers() {
       </div>
 
       { sideWindow && (
-        <SidePaneProjectBasePage onCreate={createTaskWindow} onDelete={() => setDeleteWindow(true)} isClose={closeSideWindow}/>
+        <SidePaneProjectBasePage onAi={() => setAiHelperWindow(true)} onCreate={createTaskWindow} onDelete={() => setDeleteWindow(true)} isClose={closeSideWindow}/>
       )}
 
       { openCreateTask && (
         <CreateTaskWindow onClose={() => setOpenCreateTask(false)} onUpdate={() => handleTaskCreate()} projectId={projectId}/>
       )}
-      {/* <h2 className="mb-4 text-xl font-bold dark:text-white">Kanb</h2> */}
+      
+      { aiHelperWindow && (
+        <AICreatorTask onClose={() => setAiHelperWindow(false)} projectId={projectId} onUpdate={() => handleTaskCreate()}/>
+      )}
 
 
       <DndContext

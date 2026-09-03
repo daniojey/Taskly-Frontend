@@ -1,7 +1,7 @@
 import { useState } from "react"
 
-export function useLoader() {
-    const [loading, setLoading] = useState<boolean>(true)
+export function useLoader(startLoading: boolean = true) {
+    const [loading, setLoading] = useState<boolean>(startLoading)
     const [closeLoading, setCloseLoading] = useState<boolean>(false)
 
     const onCloseLoading = () => {
@@ -14,6 +14,7 @@ export function useLoader() {
 
     return {
         loading,
+        setLoading,
         closeLoading,
         onCloseLoading
     }

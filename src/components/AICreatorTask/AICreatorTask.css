@@ -1,0 +1,102 @@
+.ai-button-container {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    gap: 25px;
+    width: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+
+    form {
+        display: flex;
+        width: 100%;
+        gap: 15px;
+    }
+
+    button {
+        display: flex;
+        background-color: #5b57d9;
+        padding: 10px 18px;
+        font-size: 1.1rem;
+        font-weight: 900;
+        border-radius: 12px;
+        transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
+
+        &:hover {
+            background-color: #4441b1;
+        }
+    }
+}
+
+.ai-loader-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    flex: 1;
+}
+
+
+
+.ai-response-body {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    gap: 20px;
+    align-items: start;
+    padding: 15px 10px;
+}
+
+.ai-created-task {
+    display: flex;
+    padding: 12px 18px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background-color: #5b57d9;
+}
+
+.ai-created-subtask {
+    display: flex;
+    padding: 12px;
+    border-radius: 12px;
+    flex-direction: column;
+    gap: 5px;
+    background: #2c2b5b;
+
+    p {
+        margin: 0;
+    }
+}
+
+
+.ai-additional-task-data {
+    left: 0;
+    bottom: 0;
+    display: flex;
+    width: 100%;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+
+    button {
+        display: flex;
+        background-color: #5b57d9;
+        padding: 10px 18px;
+        font-size: 1.1rem;
+        font-weight: 900;
+        border-radius: 12px;
+        transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
+
+        &:hover {
+            background-color: #4441b1;
+        }
+    }
+}
+
+.ai-data-buttons {
+    display: flex;
+    margin-top: auto;
+}
