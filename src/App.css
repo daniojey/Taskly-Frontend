@@ -129,19 +129,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 }
 
 
-.sendIcon {
-  display: flex;
-  cursor: pointer;
-  border: 0.3px solid rgb(255, 255, 255, 0.3);
-  border-radius: 12px;
-  height: 100%;
-  padding: 8px 12px;
-  transition: transform 0.4s ease-in-out;
-
-  &:hover {
-    transform: scale(1.1);
-  }
-}
 
 .deleteIcon {
   display: flex;

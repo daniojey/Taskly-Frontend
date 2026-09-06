@@ -4,13 +4,18 @@ import { useDroppable,UniqueIdentifier } from "@dnd-kit/core"
 
 import './DroppableContainer.css'
 
-interface Item {
-  id: string
-  content: string
-  name: string
-  deadline: string
-  title: string;
-  status: "BS" | "US" | "NS" | string;
+type TaskStatus = "US" | "NS"| "BS"
+
+interface TaskData {
+    created_at: string;
+    deadline: string;
+    description: string;
+    id: number;
+    is_performer: boolean
+    name: string;
+    project: number;
+    project_name: string;
+    status: TaskStatus
 }
 
 export function DroppableContainer({
@@ -23,7 +28,7 @@ export function DroppableContainer({
 }: {
   id: string
   title: string
-  items: Item[]
+  items: TaskData[]
   activeId: UniqueIdentifier | null
   groupId: string | undefined
   projectId: string | undefined
@@ -52,7 +57,6 @@ export function DroppableContainer({
             key={item.id} 
             status={item.status}
             deadline={item.deadline}
-            content={item.content} 
             name={item.name} 
             data={item}
             activeId={activeId}

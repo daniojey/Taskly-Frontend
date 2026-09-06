@@ -22,23 +22,23 @@ interface TaskSettingsComponentProps {
     groupId: string | undefined;
 }
 
-function TaskSettingsComponent({ onClose, taskId, projectId, groupId }: TaskSettingsComponentProps) {
+function TaskSettingsComponent({ onClose, taskId, groupId }: TaskSettingsComponentProps) {
     const [usersData, setUsersData] = useState<UserItem[]>([])
     const {
         isClosing,
         handleCloseWindow
-    } = useModalClose({ onClose: onClose, delay: 500, className: 'window-overlay'})
+    } = useModalClose({ onClose: onClose, delay: 500, className: 'window-overlay' })
 
-    const updateUsers =async (usersNewData: UserItem[] | null) => {
+    const updateUsers = async (usersNewData: UserItem[] | null) => {
         if (usersNewData === null) return
 
         try {
             const userIds = usersNewData.filter(user => user.is_performer).map(user => user.id)
 
-            const response =await api.post(
+            const response = await api.post(
                 `api/v1/performers/${taskId}/change_performers/?group=${groupId}`,
-                {usersIds: userIds},
-                {headers: {Authorization: getAccessToken()}}
+                { usersIds: userIds },
+                { headers: { Authorization: getAccessToken() } }
             )
 
             return true
@@ -49,7 +49,7 @@ function TaskSettingsComponent({ onClose, taskId, projectId, groupId }: TaskSett
 
     const changeBox = async (e: React.MouseEvent<HTMLLabelElement>, user_id: number, is_performer: boolean) => {
         const backupData = [...usersData]
-        const newData = usersData.map(user => user.id === user_id ? {...user, is_performer: is_performer} : user)
+        const newData = usersData.map(user => user.id === user_id ? { ...user, is_performer: is_performer } : user)
 
         const sortingData = newData.sort((a, b) => Number(b.is_performer) - Number(a.is_performer))
         setUsersData(sortingData)
@@ -65,9 +65,9 @@ function TaskSettingsComponent({ onClose, taskId, projectId, groupId }: TaskSett
         let newUsersData: UserItem[] | null = null
 
         if (action === 'setPerfromers') {
-            newUsersData = usersData.map(item => ({...item, is_performer: true}))
+            newUsersData = usersData.map(item => ({ ...item, is_performer: true }))
         } else if (action === 'unsetPerformers') {
-            newUsersData = usersData.map(item => ({...item, is_performer: false}))
+            newUsersData = usersData.map(item => ({ ...item, is_performer: false }))
         }
 
         const result = await updateUsers(newUsersData)
@@ -83,7 +83,7 @@ function TaskSettingsComponent({ onClose, taskId, projectId, groupId }: TaskSett
             try {
                 const response = await api.get(
                     `api/v1/performers/${taskId}/group_performers/?group=${groupId}`,
-                    {headers: {Authorization: getAccessToken()}}
+                    { headers: { Authorization: getAccessToken() } }
                 )
                 console.log(response)
                 setUsersData(response.data.results)
@@ -93,57 +93,50 @@ function TaskSettingsComponent({ onClose, taskId, projectId, groupId }: TaskSett
         }
 
         getUsersData()
-    },[])
+    }, [])
 
     return (
-        createPortal(
-            <div 
-            className={`window-overlay ${isClosing ? 'close': 'open'}`}
-            style={{ zIndex: 1100 }}
-            onClick={handleCloseWindow}>
-                <div className="window-body">
-                    <div className="task-performers-title">
-                        <h2>Performers</h2>
-                    </div>
-
-                    <div className="performers-body">
-                        {usersData.length > 0 && usersData.map((user, index) => (
-                            <div 
-                            style={{ animationDelay: `${0.2 * index}s`}}
-                            className={`user-item-card ${user.is_performer ? 'active' : ''}`} 
-                            key={user.id}
-                            >
-                                <p>{user.username}</p>
-
-                                {user.image_profile ? (
-                                    <img src={user.image_profile} className='image-profile' />
-                                ) : (
-                                    <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} className='image-profile' />
-                                )}
-
-
-                                <div className={`holy_checkbox ${user.is_performer ? 'active' : ''}`} >
-                                    <input
-                                        id="cb-1"
-                                        type="checkbox"
-                                        checked={user.is_performer}
-                                        onChange={() => { }}
-                                    />
-                                    <label htmlFor="cb-1"
-                                        onClick={(e) => changeBox(e, user.id, !user.is_performer)}
-                                    ></label>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="task-performers-buttons">
-                        <button onClick={() => setCheckedValue("setPerfromers")}>select all</button>
-                        <button onClick={() => setCheckedValue("unsetPerformers")}>unselect all</button>
-                    </div>
-                </div>
+        <>
+            <div className="task-performers-title">
+                <h2>Performers</h2>
             </div>
-        , document.body)
+
+            <div className="performers-body">
+                {usersData.length > 0 && usersData.map((user, index) => (
+                    <div
+                        style={{ animationDelay: `${0.2 * index}s` }}
+                        className={`user-item-card ${user.is_performer ? 'active' : ''}`}
+                        key={user.id}
+                    >
+                        <p>{user.username}</p>
+
+                        {user.image_profile ? (
+                            <img src={user.image_profile} className='image-profile' />
+                        ) : (
+                            <DynamicPngIcon iconName='defaultImageProfile' width={40} height={40} className='image-profile' />
+                        )}
+
+
+                        <div className={`holy_checkbox ${user.is_performer ? 'active' : ''}`} >
+                            <input
+                                id="cb-1"
+                                type="checkbox"
+                                checked={user.is_performer}
+                                onChange={() => { }}
+                            />
+                            <label htmlFor="cb-1"
+                                onClick={(e) => changeBox(e, user.id, !user.is_performer)}
+                            ></label>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="task-performers-buttons">
+                <button onClick={() => setCheckedValue("setPerfromers")}>select all</button>
+                <button onClick={() => setCheckedValue("unsetPerformers")}>unselect all</button>
+            </div>
+        </>
     )
 }
 

@@ -38,14 +38,8 @@ function TaskStatisticModelWindow({ taskId, onClose}: TaskStatisticModelWindowPr
         }
     }
 
-    return (
-        createPortal(
-        <div 
-            className={`window-overlay ${isClosing ? 'close' : 'open'}`} 
-            onClick={handleCloseWindow}
-            style={{ zIndex: 1100}}
-        >
-            <div className="window-body">
+    return (    
+                <>
                 <div className="task-statistic__button-container">
                     <button 
                     className={`statistic-button ${sessionTab === true ? 'active' : ''}`}
@@ -65,10 +59,8 @@ function TaskStatisticModelWindow({ taskId, onClose}: TaskStatisticModelWindowPr
                 {diagramTab === true && (
                     <DiagramSessionComponent taskId={taskId}/>
                 )}
-            </div>
-        </div>
-        , document.body
-        )
+                </>
+
     )
 }
 

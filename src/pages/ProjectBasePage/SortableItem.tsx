@@ -7,10 +7,23 @@ import { truncateString } from "../../common/truncate"
 import DetailTaskWindow from "../../components/DetailTaskWindow/DetailTaskWindow"
 import { useState } from "react"
 import TaskChat from "../../components/TaskChat/TaskChat"
+import TaskWindowComponent from "../../components/TaskWindowComponent/TaskWindowComponent"
+
+type TaskStatus = "US" | "NS"| "BS"
+interface TaskData {
+    created_at: string;
+    deadline: string;
+    description: string;
+    id: number;
+    is_performer: boolean
+    name: string;
+    project: number;
+    project_name: string;
+    status: TaskStatus
+}
 
 export function SortableItem({
   id,
-  content,
   status,
   deadline,
   name,
@@ -20,12 +33,11 @@ export function SortableItem({
   projectId
 }: {
   id: UniqueIdentifier,
-  content: string,
   name: string,
   status: string,
   deadline: string,
   activeId: UniqueIdentifier | null
-  data: {}
+  data: TaskData
   groupId: string | undefined
   projectId: string | undefined
 }) {
@@ -53,9 +65,10 @@ export function SortableItem({
   return (
     <>
 
-    { openWindow && (
+    { openWindow && groupId && projectId && (
       // <DetailTaskWindow  data={data} onClose={() => setOpenWindow(false)} />
-      <TaskChat data={data} onClose={() => setOpenWindow(false)} groupId={groupId} projectId={projectId}/>
+      <TaskWindowComponent onClose={() => setOpenWindow(false)} data={data} groupId={groupId} projectId={projectId}/>
+      // <TaskChat data={data} onClose={() => setOpenWindow(false)} groupId={groupId} projectId={projectId}/>
     )}
 
     <li

@@ -5,6 +5,7 @@ import './ActiveTaskPage.css'
 import ActiveTaskDetail from "../../components/ActiveTaskDetail/ActiveTaskDetail"
 import LoaderComponent from "../../components/LoaderComponent/LoaderComponent"
 import { useLoader } from "../../common/hooks/loaderHook"
+import { truncateString } from "../../common/truncate"
 
 interface TaskItem {
     id: number;
@@ -63,8 +64,8 @@ function ActiveTaskPage() {
                         key={index}
                         style={{ animationDelay: `${index * 0.1}s`}}
                         >
-                            <h2>Task name: {item?.task?.name}</h2>
-                            <h4>Project name: {item?.task?.project_name}</h4>
+                            <h2>{truncateString(item?.task?.name, 30)}</h2>
+                            <h4>Project name: {truncateString(item?.task?.project_name, 40)}</h4>
                             <p>{item?.date_add}</p>
                         </div>
                     ))}

@@ -48,19 +48,24 @@ import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon'
 import AICreatorTask from '../../components/AICreatorTask/AICreatorTask'
 
 
-interface Item {
-  id: string
-  content: string
-  name: string
-  deadline: string
-  title: string;
-  status: "BS" | "US" | "NS" | string;
+type TaskStatus = "US" | "NS"| "BS"
+
+interface TaskData {
+    created_at: string;
+    deadline: string;
+    description: string;
+    id: number;
+    is_performer: boolean
+    name: string;
+    project: number;
+    project_name: string;
+    status: TaskStatus
 }
 
 interface Container {
   id: string;
   title: string;
-  items: Item[];
+  items: TaskData[];
 }
 
 
@@ -112,9 +117,9 @@ export default function MultipleContainers() {
         const allTasks = response.data.result.tasks
 
         // Фильтруем задачи по статусам
-        const baseTasks = allTasks.filter((task: Item) => task.status === "BS")
-        const urgentTasks = allTasks.filter((task: Item) => task.status === "US") 
-        const noStatusTasks = allTasks.filter((task: Item) => task.status === "NS")
+        const baseTasks = allTasks.filter((task: TaskData) => task.status === "BS")
+        const urgentTasks = allTasks.filter((task: TaskData) => task.status === "US") 
+        const noStatusTasks = allTasks.filter((task: TaskData) => task.status === "NS")
         
         setContainers([
           {

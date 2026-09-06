@@ -5,7 +5,7 @@
     justify-content: start;
     align-items: center;
     width: 100%;
-    padding: 8px 0px;
+    padding: 8px 10px;
 }
 
 .task-chat__message-wrapper.user {
