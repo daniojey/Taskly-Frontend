@@ -10,6 +10,10 @@ export function useLoader(startLoading: boolean = true) {
         setTimeout(() => {
             setLoading(false)
         }, 400)
+        
+        setTimeout(() => {
+            setCloseLoading(false)
+        }, 500)
     }
 
     return {

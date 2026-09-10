@@ -229,3 +229,9 @@ button {
   border-color: #323079;
   box-shadow: 0 0 0 3px rgba(91, 87, 217, 0.25);
 }
+
+.holy_checkbox.off {
+  transition: filter 0.4s ease-in-out;
+  filter: brightness(0.4);
+  pointer-events: none;
+}

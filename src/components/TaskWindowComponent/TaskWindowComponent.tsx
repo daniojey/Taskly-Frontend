@@ -8,6 +8,7 @@ import { truncateString } from "../../common/truncate.js"
 import TaskStatisticModelWindow from "../TaskStatisticModelWindow/TaskStatisticModelWindow.tsx"
 import TaskSettingsComponent from "../TaskSettingsComponent/TaskSettingsComponent.tsx"
 import TaskChat from "../TaskChat/TaskChat.tsx"
+import SubTasksComponent from "../SubTasksComponent/SubTasksComponent.tsx"
 
 type TaskStatus = "US" | "NS"| "BS"
 
@@ -85,7 +86,7 @@ function TaskWindowComponent ({ onClose, data, groupId, projectId} : TaskWindowC
                             </div>
 
                             {activePart === "subTask" && (
-                                <></>
+                                <SubTasksComponent taskId={taskData.id}/>
                             )}
 
                             {activePart === "chat" && (
