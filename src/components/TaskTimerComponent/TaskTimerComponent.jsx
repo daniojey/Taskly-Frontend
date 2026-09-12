@@ -24,7 +24,7 @@ function TaskTimerComponent( {taskId, taskName, shortVersion = false }) {
             <button
                 onClick={timer.elapsed > 0 ? timer.resume : timer.start}
             >
-                {timer.elapsed > 0 ? 'Resume' : 'Start'}
+                {timer.elapsed > 0 ? 'Resume' : 'Start session'}
             </button>
             ) : (
             <button
@@ -34,11 +34,15 @@ function TaskTimerComponent( {taskId, taskName, shortVersion = false }) {
             </button>
             )}
             
-            <button
-            onClick={timer.reset}
-            >
-            Reset
-            </button>
+            {timer.startTime !== 0 && (
+                <button
+                onClick={timer.reset}
+                >
+                Reset
+                </button>
+            )
+            }
+            
         </div>
         )}
         

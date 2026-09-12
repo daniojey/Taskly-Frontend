@@ -59,6 +59,7 @@ interface OneTimerContextType {
     isPaused: boolean;
     isRunning: () => boolean;
     activeTaskId: null | number;
+    startTime: number
 }
 
 interface OneTimerProviderProps {
@@ -201,7 +202,8 @@ export function OneTimerProvider({ children }: OneTimerProviderProps) {
             getElapsed,
             isPaused,
             isRunning,
-            activeTaskId
+            activeTaskId,
+            startTime
         }}>
             {children}
         </OneTimerContext.Provider>

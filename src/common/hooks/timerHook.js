@@ -15,6 +15,7 @@ export function useTimer(taskId) {
         reset: () => context.resetTimer(),
         elapsed: context.getElapsed(),
         formatted: context.getFormattedTime(),
-        isRunning: context.isRunning()
+        isRunning: context.isRunning(),
+        startTime: context.startTime,
     }
 }
