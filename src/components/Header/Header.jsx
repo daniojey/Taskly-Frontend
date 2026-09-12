@@ -10,7 +10,7 @@ import { useTaskTimer } from '../../common/stores/TaskStore'
 
 function Header() {
     const { loading, user, logout, notifications} = useContext(AuthContext);
-    const { isPaused } = useContext(OneTimerContext)
+    const { isPaused, startTime } = useContext(OneTimerContext)
     const taskId = useTaskTimer((state) => state.taskId)
     const navigate = useNavigate()
 
@@ -40,7 +40,7 @@ function Header() {
                    <Link to='/active-tasks/'>Active Tasks</Link>
                 )}
                 
-                {!isPaused && (
+                {startTime !== 0 && (
                     <TaskTimerComponent taskId={taskId} shortVersion={true}/>
                 )}
             </div>

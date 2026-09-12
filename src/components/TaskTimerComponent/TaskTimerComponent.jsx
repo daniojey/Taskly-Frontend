@@ -1,10 +1,13 @@
 import { useTimer } from "../../common/hooks/timerHook";
 import { useTaskTimer } from "../../common/stores/TaskStore";
+import TaskTimerContextComponent from "../TaskTimerContextComponent/TaskTimerContextComponent";
 import './TaskTimerComponent.css'
+import { useState } from "react";
 
 function TaskTimerComponent( {taskId, taskName, shortVersion = false }) {
     const taskIdActive = useTaskTimer((state) => state.taskId)
     const activeTimer = useTaskTimer((state) => state.timerActive)
+    const [menuPos, setMenuPos] = useState(null)
     const timer = useTimer(taskId)
 
     return(
@@ -12,9 +15,25 @@ function TaskTimerComponent( {taskId, taskName, shortVersion = false }) {
         
         
         {taskId === taskIdActive && (
-            <div className="timer-time">
-                {timer?.formatted?.formatted}
-            </div>
+            <>
+                <div 
+                className="timer-time"
+                onClick={(e) => setMenuPos({x: e.clientX, y: e.clientY})}
+                >
+                    {timer?.formatted?.formatted}
+                </div>
+
+                {menuPos && (
+                    <TaskTimerContextComponent 
+                    data={menuPos} 
+                    onClose={() => setMenuPos(null)}
+                    onResume={timer.resume}
+                    onPause={timer.pause}
+                    onReset={timer.reset}
+                    isRunning={timer.isRunning}
+                    />
+                )}
+            </>
         )}
 
 

@@ -1,0 +1,12 @@
+.subtask__context-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #252256;
+    padding: 24px;
+    border-radius: 12px;
+
+    button {
+        background-color: #5b57d9;
+    }
+}
