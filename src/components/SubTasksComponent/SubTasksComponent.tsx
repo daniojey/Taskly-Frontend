@@ -3,6 +3,7 @@ import "./SubTasksComponent.css"
 import { SubTaskActionTypes, SubTasksActions, SubTasksState, SubTaskItem } from "./TypesSubTasks"
 import { useApi } from "../../common/api_query";
 import { useNotify } from "../../common/stores/NotifyStore";
+import DynamicPngIcon from "../UI/icons/DynamicPngIcon";
 
 const initialState: SubTasksState = {
     subtasks: [],
@@ -41,6 +42,21 @@ function SubTasksComponent({ taskId }: { taskId: number }) {
     const [state, dispatch] = useReducer(SubTasksReducer, initialState)
     const [lastActiveTask, setLastActiveTask] = useState<number>()
     const { addNotify } = useNotify()
+    const [descriptionExpanded, setDescriptionExpanded] = useState<Set<number>>(new Set())
+
+    const toggleExpand = (id: number) => {
+        setDescriptionExpanded(prev => {
+            const next = new Set(prev)
+
+            if (next.has(id)) {
+                next.delete(id)
+            } else {
+                next.add(id)
+            }
+
+            return next
+        })
+    }
 
     useEffect(() => {
         const loadSubtasks = async () => {
@@ -90,6 +106,10 @@ function SubTasksComponent({ taskId }: { taskId: number }) {
         return true
     }
 
+    const isExpanded = (id: number) => {
+        return descriptionExpanded.has(id)
+    }
+
 
     return (
         <div className="subtasks__base-container">
@@ -114,8 +134,26 @@ function SubTasksComponent({ taskId }: { taskId: number }) {
                             ></label>
                         </div>
 
-                        <p>{item.title}</p>
-                        <div></div>
+                        <div 
+                        className="subtask__row-title"
+                        onClick={() => toggleExpand(item.id)}
+                        >
+                            <p
+                            
+                            >{item.title}</p>
+                        </div>
+                        
+                        {!isExpanded(item.id) && (
+                            <DynamicPngIcon 
+                            onClick={() => toggleExpand(item.id)}
+                            iconName={"arrowDownWhite"}/>
+                        )}
+                    </div>
+
+                    <div className={`subtask__description-wrapper ${isExpanded(item.id) ? "expanded" : ""}`}>
+                        <div className="subtask__description">
+                            {item.description}
+                        </div>
                     </div>
                 </>
             ))}

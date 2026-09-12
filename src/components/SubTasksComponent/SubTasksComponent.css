@@ -2,26 +2,72 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    gap: 25px;
+    /* gap: 25px; */
     flex: 1;
     min-height: 0;
     padding: 20px 0px;
     box-sizing: border-box;
 }
 
+
 .subtask__row {
+    position: relative;
     display: flex;
     gap: 10px;
     align-items: center;
+    padding-bottom: 5px;
     justify-content: start;
+    border-bottom: 0.2px solid #3b3887ab;
     
-    p {
-        margin: 0;
-        font-weight: 900;
+    img {
+        position: absolute;
+        height: 2vh;
+        width: 2vw;
+        right: 0;
+        cursor: pointer;
     }
 }
+
 
 .subtask__row.active {
     filter: brightness(0.4);
     pointer-events: none;
+}
+
+
+.subtask__row-title {
+    display: flex;
+    width: 100%;
+    cursor: pointer;
+
+    p {
+        margin: 0;
+        font-weight: 900;
+        transition: color 0.3s ease-in-out;
+    }
+
+    &:hover {
+        p {
+            color: #5b57d9
+        }
+    }
+}
+
+
+.subtask__description-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+    margin-bottom: 20px;
+}
+
+
+.subtask__description-wrapper.expanded {
+    grid-template-rows: 1fr;
+}
+
+
+.subtask__description {
+    overflow: hidden;
+    min-height: 0; /* важно для grid */
 }
