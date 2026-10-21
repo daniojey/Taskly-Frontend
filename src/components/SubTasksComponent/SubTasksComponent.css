@@ -9,6 +9,25 @@
     box-sizing: border-box;
 }
 
+.subtask-button__body {
+    display: flex;
+    justify-content: center;
+
+    p {
+        display: flex;
+        background-color: #5b57d9;
+        padding: 8px 16px;
+        margin: 0;
+        cursor: pointer;
+        transition: background-color 0.3s ease-in-out;
+        border-radius: 8px;
+
+        &:hover {
+            background-color: #3b3887ab;
+        }
+    }
+}
+
 
 .subtask__row {
     position: relative;

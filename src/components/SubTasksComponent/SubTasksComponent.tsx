@@ -4,6 +4,7 @@ import { SubTaskActionTypes, SubTasksActions, SubTasksState, SubTaskItem } from 
 import { useApi } from "../../common/api_query";
 import { useNotify } from "../../common/stores/NotifyStore";
 import DynamicPngIcon from "../UI/icons/DynamicPngIcon";
+import CreateSubTask from "../CreateSubTask/CreateSubTask";
 
 const initialState: SubTasksState = {
     subtasks: [],
@@ -31,6 +32,12 @@ function SubTasksReducer(state: SubTasksState, action: SubTasksActions) {
                 ...state,
                 subtasks: state.subtasks.filter(item => item.id === item.id)
             }
+
+        case SubTaskActionTypes.ADD_NEW_SUBTASK:
+            return {
+                ...state,
+                subtasks: [...state.subtasks, payload]
+            }
         default:
             return state
     }
@@ -40,6 +47,7 @@ function SubTasksReducer(state: SubTasksState, action: SubTasksActions) {
 
 function SubTasksComponent({ taskId }: { taskId: number }) {
     const [state, dispatch] = useReducer(SubTasksReducer, initialState)
+    const [ createWindow, setCreateWindow] = useState<boolean>(false)
     const [lastActiveTask, setLastActiveTask] = useState<number>()
     const { addNotify } = useNotify()
     const [descriptionExpanded, setDescriptionExpanded] = useState<Set<number>>(new Set())
@@ -110,9 +118,19 @@ function SubTasksComponent({ taskId }: { taskId: number }) {
         return descriptionExpanded.has(id)
     }
 
+    const handleUpdateSubtasks = (subtask: SubTaskItem) => {
+        dispatch({"type": SubTaskActionTypes.ADD_NEW_SUBTASK, "payload": subtask})
+        setCreateWindow(false)
+    }
+
 
     return (
         <div className="subtasks__base-container">
+            {createWindow && (
+                <CreateSubTask onClose={() => setCreateWindow(false)} taskId={taskId}/>
+            )}
+
+
             {state.subtasks.length > 0 && state.subtasks.map((item, index) => (
                 <>
                     <div
@@ -157,6 +175,11 @@ function SubTasksComponent({ taskId }: { taskId: number }) {
                     </div>
                 </>
             ))}
+            <div 
+            className="subtask-button__body"
+            onClick={() => setCreateWindow(true)}>
+                <p>Add Subtask +</p>
+            </div>
         </div>
     )
 }

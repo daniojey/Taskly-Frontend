@@ -50,6 +50,8 @@ function StratagemComponent() {
 
     const mapTimers = useRef(new Map())
 
+    const SECONDDELAY = 2000
+
     const arrowMap = new Map([
         [1, 'up'],
         [2, 'down'],
@@ -74,10 +76,14 @@ function StratagemComponent() {
     useEffect(() => {
         const handleKeydownEvent = (e: KeyboardEvent) => {
             const inputKey = e.code
-
+            
             if (e.altKey) {
-                e.preventDefault()
-                setOpenWindow(true)
+                const openTimer = setTimeout(() => {
+                    e.preventDefault()
+                    setOpenWindow(true)
+                }, 300)
+
+                mapTimers.current.set("openTimer", openTimer)
             }
 
             if (e.altKey && isArrayKey(inputKey)) {
@@ -108,7 +114,11 @@ function StratagemComponent() {
 
         const handleKeyupEvent = (e: KeyboardEvent) => {
             if (e.key.toLowerCase() === 'alt') {
-                if (mapTimers.current.has('sTimer')) {
+                if (mapTimers.current.has('openTimer')) {
+                    clearTimeout(mapTimers.current.get('openTimer'))
+                }
+
+                if (mapTimers.current.has('closeTimer')) {
                     return 
                 }
                 e.preventDefault()
@@ -119,16 +129,22 @@ function StratagemComponent() {
                 const timer = setTimeout(() => {
                     setCloseWindow(false)
                     setOpenWindow(false)
-                    mapTimers.current.clear()
+                    mapTimers.current.delete('closeTimer')
                 }, 400)
 
-                mapTimers.current.set('sTimer', timer)
+                mapTimers.current.set('closeTimer', timer)
             }
         }
 
+        const handleBlurEvent = (e: Event) => {
+            setOpenWindow(false)
+        }
+
+        window.addEventListener('blur', handleBlurEvent)
         window.addEventListener('keydown', handleKeydownEvent)
         window.addEventListener('keyup', handleKeyupEvent)
         return () => {
+            window.removeEventListener("blur", handleBlurEvent)
             window.removeEventListener('keydown', handleKeydownEvent)
             window.removeEventListener('keyup', handleKeyupEvent)
         } 

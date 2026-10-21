@@ -1,0 +1,35 @@
+.subtask-create__title {
+    display: flex;
+    justify-content: center;
+}
+
+.subtask-create__form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+    width: 100%;
+}
+
+.subtask-create__button-body {
+    display: flex;
+    width: 100%;
+    justify-content: end;
+
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #5b57d9;
+        padding: 10px 35px;
+        font-size: 1.1rem;
+        font-weight: 900;
+        border-radius: 12px;
+        transition: background-color 0.5s ease;
+        font-family: var(--main-font-bold);
+
+        &:hover {
+            background-color: #4441b1;
+        }
+    }
+}

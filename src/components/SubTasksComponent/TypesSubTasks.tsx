@@ -1,7 +1,8 @@
 export enum SubTaskActionTypes {
     SET_SUBTASKS = "SET_SUBTASKS",
     UPDATE_SUBTASK = "UPDATE_SUBTASK",
-    REMOVE_SUBTASK = "REMOVE_SUBTASK"
+    REMOVE_SUBTASK = "REMOVE_SUBTASK",
+    ADD_NEW_SUBTASK = "ADD_NEW_SUBTASK"
 }
 
 
@@ -30,10 +31,16 @@ interface RemoveSubtask {
     payload: SubTaskItem
 }
 
+interface AddNewSubTask {
+    type: SubTaskActionTypes.ADD_NEW_SUBTASK,
+    payload: SubTaskItem
+}
+
 export type SubTasksActions = 
     SetSubTasks |
     UpdateSubTask |
-    RemoveSubtask
+    RemoveSubtask |
+    AddNewSubTask
 
 
 export interface SubTasksState {
