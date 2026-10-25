@@ -45,6 +45,7 @@ export type SubTasksActions =
 
 export interface SubTasksState {
     subtasks: SubTaskItem[];    
-    loading: boolean
+    loading: boolean;
+    newSubtasks: SubTaskItem[];
 }
 

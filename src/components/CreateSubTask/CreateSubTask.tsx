@@ -11,7 +11,7 @@ import { useNotify } from "../../common/stores/NotifyStore"
 import { SubTaskItem } from "../SubTasksComponent/TypesSubTasks"
 
 
-function CreateSubTask({onClose, taskId} : CreateSubTaskProps) {
+function CreateSubTask({onClose, taskId, onUpdate} : CreateSubTaskProps) {
     const { addNotify } = useNotify()
     const [ loading, setLoading] = useState<boolean>(false)
     const { isClosing, handleCloseWindow, closeWindow } = useModalClose({onClose: onClose, delay: 400, className: 'window-overlay'})
@@ -53,7 +53,7 @@ function CreateSubTask({onClose, taskId} : CreateSubTaskProps) {
         )
 
         if (result["success"]) {
-            console.log(result['data'])
+            onUpdate(result['data'])
         } else {
             addNotify("Server return error when processing", "error")
         }

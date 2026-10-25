@@ -12,6 +12,7 @@
 .subtask-button__body {
     display: flex;
     justify-content: center;
+    gap: 10px;
 
     p {
         display: flex;
@@ -26,6 +27,14 @@
             background-color: #3b3887ab;
         }
     }
+
+    #edit-mode {
+        background-color: red;
+    }
+
+    #unactive-edit-mode {
+        background-color: green;
+    }
 }
 
 
@@ -38,7 +47,7 @@
     justify-content: start;
     border-bottom: 0.2px solid #3b3887ab;
     
-    img {
+    #subtask-expand-arrow {
         position: absolute;
         height: 2vh;
         width: 2vw;
@@ -72,6 +81,30 @@
     }
 }
 
+.subtask-edit-mode__body {
+    display: flex;
+    box-sizing: border-box;
+    gap: 15px;
+    justify-content: end;
+    align-items: center;
+    width: 100%;
+
+    img {
+        display: flex;
+        height: 22px;
+        width: 22px;
+    }
+}
+
+.subtask-edit-mode__item {
+    border: 0.2px solid rgba(255, 255, 255, 0.505);
+    padding: 4px 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    cursor: pointer;
+}
 
 .subtask__description-wrapper {
     display: grid;
