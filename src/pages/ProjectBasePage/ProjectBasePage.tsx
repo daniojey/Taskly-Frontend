@@ -114,7 +114,7 @@ export default function MultipleContainers() {
           }}
         )
 
-        const allTasks = response.data.result.tasks
+        const allTasks = response.data.results.tasks
 
         // Фильтруем задачи по статусам
         const baseTasks = allTasks.filter((task: TaskData) => task.status === "BS")

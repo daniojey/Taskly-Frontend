@@ -7,7 +7,7 @@ import { useNotify } from "./common/stores/NotifyStore";
 const startSession = async ( taskId: number) => {
     try {
         const response = await api.post(
-            `api/v1/task-sessions/start_session_performer/`,
+            `api/v1/task-sessions/start/`,
             {taskId},
             {headers: {
                 Authorization: getAccessToken()
@@ -24,7 +24,7 @@ const updateSession = async ( sessionId: number | null, time: number) => {
 
     try {
         const response = await api.patch(
-            `api/v1/task-sessions/${sessionId}/update_session_performer/`,
+            `api/v1/task-sessions/${sessionId}/update_session/`,
             {time},
             {headers: {Authorization: getAccessToken()}}
         )
@@ -39,7 +39,7 @@ const updateSession = async ( sessionId: number | null, time: number) => {
 const endSession = async ( sessionId: number | null, time: number) => {
     try {
         const response = await api.post(
-            `api/v1/task-sessions/${sessionId}/end_session/`,
+            `api/v1/task-sessions/${sessionId}/end/`,
             {time},
             {headers: {Authorization: getAccessToken()}}
         )

@@ -1,7 +1,7 @@
 import { api } from "../../api";
 import { getAccessToken } from "../../tokens_func";
 
-type MethodTypes = 'get' | 'post'| 'delete' | 'patch'
+type MethodTypes = 'get' | 'post'| 'delete' | 'patch' | 'put'
 
 interface ApiResultSuccess<T> {
     success: true,
@@ -31,6 +31,9 @@ export async function useApi<T>(url: string, method: MethodTypes, data: any = {}
             case "patch":
                 const patchResult = await api.patch(url, data, {headers: {Authorization: getAccessToken()}})
                 return { success: true, data: patchResult.data.results}
+            case "put":
+                const putResult = await api.put(url, data, {headers: {Authorization: getAccessToken()}})
+                return { success: true, data: putResult.data.results}
         }
     } catch (e) {
         return { success: false, error: String(e)}

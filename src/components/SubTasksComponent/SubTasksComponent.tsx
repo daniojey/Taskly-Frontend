@@ -77,7 +77,10 @@ function SubTasksComponent({ taskId }: { taskId: number }) {
 
 
     const loadSubtasks = useCallback(async () => {
-        const result = await useApi<SubTaskItem[]>(`api/v1/tasks/${taskId}/get_subtasks/`, "get");
+        const result = await useApi<SubTaskItem[]>(
+            `api/v1/subtasks/${taskId}/get_subtasks/`, 
+            "get",
+        );
 
             if (result.success) {
                 dispatch({ type: SubTaskActionTypes.SET_SUBTASKS, payload: result.data });
@@ -95,7 +98,7 @@ function SubTasksComponent({ taskId }: { taskId: number }) {
 
     async function UpdateSubtask(subTaskId: number, is_closed: boolean) {
         const result = await useApi<SubTaskItem>(
-            `api/v1/tasks/${subTaskId}/suptask_update/`,
+            `api/v1/subtasks/${subTaskId}/`,
             "patch",
             { is_closed: is_closed }
         )

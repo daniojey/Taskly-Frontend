@@ -1,3 +1,11 @@
+.task-performers-main {
+    display: flex;
+    overflow-y: auto;
+    height: 100%;
+    flex-direction: column;
+}
+
+
 .task-performers-title {
     display: flex;
     align-items: center;
@@ -42,6 +50,17 @@
 
 .user-item-card.active {
     background-color: #423fa0;
+}
+
+.task-settings__is-active {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+
+    img {
+        cursor: pointer;
+    }
 }
 
 

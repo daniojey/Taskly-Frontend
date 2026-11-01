@@ -104,7 +104,7 @@ function TaskSessionComponent({ taskId }: { taskId: number }) {
     },[state.is_active, state.unactive, state.unactive])
 
     const buildUrl = () => {
-        let url = `api/v1/task-sessions/${taskId}/get_task_performers_sessions/?page=${currentPage}`;
+        let url = `api/v1/task-sessions/${taskId}/get_sessions/?page=${currentPage}`;
 
         if (state.is_active) {
             url += `&is_active=${state.is_active ? 'True' : ''}`
