@@ -28,8 +28,14 @@ function calculateMatches (short: number[], strategies: StratagemItem[]) {
 }
 
 function isArrayKey(key: string): key is keyof typeof userInputMap {
+    console.log(key)
     return key in userInputMap
 }
+
+const isTyping = (t: EventTarget | null) => 
+    t instanceof HTMLElement &&
+    (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName))
+
 
 const baseStrategies = [
     {name: 'groups', url: '/groups/',  combination: [1, 1, 2, 4], is_match: false, is_base: true},
@@ -43,6 +49,7 @@ function StratagemComponent() {
     const [strategies, setStrategies] = useState<StratagemItem[]>([...baseStrategies, ...stratagems])
     const strategiesRef = useRef<StratagemItem[]>(strategies)
     const [closeWindow, setCloseWindow] = useState<boolean>(false)
+    const heldRef = useRef(new Set<string>())
 
     const [openWindow, setOpenWindow] = useState<boolean>(false)
     const [userInput, setUserInput] = useState<number[]>([])
@@ -75,9 +82,14 @@ function StratagemComponent() {
 
     useEffect(() => {
         const handleKeydownEvent = (e: KeyboardEvent) => {
-            const inputKey = e.code
+            if (isTyping(e.target)) return 
             
-            if (e.altKey) {
+            const inputKey = e.code
+
+            if (e.code === "KeyQ") {
+                if (e.repeat) return
+                heldRef.current.add('KeyQ')
+
                 const openTimer = setTimeout(() => {
                     e.preventDefault()
                     setOpenWindow(true)
@@ -85,8 +97,10 @@ function StratagemComponent() {
 
                 mapTimers.current.set("openTimer", openTimer)
             }
-
-            if (e.altKey && isArrayKey(inputKey)) {
+            
+            console.log("Ex")
+            if (heldRef.current.has('KeyQ') && isArrayKey(inputKey)) {
+                console.log('EXCECUTE')
                 const currentStrategies = strategiesRef.current
                 const input = [...userInput, userInputMap[inputKey]]
 
@@ -113,7 +127,7 @@ function StratagemComponent() {
         }
 
         const handleKeyupEvent = (e: KeyboardEvent) => {
-            if (e.key.toLowerCase() === 'alt') {
+            if (e.key.toLowerCase() === 'q') {
                 if (mapTimers.current.has('openTimer')) {
                     clearTimeout(mapTimers.current.get('openTimer'))
                 }

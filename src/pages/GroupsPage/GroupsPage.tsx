@@ -1,12 +1,12 @@
 import { useEffect, useState, useContext } from "react"
-import { api } from "../../../api.js"
+import { api } from "../../../api.ts"
 import { getAccessToken } from "../../../tokens_func.js"
 import GroupCard from "../../components/GroupCard/GroupCard.tsx"
 import './GroupPage.css'
 import { useSearchParams } from "react-router"
-import { AuthContext } from "../../AuthContext.jsx"
 import AddMembersModelWindow from "../../components/AddMembersModelWindow/AddMembersModelWindow.tsx"
 import { useNotify } from "../../common/stores/NotifyStore.tsx"
+import { useAuth } from "../../common/hooks/useAuth.ts"
 
 
 interface GroupItem {
@@ -23,7 +23,7 @@ function GroupsPage() {
     const [searchParams, setSearchParams] = useSearchParams()
     const [createForm, setCreateForm] = useState<boolean>(false) 
     const [groupName, setGroupName] = useState<string | null>(null)
-    const {user} = useContext(AuthContext)
+    const {user} = useAuth()
     const [addMembersWindow, setAddMembersWindow] = useState<boolean>(false)
     const [selectValue, setSelectValue] = useState<string | null>(null)
     const addNotify = useNotify((state) => state.addNotify)
@@ -43,6 +43,11 @@ function GroupsPage() {
     }
 
     const onCreateGroup = async (members_ids: number[] | null = null) => {
+        if (!user) {
+            addNotify('user was not found', 'error')
+            return
+        }
+
         let members_data: number[] = [user.id]
 
         if (members_ids) {

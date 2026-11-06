@@ -1,17 +1,16 @@
-import React, { useState, useEffect, createContext, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { api } from "../api";
-import Cookies from "js-cookie";
 import { getAccessToken, verifyToken } from "../tokens_func";
 import { useUser } from "./common/stores/AuthStore";
 import { useStratagemStore } from "./common/stores/StratagemStore";
-
-
-export const AuthContext = createContext();
+import { useNotify } from "./common/stores/NotifyStore";
+import { AuthContext } from "./createdContext";
 
 export const AuthProvider = ({ children }) => {
-    const removeUser = useUser((state) => state.removeUser)
-    const { user, setUser } = useUser()
-    const [notifications, setNotifications] = useState(null)
+    const context = AuthContext
+    const { user, setUser, removeUser} = useUser()
+    const { addNotify } = useNotify()
+    const [notifications, setNotifications] = useState<[]>([])
     const [loading, setLoading] = useState(false)
     const [isLogin, setIsLogin] = useState(false)
     const [error, setError] = useState(null)
@@ -149,8 +148,7 @@ export const AuthProvider = ({ children }) => {
 
             return true
         } catch (error) {
-            console.error('Ошибка входа:', err);
-            setError(err);
+            addNotify("Error when processing login", 'error')
             return false
         } finally {
             setIsLogin(false)
@@ -197,7 +195,7 @@ export const AuthProvider = ({ children }) => {
     }), [user, login, logout, loading, isLogin, error, showLoading, notifications, updateNotify])
 
     return (
-        <AuthContext.Provider value={contextValue}>
+        <context.Provider value={contextValue}>
             {children}
 
             {showLoading && (
@@ -207,6 +205,6 @@ export const AuthProvider = ({ children }) => {
                     </div>
                 </div>
             )}
-        </AuthContext.Provider>
+        </context.Provider>
     )
 }

@@ -4,11 +4,10 @@ import '../../index.css'
 import { Resolver, SubmitHandler, useForm } from 'react-hook-form'
 import * as yup from 'yup';
 import {yupResolver} from '@hookform/resolvers/yup'
-import { useContext} from 'react';
-import { AuthContext} from '../../AuthContext'
 import { useModalClose } from '../../common/hooks/closeOverlay';
 import { createTask } from './common/create_task';
 import { useNotify } from '../../common/stores/NotifyStore';
+import { useAuth } from '../../common/hooks/useAuth';
 
 interface CreateTaskWindowProps {
     onClose: () => void;
@@ -32,7 +31,7 @@ interface FormData extends YupFormData {
 
 
 function CreateTaskWindow({ onClose, onUpdate, projectId }: CreateTaskWindowProps) {
-    const { user } = useContext(AuthContext)
+    const { user } = useAuth()
     const { addNotify } = useNotify()
     const { isClosing, handleCloseWindow, closeWindow} = useModalClose({ onClose: onClose, delay: 400, className: 'window-overlay'})
 
@@ -59,10 +58,12 @@ function CreateTaskWindow({ onClose, onUpdate, projectId }: CreateTaskWindowProp
 
 
     const submitForm: SubmitHandler<YupFormData> = async (data) => {
+        if (!user) return
+
         const formData: FormData = {
             ...data,
             project_id: projectId,
-            created_by: user.id
+            created_by: user?.id
         }
         
         const result = await createTask(formData, projectId, { closeWindow: closeWindow, onUpdate: onUpdate})

@@ -2,14 +2,14 @@ import './Header.css'
 import { useContext } from 'react'
 import { useNavigate } from 'react-router'
 import { Link } from 'react-router'
-import { AuthContext } from '../../AuthContext'
 import DynamicPngIcon from '../UI/icons/DynamicPngIcon'
 import TaskTimerComponent from '../TaskTimerComponent/TaskTimerComponent'
 import { OneTimerContext } from '../../OneTimerContext'
 import { useTaskTimer } from '../../common/stores/TaskStore'
+import { useAuth } from '../../common/hooks/useAuth'
 
 function Header() {
-    const { loading, user, logout, notifications} = useContext(AuthContext);
+    const { loading, user, logout, notifications} = useAuth()
     const { isPaused, startTime } = useContext(OneTimerContext)
     const taskId = useTaskTimer((state) => state.taskId)
     const navigate = useNavigate()

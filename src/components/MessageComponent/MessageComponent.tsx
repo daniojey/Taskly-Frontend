@@ -54,7 +54,7 @@ function MessageComponent({ messageData, activeImageRef, setActiveImage } : Mess
     const [messageItem, _] = useState<MessageItem>(messageData)
     const user = useUser((state) => state.user)
     
-    const isOwn = messageItem.user.id === user.id
+    const isOwn = user !== null && messageItem.user.id === user.id
 
     return (
         <div className="task-chat__message-wrapper">

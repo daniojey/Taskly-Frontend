@@ -3,10 +3,10 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup'
 import { api } from '../../../api';
 import { useContext } from 'react';
-import { AuthContext } from '../../AuthContext.jsx'
 import { useNavigate } from "react-router"
 import "./RegistrationPage.css"
 import { Link } from 'react-router';
+import { useAuth } from '../../common/hooks/useAuth';
 
 
 interface YupFormData {
@@ -19,7 +19,7 @@ interface YupFormData {
 }
 
 function RegistrationPage() {
-    const { login } = useContext(AuthContext)
+    const { login } = useAuth()
     const navigate = useNavigate()
     
     const schema = yup.object({

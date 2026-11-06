@@ -1,8 +1,8 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { useSearchParams } from "react-router";
 import './Notification.css'
-import { AuthContext } from "../../AuthContext";
 import { useWebSocket } from "../../common/hooks/webSocketHook";
+import { useAuth } from "../../common/hooks/useAuth";
 
 interface NotificationData {
   message: string;
@@ -14,7 +14,7 @@ function Notification() {
     const token = localStorage.getItem('accessToken')
     const [notify, setNotify] = useState<string | null>(null)
     const [hideNotify, setHideNotify] = useState(false)
-    const {updateNotify} = useContext(AuthContext)
+    const {updateNotify} = useAuth()
 
     const protocol = window.location.protocol === "https:" ? 'wss://' : 'ws://'
 

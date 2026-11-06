@@ -1,7 +1,7 @@
 import { useContext, useState } from "react"
-import { AuthContext } from "../../AuthContext"
 import { useNavigate } from "react-router"
 import './LoginPage.css'
+import { useAuth } from "../../common/hooks/useAuth"
 
 const welcomeText = ['W', 'e', 'l', 'c', 'o', 'm', 'e', '', 'b', 'a', 'c', 'k']
 
@@ -9,11 +9,12 @@ function LoginPage() {
     const [username, setUsername] = useState<string | null>(null)
     const [password, setPassword] = useState<string | null>(null)
     const [showPassword, setShowPassword] = useState<boolean>(false)
-    const { login } = useContext(AuthContext)
+    const { login } = useAuth()
     const navigate = useNavigate()
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        if (!username && !password) return
         const success = await login(username, password)
 
         if (success) {

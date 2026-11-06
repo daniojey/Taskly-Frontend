@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import './GroupPageDetail.css'
 import { useParams, useNavigate } from 'react-router'
-import { api } from '../../../api.js'
+import { api } from '../../../api.ts'
 import { getAccessToken } from '../../../tokens_func.js'
 import ProjectCard from '../../components/ProjectCard/ProjectCard.jsx'
 import AddMemberWindow from '../../components/AddMembersWindow/AddMembersWindow.js'
@@ -10,7 +10,7 @@ import DynamicPngIcon from '../../components/UI/icons/DynamicPngIcon.jsx'
 import CreateProjectWindow from '../../components/CreateProjectWindow/CreateProjectWindow.js'
 import DeleteWindow from '../../components/DeleteWindow/DeleteWindow.js'
 import DeleteWindowConfirmation from '../../components/DeleteWindowConfirmation/DeleteWindowConfirmation.js'
-import { useUser } from '../../common/stores/AuthStore.jsx'
+import { useUser } from '../../common/stores/AuthStore.tsx'
 import { deleteGroup } from './common/delete_group.js'
 
 interface UserItem {

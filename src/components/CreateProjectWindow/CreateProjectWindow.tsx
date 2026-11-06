@@ -7,9 +7,9 @@ import { useForm, SubmitHandler, Resolver } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from '../../../api'
 import { getAccessToken } from '../../../tokens_func'
-import { AuthContext } from '../../AuthContext'
 import { useModalClose } from '../../common/hooks/closeOverlay'
 import '../../common/Styles/ModelWindow.css'
+import { useAuth } from '../../common/hooks/useAuth'
 
 interface CreateProjectWindowProps {
     groupId: string;
@@ -19,7 +19,7 @@ interface CreateProjectWindowProps {
 
 
 function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindowProps) {
-    const { user } = useContext(AuthContext)
+    const { user } = useAuth()
     const { 
         handleCloseWindow,
         closeWindow, 
@@ -53,6 +53,7 @@ function CreateProjectWindow({ groupId, onClose, onUpdate }: CreateProjectWindow
 
 
     const handleForm: SubmitHandler<ProjectData> = async (data) => {
+        if (!user) return
         console.log(data)
 
         const apiData: FormData = {

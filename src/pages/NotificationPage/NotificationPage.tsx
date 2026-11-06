@@ -1,5 +1,4 @@
 import { useContext, useEffect, useReducer, useState } from "react"
-import { AuthContext } from "../../AuthContext"
 import './NotificationPage.css'
 import { api } from "../../../api"
 import { getAccessToken } from "../../../tokens_func"
@@ -84,7 +83,6 @@ function reducer(state: InitialStateData, action: ActionTypes): InitialStateData
 
 
 function NotificationPage() {
-    const { user } = useContext(AuthContext)
     const [searchParams, setSearchParams] = useSearchParams()
     const [state, dispatch] = useReducer(reducer, initialState)
 

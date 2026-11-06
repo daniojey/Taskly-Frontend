@@ -1,9 +1,11 @@
 import { create } from "zustand";
 
-interface MessageObj {
+type messageType = "success" | "error"
+
+export interface MessageObj {
     id: number;
     message: string;
-    type: string;
+    type: messageType;
     hidden: boolean;
 }
 
@@ -12,7 +14,7 @@ interface Notify {
 }
 
 interface Actions {
-    addNotify: (message: string, type: string) => void;
+    addNotify: (message: string, type: messageType) => void;
     reduceNotify: () => void;
     removeNotify: (notifyId: number) => void;
 }

@@ -9,6 +9,7 @@ import DynamicPngIcon from "../../components/UI/icons/DynamicPngIcon"
 import "../../index.css"
 import "./StratagemPage.css"
 import { useStratagemStore } from "../../common/stores/StratagemStore"
+import { useUser } from "../../common/stores/AuthStore"
 
 interface StratagemCreateSchema {
     name: string;
@@ -55,10 +56,13 @@ const stratagemFormSchema = yup.object({
 
 function StratagemPage () {
     const setNotify = useNotify((state) => state.addNotify)
+    const {user} = useUser()
     const { register, watch, handleSubmit, formState: { errors}} = useForm({
         resolver: yupResolver(stratagemFormSchema),
         mode: "onSubmit",
     })
+
+    console.log(user)
     
     const stratagems = useStratagemStore<StratagemItem[]>((state) => state.stratagems)
     const setStratagemsStore = useStratagemStore((state) => state.setStratagemsStore)
@@ -101,7 +105,8 @@ function StratagemPage () {
 
 
     const submitForm = async (data: StratagemCreateSchema) => {
-        let formData = data
+        if (!user) return
+        let formData = {...data, user: user.id}
 
         switch (action) {
             case ('group'):
